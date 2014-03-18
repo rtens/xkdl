@@ -46,6 +46,10 @@ class Task {
         $this->done = $done;
     }
 
+    public function isDone() {
+        return $this->done;
+    }
+
     public function getDeadline() {
         return $this->deadline ? : ($this->parent ? $this->parent->getDeadline() : null);
     }
@@ -58,6 +62,10 @@ class Task {
         $this->duration = $duration;
     }
 
+    public function getDuration() {
+        return $this->duration;
+    }
+
     public function addChild(Task $child) {
         $child->parent = $this;
         $this->children[] = $child;
@@ -67,8 +75,16 @@ class Task {
         $this->logs[] = $window;
     }
 
+    public function getLogs() {
+        return $this->logs;
+    }
+
     public function addWindow(TimeWindow $window) {
         $this->windows[] = $window;
+    }
+
+    public function getWindows() {
+        return $this->windows;
     }
 
     public function addDependency(Task $dependency) {
@@ -186,5 +202,19 @@ class Task {
             $seconds -= $log->getSeconds();
         }
         return $seconds / 3600;
+    }
+
+    /**
+     * @param $name
+     * @return Task
+     * @throws \Exception
+     */
+    public function getChild($name) {
+        foreach ($this->children as $child) {
+            if ($child->name == $name) {
+                return $child;
+            }
+        }
+        throw new \Exception("Child [$name] not found in [{$this->name}]");
     }
 }

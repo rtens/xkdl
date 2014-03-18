@@ -1,8 +1,12 @@
 <?php
-namespace rtens\xkdl;
+namespace spec\rtens\xkdl;
 
 use PHPUnit_Framework_TestCase;
 use rtens\xkdl\lib\TimeWindow;
+use rtens\xkdl\RepeatingTask;
+use rtens\xkdl\Scheduler;
+use rtens\xkdl\Slot;
+use rtens\xkdl\Task;
 
 /**
  * @property Task root

@@ -12,6 +12,10 @@ class RepeatingTask extends Task {
         $this->repetition = $interval;
     }
 
+    public function getRepetition() {
+        return $this->repetition;
+    }
+
     protected function isSchedulable(\DateTime $now, array $schedule) {
         return false;
     }
