@@ -1,0 +1,25 @@
+{
+    "minimum-stability": "dev",
+    "name": "rtens/xkdl",
+    "description": "Simple task scheduler and time tracker",
+    "keywords": [ "task manager", "todo", "time tracking" ],
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Nikolas Martens",
+            "email": "Nikolas.M@rtens.org",
+            "homepage": "http://rtens.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.22"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-0": {
+            "rtens\\xkdl": "src/",
+            "spec\\rtens\\xkdl": ""
+        }
+    }
+}
