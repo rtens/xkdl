@@ -1,7 +1,7 @@
 <?php
-use rtens\xkdl\web\RootResource;
+use rtens\xkdl\web\TrackingResource;
 use watoki\curir\WebApplication;
 
 require_once 'bootstrap.php';
 
-WebApplication::quickStart(RootResource::$CLASS);
+WebApplication::quickStart(TrackingResource::$CLASS);

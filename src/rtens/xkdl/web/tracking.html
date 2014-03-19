@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>xkdl</title>
+</head>
+<body>
+
+<div property="idle">
+    <form action="?method=start" method="post">
+        <label>
+            Task:
+            <input required="true" type="text" name="task" size="50"/>
+        </label>
+
+        <label>
+            Start:
+            <input required="true" type="text" name="start" value="now" size="12"/>
+        </label>
+
+        <label>
+            End:
+            <input type="text" name="end" size="12"/>
+        </label>
+
+        <input type="submit" value="log"/>
+    </form>
+</div>
+
+<div property="logging">
+    <form action="?method=stop" method="post">
+        <label>
+            Task:
+            <input property="task" type="text" disabled="disabled" size="50" value="some/task/with/a/__long/__10_name"/>
+        </label>
+
+        <label>
+            Start:
+            <input property="start" type="text" disabled="disabled" value="2014-03-19 20:12" size="12"/>
+        </label>
+
+        <label>
+            End:
+            <input type="text" name="end" value="now" size="12"/>
+        </label>
+
+        <input type="submit" value="log"/>
+    </form>
+</div>
+
+</body>
+</html>
