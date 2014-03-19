@@ -12,7 +12,9 @@
         }
     ],
     "require": {
-        "php": ">=5.4.22"
+        "php": ">=5.4",
+        "watoki/curir": "*",
+        "watoki/tempan": "*"
     },
     "require-dev": {
     },
