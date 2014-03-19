@@ -1,7 +1,7 @@
 <?php
-namespace rtens\xkdl;
+namespace rtens\xkdl\lib;
 
-use rtens\xkdl\lib\TimeWindow;
+use rtens\xkdl\Task;
 
 class Slot {
 

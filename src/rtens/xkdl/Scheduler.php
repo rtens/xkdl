@@ -2,6 +2,7 @@
 namespace rtens\xkdl;
 
 use DateTime;
+use rtens\xkdl\lib\Slot;
 
 class Scheduler {
 
@@ -16,7 +17,7 @@ class Scheduler {
     /**
      * @param DateTime $from
      * @param DateTime $until
-     * @return array|Task[]
+     * @return array|Slot[]
      */
     public function createSchedule(\DateTime $from, \DateTime $until) {
         $now = new \DateTime($from->format('Y-m-d H:i:0'));

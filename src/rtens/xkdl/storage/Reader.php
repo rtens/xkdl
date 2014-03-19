@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\storage;
 
+use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\RepeatingTask;
 use rtens\xkdl\Task;
@@ -21,15 +22,19 @@ class Reader {
 
     private function readChildren($folder, Task $parent) {
         foreach (glob($folder . '/*') as $file) {
-            $fileName = basename($file);
-            $name = substr($fileName, 2);
-
-            if (is_dir($file) && substr($fileName, 1, 1) == '_') {
+            if (is_dir($file)) {
+                $fileName = basename($file);
+                $name = $fileName;
                 $duration = 0;
-                if (strpos($name, '_')) {
-                    list($durationString, $name) = explode('_', $name, 2);
-                    if (is_numeric($durationString)) {
-                        $duration = floatval($durationString);
+
+                if (substr($fileName, 1, 1) == '_') {
+                    $name = substr($fileName, 2);
+
+                    if (strpos($name, '_')) {
+                        list($durationString, $name) = explode('_', $name, 2);
+                        if (is_numeric($durationString)) {
+                            $duration = floatval($durationString);
+                        }
                     }
                 }
 
@@ -78,7 +83,7 @@ class Reader {
 
     private function setWindows(Task $task, $file) {
         foreach ($this->readWindows($file) as $window) {
-            $task->addWindow($window);
+            $task->addWindow(new ExecutionWindow($window->start, $window->end));
         }
     }
 
@@ -88,6 +93,10 @@ class Reader {
         }
     }
 
+    /**
+     * @param $file
+     * @return array|TimeWindow[]
+     */
     private function readWindows($file) {
         if (!file_exists($file)) {
             return array();

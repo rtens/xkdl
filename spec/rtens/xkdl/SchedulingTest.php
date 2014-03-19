@@ -2,16 +2,18 @@
 namespace spec\rtens\xkdl;
 
 use PHPUnit_Framework_TestCase;
+use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\RepeatingTask;
 use rtens\xkdl\Scheduler;
-use rtens\xkdl\Slot;
+use rtens\xkdl\lib\Slot;
 use rtens\xkdl\Task;
 
 /**
  * @property Task root
  * @property array|Task[]|RepeatingTask[] tasks
  * @property array|Slot[] schedule
+ * @property \Exception|null caught
  */
 class SchedulingTest extends PHPUnit_Framework_TestCase {
 
@@ -232,6 +234,29 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->thenSlot_ShouldBe_Minutes(4, 3);
     }
 
+    function testRepeatingExecutionWindow() {
+        $this->givenTheTask_In('one', 'root');
+        $this->given_Takes_Minutes('one', '10');
+        $this->given_HasAWindowFrom_Until('one', 'now', '2 minutes');
+        $this->givenTheWindowsOf_AreRepeatedEvery_Minutes('one', 15);
+        $this->given_HasAWindowFrom_Until('one', '4 minutes', '6 minutes');
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(5);
+        $this->thenSlot_ShouldStart(1, 'now');
+        $this->thenSlot_ShouldStart(2, '4 minutes');
+        $this->thenSlot_ShouldStart(3, '15 minutes');
+        $this->thenSlot_ShouldStart(4, '19 minutes');
+        $this->thenSlot_ShouldStart(5, '30 minutes');
+    }
+
+    function testRepeatingTaskWithRepeatingWindows() {
+        $this->givenTheRepeatingTask_In('one', 'root');
+        $this->whenITryToRepeatTheWindowsOf('one');
+        $this->thenAnExceptionShouldBeThrown();
+    }
+
     ######################### SETUP ############################
 
     protected function setUp() {
@@ -288,11 +313,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     private function given_HasAWindowFrom_Until($task, $from, $until) {
-        $this->tasks[$task]->addWindow(new TimeWindow($this->aligned($from), $this->aligned($until)));
+        $this->tasks[$task]->addWindow(new ExecutionWindow($this->aligned($from), $this->aligned($until)));
     }
 
     private function given_HasAWindowFrom_Until_WithAQuotaOf_Minutes($task, $from, $until, $quota) {
-        $this->tasks[$task]->addWindow(new TimeWindow($this->aligned($from), $this->aligned($until), $quota / 60));
+        $this->tasks[$task]->addWindow(new ExecutionWindow($this->aligned($from), $this->aligned($until), $quota / 60));
     }
 
     private function aligned($from) {
@@ -309,6 +334,22 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
 
     private function given_IsDone($task) {
         $this->tasks[$task]->setDone();
+    }
+
+    private function givenTheWindowsOf_AreRepeatedEvery_Minutes($task, $minutes) {
+        $this->tasks[$task]->repeatWindow(new \DateInterval("PT{$minutes}M"));
+    }
+
+    private function whenITryToRepeatTheWindowsOf($task) {
+        try {
+            $this->givenTheWindowsOf_AreRepeatedEvery_Minutes($task, 1);
+        } catch (\Exception $e) {
+            $this->caught = $e;
+        }
+    }
+
+    private function thenAnExceptionShouldBeThrown() {
+        $this->assertNotNull($this->caught);
     }
 
 }

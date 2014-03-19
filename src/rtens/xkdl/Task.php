@@ -2,6 +2,9 @@
 namespace rtens\xkdl;
 
 use DateTime;
+use rtens\xkdl\lib\ExecutionWindow;
+use rtens\xkdl\lib\RepeatedExecutionWindows;
+use rtens\xkdl\lib\Slot;
 use rtens\xkdl\lib\TimeWindow;
 
 class Task {
@@ -27,7 +30,7 @@ class Task {
     /** @var array|TimeWindow[] */
     protected $logs = array();
 
-    /** @var array|TimeWindow[] */
+    /** @var array|ExecutionWindow[] */
     protected $windows = array();
 
     /** @var array|Task[] */
@@ -79,12 +82,16 @@ class Task {
         return $this->logs;
     }
 
-    public function addWindow(TimeWindow $window) {
+    public function addWindow(ExecutionWindow $window) {
         $this->windows[] = $window;
     }
 
     public function getWindows() {
         return $this->windows;
+    }
+
+    public function repeatWindow(\DateInterval $every) {
+        $this->windows = new RepeatedExecutionWindows($every, $this->windows);
     }
 
     public function addDependency(Task $dependency) {
@@ -98,7 +105,7 @@ class Task {
      * @return array|Task[]
      */
     public function getSchedulableTasks(\DateTime $now, array $schedule, \DateTime $until) {
-        if ($this->done || !$this->isInWindow($now, $schedule)) {
+        if ($this->done || !$this->isInWindow($now, $schedule, $until)) {
             return array();
         }
 
@@ -107,7 +114,7 @@ class Task {
             foreach ($child->getSchedulableTasks($now, $schedule, $until) as $task) {
                 $tasks[] = $task;
             }
-            if ($child->isSchedulable($now, $schedule)) {
+            if ($child->isSchedulable($now, $schedule, $until)) {
                 $tasks[] = $child;
             }
         }
@@ -117,12 +124,13 @@ class Task {
     /**
      * @param DateTime $now
      * @param array|Slot[] $schedule
+     * @param \DateTime $until
      * @return bool
      */
-    protected function isSchedulable(\DateTime $now, array $schedule) {
+    protected function isSchedulable(\DateTime $now, array $schedule, \DateTime $until) {
         return (!$this->done
             && empty($this->children)
-            && $this->isInWindow($now, $schedule)
+            && $this->isInWindow($now, $schedule, $until)
             && $this->areAllDependenciesScheduled($schedule)
             && $this->hasUnscheduledDuration($schedule));
     }
@@ -130,14 +138,19 @@ class Task {
     /**
      * @param \DateTime $now
      * @param array|Slot[] $schedule
+     * @param $until
      * @return bool
      */
-    private function isInWindow(\DateTime $now, $schedule) {
+    private function isInWindow(\DateTime $now, $schedule, $until) {
         if (empty($this->windows)) {
             return true;
         }
 
         foreach ($this->windows as $window) {
+            if ($window->start > $until) {
+                return false;
+            }
+
             if ($window->start <= $now && $now < $window->end
                 && $this->isScheduledTimeSmallerThanQuota($window, $schedule)
             ) {
@@ -148,11 +161,11 @@ class Task {
     }
 
     /**
-     * @param \rtens\xkdl\lib\TimeWindow $window
+     * @param \rtens\xkdl\lib\ExecutionWindow $window
      * @param array|Slot[] $schedule
      * @return bool
      */
-    private function isScheduledTimeSmallerThanQuota(TimeWindow $window, $schedule) {
+    private function isScheduledTimeSmallerThanQuota(ExecutionWindow $window, $schedule) {
         if (!$window->quota) {
             return true;
         }

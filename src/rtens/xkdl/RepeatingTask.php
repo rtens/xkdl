@@ -1,12 +1,16 @@
 <?php
 namespace rtens\xkdl;
 
-use rtens\xkdl\lib\TimeWindow;
+use rtens\xkdl\lib\ExecutionWindow;
 
 class RepeatingTask extends Task {
 
     /** @var \DateInterval */
     private $repetition;
+
+    public function repeatWindow(\DateInterval $every) {
+        throw new \Exception('A repeating task cannot have repeating windows');
+    }
 
     public function repeatEvery(\DateInterval $interval) {
         $this->repetition = $interval;
@@ -16,7 +20,7 @@ class RepeatingTask extends Task {
         return $this->repetition;
     }
 
-    protected function isSchedulable(\DateTime $now, array $schedule) {
+    protected function isSchedulable(\DateTime $now, array $schedule, \DateTime $until) {
         return false;
     }
 
@@ -26,7 +30,7 @@ class RepeatingTask extends Task {
             if (!$this->hasWindowsContaining($task, $until)) {
                 return array();
             }
-            if ($task->isSchedulable($now, $schedule)) {
+            if ($task->isSchedulable($now, $schedule, $until)) {
                 return array($task);
             }
         }
@@ -50,7 +54,7 @@ class RepeatingTask extends Task {
         }
 
         foreach ($this->windows as $window) {
-            $task->addWindow(new TimeWindow(clone $window->start, clone $window->end));
+            $task->addWindow(new ExecutionWindow(clone $window->start, clone $window->end, $window->quota));
         }
 
         for ($n = 0; $n < $i; $n++) {

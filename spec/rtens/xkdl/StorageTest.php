@@ -12,8 +12,10 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
 
     function testReadTask() {
         $this->givenTheFolder('root/__Task one');
+        $this->givenTheFolder('root/Task two');
         $this->whenIReadTasksFrom('root');
         $this->thenThereShouldBeATask('Task one');
+        $this->thenThereShouldBeATask('Task two');
     }
 
     function testCompletedTask() {
