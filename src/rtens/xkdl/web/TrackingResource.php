@@ -17,14 +17,20 @@ class TrackingResource extends DynamicResource {
     public $writer;
 
     public function doGet(\DateTime $until = null) {
+        $until = $until ? : new \DateTime('tomorrow');
+
+        $reader = new Reader(ROOT . '/user/root');
+        $root = $reader->read();
+
         $logging = $this->writer->isLogging();
         return new Presenter($this, array(
             'idle' => !$logging,
             'logging' => $logging ? array(
                     'task' => array('value' => $logging['task']),
-                    'start' => array('value' => date('Y-m-d H:i', strtotime($logging['start'])))
+                    'start' => array('value' => date('Y-m-d H:i', strtotime($logging['start']))),
+                    'taskList' => 'var taskList = ' . json_encode($this->getAllTasksOf($root))
                 ) : false,
-            'taskList' => 'var taskList = ' . json_encode($this->getTaskList())
+            'slot' => $this->assembleSchedule($root, $until)
         ));
     }
 
@@ -47,11 +53,6 @@ class TrackingResource extends DynamicResource {
         return new Redirecter($this->getUrl());
     }
 
-    private function getTaskList() {
-        $reader = new Reader(ROOT . '/user/root');
-        return $this->getAllTasksOf($reader->read());
-    }
-
     private function getAllTasksOf(Task $task) {
         $tasks = array();
         foreach ($task->getChildren() as $child) {
@@ -63,21 +64,16 @@ class TrackingResource extends DynamicResource {
         return $tasks;
     }
 
-    /**
-     * @param \DateTime $until
-     */
-    private function createSchedule(\DateTime $until) {
-        $reader = new Reader(ROOT . '/user/root');
-        $scheduler = new Scheduler($reader->read());
-        $schedule = $scheduler->createSchedule(new \DateTime(), $until ? : new \DateTime('7 days'));
-
+    private function assembleSchedule(Task $root, \DateTime $until) {
+//        $scheduler = new Scheduler($root);
+//        $schedule = $scheduler->createSchedule(new \DateTime(), $until ? : new \DateTime('7 days'));
+//
         $model = array();
-        foreach ($schedule as $slot) {
-            $model[] = $slot->task->getName() . ' ('
-                . $slot->window->start->format('Y-m-d H:i') . ' >> ' . $slot->window->end->format('Y-m-d H:i') . ')';
-        }
-        echo '<pre>';
-        var_dump($model);
+//        foreach ($schedule as $slot) {
+//            $model[] = $slot->task->getName() . ' ('
+//                . $slot->window->start->format('Y-m-d H:i') . ' >> ' . $slot->window->end->format('Y-m-d H:i') . ')';
+//        }
+        return $model;
     }
 
 } 

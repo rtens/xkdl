@@ -4,70 +4,154 @@
     <title>xkdl</title>
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <style>
+        .item {
+            margin: 30px;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .item .main {
+            float: left;
+            width: 70%;
+        }
+
+        .item .main label {
+            font-weight: normal;
+            font-size: 1.8em;
+        }
+
+        .item .logging {
+            width: 25%;
+            min-width: 10em;
+            float: right;
+        }
+
+        .item .info {
+            text-align: center;
+            float: left;
+            width: 8%;
+            min-width: 4em;
+            margin-right: 2%;
+        }
+
+        .item .info .btn {
+            width: 3em;
+            height: 3em;
+            padding: 0;
+            color: transparent;
+        }
+
+        .slot.item .main {
+            width: 60%;
+        }
+
+        .logging .actions {
+            width: 100%;
+        }
+
+        .logging .actions .btn {
+            text-align: center;
+            margin: 5px auto;
+        }
+    </style>
 </head>
 <body>
 
-<div property="idle">
-    <script property="taskList">
-        var taskList = [
-            "some",
-            "some other",
-            "some/task",
-            "some other/task",
-            "some/task/subtask",
-            "some other/task/with subtask"
-        ];
-    </script>
-    <script>
-        $(function() {
-            $( "#task" ).autocomplete({
-                source: taskList
+<div class="container">
+
+    <div property="idle" class="unscheduled item clearfix bg-success">
+        <script property="taskList">
+            var taskList = [
+                "some",
+                "some other",
+                "some/task",
+                "some other/task",
+                "some/task/subtask",
+                "some other/task/with subtask"
+            ];
+        </script>
+        <script>
+            $(function () {
+                $("#task").autocomplete({
+                    source: taskList
+                });
             });
-        });
-    </script>
+        </script>
 
-    <form method="post">
-        <label>
-            Task:
-            <input required="true" type="text" id="task" name="task" size="50"/>
-        </label>
+        <form method="post">
+            <div class="main">
+                <label for="task">Log unscheduled task</label>
+                <input class="form-control" required="true" type="text" id="task" name="task"
+                       placeholder="full/task/name"/>
+            </div>
+            <div class="logging">
+                <input class="form-control" required="true" type="text" name="start" value="now"/>
 
-        <label>
-            Start:
-            <input required="true" type="text" name="start" value="now" size="12"/>
-        </label>
+                <div class="actions">
+                    <input style="width: 100%;" class="btn btn-lg btn-primary" type="submit" name="method" value="log"/>
+                </div>
+                <input class="form-control" type="text" name="end" placeholder="ongoing"/>
+            </div>
+        </form>
+    </div>
 
-        <label>
-            End:
-            <input type="text" name="end" size="12"/>
-        </label>
+    <div property="logging" class="logging item clearfix bg-warning">
+        <form method="post">
+            <div class="main">
+                <label for="logging">Currently logging</label>
+                <input class="form-control" property="task" id="logging" type="text" disabled="disabled"
+                       value="some/task/with/a/__long/__10_name"/>
+            </div>
 
-        <input type="submit" name="method" value="log"/>
-    </form>
-</div>
+            <div class="logging">
+                <input class="form-control" property="start" type="text" disabled="disabled" value="2014-03-19 20:12"/>
 
-<div property="logging">
-    <form method="post">
-        <label>
-            Task:
-            <input property="task" type="text" disabled="disabled" size="50" value="some/task/with/a/__long/__10_name"/>
-        </label>
+                <div class="actions btn-group">
+                    <input style="width: 60%;" class="btn btn-lg btn-success" type="submit" name="method"
+                           value="finish"/>
+                    <input style="width: 40%;" class="btn btn-lg btn-danger" type="submit" name="method"
+                           value="cancel"/>
+                </div>
 
-        <label>
-            Start:
-            <input property="start" type="text" disabled="disabled" value="2014-03-19 20:12" size="12"/>
-        </label>
+                <input class="form-control" type="text" name="end" value="now"/>
+            </div>
+        </form>
+    </div>
 
-        <label>
-            End:
-            <input type="text" name="end" value="now" size="12"/>
-        </label>
+    <div property="slot" class="slot item clearfix bg-info">
+        <form property="form" action="some/task/name" method="post">
+            <div class="info">
+                <h4>14:02</h4>
 
-        <input type="submit" name="method" value="finish"/>
-        <input type="submit" name="method" value="cancel"/>
-    </form>
+                <input type="submit" name="method" value="done" class="btn btn-warning"/>
+
+                <h4>15:32</h4>
+            </div>
+
+            <div property="task" class="main">
+                <p property="fullName" class="text-muted">the/full/name/of/the/parent</p>
+                <h3 property="name">Name of this task</h3>
+                <p property="deadline" class="text-danger">2014-02-13 14:00 (4 days left)</p>
+            </div>
+
+            <div class="logging">
+                <input class="form-control" property="start" type="text" value="now"/>
+
+                <div class="actions btn-group">
+                    <input style="width: 100%;" class="btn btn-lg btn-primary" type="submit" name="method" value="log"/>
+                </div>
+
+                <input class="form-control" type="text" name="end" placeholder="ongoing"/>
+            </div>
+        </form>
+    </div>
+
 </div>
 
 </body>
