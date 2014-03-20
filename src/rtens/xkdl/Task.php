@@ -45,6 +45,10 @@ class Task {
         return $this->name;
     }
 
+    public function getFullName() {
+        return ($this->parent ? ($this->parent->getFullName() . '/'. $this->getName()) : '');
+    }
+
     public function setDone($done = true) {
         $this->done = $done;
     }
@@ -72,6 +76,10 @@ class Task {
     public function addChild(Task $child) {
         $child->parent = $this;
         $this->children[] = $child;
+    }
+
+    public function getChildren() {
+        return $this->children;
     }
 
     public function addLog(TimeWindow $window) {

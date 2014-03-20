@@ -22,6 +22,10 @@ class Writer {
     public function stopLogging(\DateTime $end) {
         $data = $this->readTmpFile();
         $this->addLog($data['task'], new TimeWindow(new \DateTime($data['start']), $end));
+        $this->cancelLogging();
+    }
+
+    public function cancelLogging() {
         unlink($this->tmpFile());
     }
 

@@ -40,6 +40,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->thenThereShouldBeATask('one/one one');
         $this->thenThereShouldBeATask('one/one two');
         $this->thenThereShouldBeATask('one/one two/one two one');
+        $this->then_ShouldHaveNoChildren('two');
     }
 
     function testReadDuration() {
@@ -53,6 +54,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFile_WithContent('root/__one/__.txt', 'deadline: 2014-12-31 12:00');
         $this->whenIReadTasksFrom('root');
         $this->then_ShouldHaveTheDeadline('one', '2014-12-31 12:00');
+        $this->then_ShouldHaveNoChildren('one');
     }
 
     function testRepeatingTask() {
@@ -146,6 +148,10 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
 
     private function then_ShouldHave_Logs($path, $count) {
         $this->assertCount($count, $this->getTask($path)->getLogs());
+    }
+
+    private function then_ShouldHaveNoChildren($path) {
+        $this->assertEmpty($this->getTask($path)->getChildren());
     }
 
 } 

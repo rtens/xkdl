@@ -2,14 +2,36 @@
 <html>
 <head>
     <title>xkdl</title>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 </head>
 <body>
 
 <div property="idle">
-    <form action="?method=start" method="post">
+    <script property="taskList">
+        var taskList = [
+            "some",
+            "some other",
+            "some/task",
+            "some other/task",
+            "some/task/subtask",
+            "some other/task/with subtask"
+        ];
+    </script>
+    <script>
+        $(function() {
+            $( "#task" ).autocomplete({
+                source: taskList
+            });
+        });
+    </script>
+
+    <form method="post">
         <label>
             Task:
-            <input required="true" type="text" name="task" size="50"/>
+            <input required="true" type="text" id="task" name="task" size="50"/>
         </label>
 
         <label>
@@ -22,12 +44,12 @@
             <input type="text" name="end" size="12"/>
         </label>
 
-        <input type="submit" value="log"/>
+        <input type="submit" name="method" value="log"/>
     </form>
 </div>
 
 <div property="logging">
-    <form action="?method=stop" method="post">
+    <form method="post">
         <label>
             Task:
             <input property="task" type="text" disabled="disabled" size="50" value="some/task/with/a/__long/__10_name"/>
@@ -43,7 +65,8 @@
             <input type="text" name="end" value="now" size="12"/>
         </label>
 
-        <input type="submit" value="log"/>
+        <input type="submit" name="method" value="finish"/>
+        <input type="submit" name="method" value="cancel"/>
     </form>
 </div>
 

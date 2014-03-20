@@ -5,7 +5,9 @@ use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\Scheduler;
 use rtens\xkdl\storage\Reader;
 use rtens\xkdl\storage\Writer;
+use rtens\xkdl\Task;
 use watoki\curir\resource\DynamicResource;
+use watoki\curir\responder\Redirecter;
 
 class TrackingResource extends DynamicResource {
 
@@ -21,22 +23,44 @@ class TrackingResource extends DynamicResource {
             'logging' => $logging ? array(
                     'task' => array('value' => $logging['task']),
                     'start' => array('value' => date('Y-m-d H:i', strtotime($logging['start'])))
-                ) : false
+                ) : false,
+            'taskList' => 'var taskList = ' . json_encode($this->getTaskList())
         ));
     }
 
-    public function doStart($task, \DateTime $start, $end = null) {
+    public function doLog($task, \DateTime $start, $end = null) {
         if ($end) {
             $this->writer->addLog($task, new TimeWindow($start, new \DateTime($end)));
         } else {
             $this->writer->startLogging($task, $start);
         }
-        return $this->doGet();
+        return new Redirecter($this->getUrl());
     }
 
-    public function doStop(\DateTime $end) {
+    public function doFinish(\DateTime $end) {
         $this->writer->stopLogging($end);
-        return $this->doGet();
+        return new Redirecter($this->getUrl());
+    }
+
+    public function doCancel() {
+        $this->writer->cancelLogging();
+        return new Redirecter($this->getUrl());
+    }
+
+    private function getTaskList() {
+        $reader = new Reader(ROOT . '/user/root');
+        return $this->getAllTasksOf($reader->read());
+    }
+
+    private function getAllTasksOf(Task $task) {
+        $tasks = array();
+        foreach ($task->getChildren() as $child) {
+            $tasks[] = utf8_encode($child->getFullName());
+        }
+        foreach ($task->getChildren() as $child) {
+            $tasks = array_merge($tasks, $this->getAllTasksOf($child));
+        }
+        return $tasks;
     }
 
     /**
