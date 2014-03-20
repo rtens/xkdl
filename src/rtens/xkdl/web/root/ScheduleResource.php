@@ -17,11 +17,13 @@ class ScheduleResource extends DynamicResource {
     /** @var Writer <- */
     public $writer;
 
+    /** @var Reader <- */
+    public $reader;
+
     public function doGet(\DateTime $until = null) {
         $until = $until ? : new \DateTime('tomorrow');
 
-        $reader = new Reader(ROOT . '/user/root');
-        $root = $reader->read();
+        $root = $this->reader->read();
 
         $logging = $this->writer->isLogging();
         return new Presenter($this, array(

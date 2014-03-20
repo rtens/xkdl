@@ -5,11 +5,25 @@ use rtens\xkdl\lib\TimeWindow;
 
 class Writer {
 
-    public function addLog($task, TimeWindow $window) {
-        $dir = ROOT . '/user/root/' . $task;
-        if (!file_exists($dir)) {
-            mkdir($dir, 0777, true);
-        }
+    private $userFolder;
+
+    public function __construct($userFolder = null) {
+        $this->userFolder = $userFolder ?: ROOT . '/user';
+    }
+
+    public function addLog($fullTaskName, TimeWindow $window) {
+        $dir = $this->userFolder . '/root';
+
+        foreach (explode('/', trim($fullTaskName, '/')) as $taskName) {
+            foreach (glob($dir . '/*') as $file) {
+                if (basename($file) == $taskName || preg_match('/[xX_]_(\d+_)?' . $taskName . '/', basename($file))) {
+                    $dir = $file;
+                    continue 2;
+                }
+            }
+            $dir = $dir . '/' . $taskName;
+            mkdir($dir);
+         }
 
         $data = $window->start->format('c') . ' >> ' . $window->end->format('c') . "\n";
         file_put_contents($dir . '/logs.txt', $data, FILE_APPEND);
@@ -38,7 +52,7 @@ class Writer {
     }
 
     private function tmpFile() {
-        return ROOT . '/user/logging';
+        return $this->userFolder . '/logging';
     }
 
     /**

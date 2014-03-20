@@ -12,8 +12,8 @@ class Reader {
 
     private $rootFolder;
 
-    function __construct($rootFolder) {
-        $this->rootFolder = $rootFolder;
+    function __construct($rootFolder = null) {
+        $this->rootFolder = $rootFolder ?: ROOT . '/user/root';
     }
 
     public function read() {
