@@ -90,11 +90,11 @@ class ScheduleResource extends DynamicResource {
     }
 
     private function assembleDuration(Task $task) {
-        $logged = $task->getLoggedDuration();
+        $logged = round($task->getLoggedDuration(), 1);
         $duration = $task->getDuration();
 
         return array(
-            'number' => $logged . '/' . $duration,
+            'number' => $logged . ' / ' . $duration,
             'logged' => array('style' => 'width: ' . ($logged / $duration * 100) . '%')
         );
     }
