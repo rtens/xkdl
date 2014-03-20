@@ -1,0 +1,68 @@
+.item {
+    margin: 30px;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.item .main {
+    float: left;
+    width: 70%;
+}
+
+.item .main label {
+    font-weight: normal;
+    font-size: 1.8em;
+}
+
+.item .logging {
+    width: 25%;
+    min-width: 10em;
+    float: right;
+}
+
+.item .info {
+    text-align: center;
+    float: left;
+    width: 8%;
+    min-width: 4em;
+    margin-right: 2%;
+}
+
+.item .info .btn {
+    width: 3em;
+    height: 3em;
+    padding: 0;
+    color: transparent;
+}
+
+.slot.item .main {
+    width: 60%;
+}
+
+.slot.item .main .duration {
+    height: 1.3em;
+    position: relative;
+    background-color: white;
+}
+
+.slot.item .main .duration .number {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+.slot.item .main .duration .logged {
+    position: absolute;
+    display: inline-block;
+    background-color: #5cb85c;
+    height: 100%;
+}
+
+.logging .actions {
+    width: 100%;
+}
+
+.logging .actions .btn {
+    text-align: center;
+    margin: 5px auto;
+}

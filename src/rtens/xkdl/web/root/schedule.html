@@ -5,61 +5,11 @@
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="res/style.css"/>
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 
-    <style>
-        .item {
-            margin: 30px;
-            padding: 30px;
-            border-radius: 10px;
-        }
-
-        .item .main {
-            float: left;
-            width: 70%;
-        }
-
-        .item .main label {
-            font-weight: normal;
-            font-size: 1.8em;
-        }
-
-        .item .logging {
-            width: 25%;
-            min-width: 10em;
-            float: right;
-        }
-
-        .item .info {
-            text-align: center;
-            float: left;
-            width: 8%;
-            min-width: 4em;
-            margin-right: 2%;
-        }
-
-        .item .info .btn {
-            width: 3em;
-            height: 3em;
-            padding: 0;
-            color: transparent;
-        }
-
-        .slot.item .main {
-            width: 60%;
-        }
-
-        .logging .actions {
-            width: 100%;
-        }
-
-        .logging .actions .btn {
-            text-align: center;
-            margin: 5px auto;
-        }
-    </style>
 </head>
 <body>
 
@@ -127,21 +77,29 @@
     <div property="slot" class="slot item clearfix bg-info">
         <form property="form" action="some/task/name" method="post">
             <div class="info">
-                <h4>14:02</h4>
+                <h4 property="start">14:02</h4>
 
-                <input type="submit" name="method" value="done" class="btn btn-warning"/>
+                <input property="done" type="submit" name="method" value="done" class="btn btn-warning"/>
 
-                <h4>15:32</h4>
+                <h4 property="end">15:32</h4>
             </div>
 
             <div property="task" class="main">
-                <p property="fullName" class="text-muted">the/full/name/of/the/parent</p>
+                <p property="parent" class="text-muted">the/full/name/of/the/parent</p>
                 <h3 property="name">Name of this task</h3>
-                <p property="deadline" class="text-danger">2014-02-13 14:00 (4 days left)</p>
+                <p property="deadline" class="text-danger">
+                    Due in
+                    <span property="relative" style="font-weight: bold">4 days 2 hours</span>
+                    (<span property="absolute">2014-02-13 14:00</span>)
+                </p>
+                <div property="duration" class="duration">
+                    <span property="logged" class="logged" style="width: 40%;"></span>
+                    <span property="number" class="number">4.7 / 15</span>
+                </div>
             </div>
 
             <div class="logging">
-                <input class="form-control" property="start" type="text" value="now"/>
+                <input class="form-control" type="text" value="now"/>
 
                 <div class="actions btn-group">
                     <input style="width: 100%;" class="btn btn-lg btn-primary" type="submit" name="method" value="log"/>

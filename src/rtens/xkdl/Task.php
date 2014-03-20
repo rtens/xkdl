@@ -41,6 +41,10 @@ class Task {
         $this->duration = $duration;
     }
 
+    public function getParent() {
+        return $this->parent;
+    }
+
     public function getName() {
         return $this->name;
     }
@@ -57,6 +61,9 @@ class Task {
         return $this->done;
     }
 
+    /**
+     * @return null|\DateTime
+     */
     public function getDeadline() {
         return $this->deadline ? : ($this->parent ? $this->parent->getDeadline() : null);
     }
@@ -205,7 +212,7 @@ class Task {
      * @return float
      */
     private function hasUnscheduledDuration(array $schedule) {
-        $unscheduledSeconds = $this->getUnloggedDuration() * 3600;
+        $unscheduledSeconds = ($this->duration - $this->getLoggedDuration()) * 3600;
         foreach ($schedule as $slot) {
             if ($slot->task == $this) {
                 $unscheduledSeconds -= $slot->window->getSeconds();
@@ -217,12 +224,12 @@ class Task {
         return $unscheduledSeconds > 0;
     }
 
-    private function getUnloggedDuration() {
-        $seconds = $this->duration * 3600;
+    public function getLoggedDuration() {
+        $durationSeconds = 0;
         foreach ($this->logs as $log) {
-            $seconds -= $log->getSeconds();
+            $durationSeconds += $log->getSeconds();
         }
-        return $seconds / 3600;
+        return $durationSeconds / 3600;
     }
 
     /**

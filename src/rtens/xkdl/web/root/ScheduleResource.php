@@ -1,15 +1,16 @@
 <?php
-namespace rtens\xkdl\web;
+namespace rtens\xkdl\web\root;
 
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\Scheduler;
 use rtens\xkdl\storage\Reader;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
+use rtens\xkdl\web\Presenter;
 use watoki\curir\resource\DynamicResource;
 use watoki\curir\responder\Redirecter;
 
-class TrackingResource extends DynamicResource {
+class ScheduleResource extends DynamicResource {
 
     public static $CLASS = __CLASS__;
 
@@ -66,15 +67,36 @@ class TrackingResource extends DynamicResource {
     }
 
     private function assembleSchedule(Task $root, \DateTime $until) {
-//        $scheduler = new Scheduler($root);
-//        $schedule = $scheduler->createSchedule(new \DateTime(), $until ? : new \DateTime('7 days'));
-//
+        $scheduler = new Scheduler($root);
+        $schedule = $scheduler->createSchedule(new \DateTime(), $until ? : new \DateTime('7 days'));
+
         $model = array();
-//        foreach ($schedule as $slot) {
-//            $model[] = $slot->task->getName() . ' ('
-//                . $slot->window->start->format('Y-m-d H:i') . ' >> ' . $slot->window->end->format('Y-m-d H:i') . ')';
-//        }
+        foreach ($schedule as $slot) {
+            $model[] = array(
+                'start' => $slot->window->start->format('H:i'),
+                'end' => $slot->window->end->format('H:i'),
+                'task' => array(
+                    'name' => $slot->task->getName(),
+                    'parent' => $slot->task->getParent()->getFullName(),
+                    'deadline' => $slot->task->getDeadline() ? array(
+                        'relative' => $slot->task->getDeadline()->diff(new \DateTime())->format('%ad %hh %im'),
+                        'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
+                    ) : null,
+                    'duration' => $this->assembleDuration($slot->task)
+                )
+            );
+        }
         return $model;
+    }
+
+    private function assembleDuration(Task $task) {
+        $logged = $task->getLoggedDuration();
+        $duration = $task->getDuration();
+
+        return array(
+            'number' => $logged . '/' . $duration,
+            'logged' => array('style' => 'width: ' . ($logged / $duration * 100) . '%')
+        );
     }
 
 } 
