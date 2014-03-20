@@ -8,6 +8,8 @@ use rtens\xkdl\Task;
 
 class Reader {
 
+    const MINIMUM_DURATION = 0.1;
+
     private $rootFolder;
 
     function __construct($rootFolder) {
@@ -25,7 +27,7 @@ class Reader {
             if (is_dir($file)) {
                 $fileName = basename($file);
                 $name = $fileName;
-                $duration = 0;
+                $duration = self::MINIMUM_DURATION;
 
                 if (substr($fileName, 1, 1) == '_') {
                     $name = substr($fileName, 2);
