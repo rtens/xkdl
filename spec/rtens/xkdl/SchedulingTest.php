@@ -144,7 +144,7 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     function testLoggedTime() {
         $this->givenTheTask_In('one', 'root');
         $this->given_Takes_Minutes('one', 12);
-        $this->givenIHaveLogged_MinutedFor(5, 'one');
+        $this->givenIHaveLogged_MinutesFor(5, 'one');
 
         $this->whenICreateTheSchedule();
 
@@ -301,14 +301,14 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     private function thenSlot_ShouldBe_Minutes($index, $minutes) {
-        $this->assertEquals($minutes * 60, $this->schedule[$index - 1]->window->getSeconds());
+        $this->assertEquals($minutes, $this->schedule[$index - 1]->window->getSeconds() / 60);
     }
 
     private function thenSlot_ShouldStart($index, $when) {
         $this->assertEquals($this->aligned($when), $this->schedule[$index - 1]->window->start);
     }
 
-    private function givenIHaveLogged_MinutedFor($minutes, $name) {
+    private function givenIHaveLogged_MinutesFor($minutes, $name) {
         $this->tasks[$name]->addLog(new TimeWindow(new \DateTime(), new \DateTime($minutes . ' minutes')));
     }
 

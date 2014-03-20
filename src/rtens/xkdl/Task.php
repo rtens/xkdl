@@ -212,7 +212,7 @@ class Task {
      * @return float
      */
     private function hasUnscheduledDuration(array $schedule) {
-        $unscheduledSeconds = ($this->duration - $this->getLoggedDuration()) * 3600;
+        $unscheduledSeconds = intval(($this->duration - $this->getLoggedDuration()) * 3600);
         foreach ($schedule as $slot) {
             if ($slot->task == $this) {
                 $unscheduledSeconds -= $slot->window->getSeconds();
