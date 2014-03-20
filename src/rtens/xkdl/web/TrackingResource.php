@@ -24,12 +24,13 @@ class TrackingResource extends DynamicResource {
 
         $logging = $this->writer->isLogging();
         return new Presenter($this, array(
-            'idle' => !$logging,
+            'idle' => !$logging ? array(
+                    'taskList' => 'var taskList = ' . json_encode($this->getAllTasksOf($root))
+                ) : null,
             'logging' => $logging ? array(
                     'task' => array('value' => $logging['task']),
-                    'start' => array('value' => date('Y-m-d H:i', strtotime($logging['start']))),
-                    'taskList' => 'var taskList = ' . json_encode($this->getAllTasksOf($root))
-                ) : false,
+                    'start' => array('value' => date('Y-m-d H:i', strtotime($logging['start'])))
+                ) : null,
             'slot' => $this->assembleSchedule($root, $until)
         ));
     }
