@@ -8,8 +8,7 @@ use rtens\xkdl\Task;
 
 class Reader {
 
-    const MINIMUM_DURATION = 0.1;
-
+    const DEFAULT_DURATION = 0.1;
     private $rootFolder;
 
     function __construct($rootFolder = null) {
@@ -27,10 +26,11 @@ class Reader {
             if (is_dir($file)) {
                 $fileName = basename($file);
                 $name = $fileName;
-                $duration = self::MINIMUM_DURATION;
+                $duration = 0;
 
                 if (substr($fileName, 1, 1) == '_') {
                     $name = substr($fileName, 2);
+                    $duration = self::DEFAULT_DURATION;
 
                     if (strpos($name, '_')) {
                         list($durationString, $name) = explode('_', $name, 2);
@@ -49,7 +49,7 @@ class Reader {
                     $child = new Task($name, $duration);
                 }
 
-                $child->setDone(strtolower(substr($fileName, 0, 1)) == 'x');
+                $child->setDone(strtolower(substr($fileName, 0, 2)) == 'x_');
                 $parent->addChild($child);
 
                 $this->setProperties($child, $properties);

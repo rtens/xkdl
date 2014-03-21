@@ -49,6 +49,21 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->thenSlot_ShouldBeTask(3, 'two');
     }
 
+    function testNoDeadline() {
+        $this->givenTheTask_In('one', 'root');
+        $this->givenTheTask_In('two', 'root');
+        $this->givenTheTask_In('three', 'root');
+        $this->given_HasTheDeadline('one', 'tomorrow');
+        $this->given_HasTheDeadline('two', 'next week');
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(3);
+        $this->thenSlot_ShouldBeTask(1, 'one');
+        $this->thenSlot_ShouldBeTask(2, 'two');
+        $this->thenSlot_ShouldBeTask(3, 'three');
+    }
+
     function testCompletedTask() {
         $this->givenTheTask_In('one', 'root');
         $this->givenTheTask_In('two', 'root');
@@ -72,21 +87,6 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->thenSlot_ShouldBeTask(1, 'two');
     }
 
-    function testNoDeadline() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('three', 'root');
-        $this->given_HasTheDeadline('one', 'tomorrow');
-        $this->given_HasTheDeadline('two', 'next week');
-
-        $this->whenICreateTheSchedule();
-
-        $this->thenThereShouldBe_SlotsInTheSchedule(3);
-        $this->thenSlot_ShouldBeTask(1, 'one');
-        $this->thenSlot_ShouldBeTask(2, 'two');
-        $this->thenSlot_ShouldBeTask(3, 'three');
-    }
-
     function testTaskTree() {
         $this->givenTheTask_In('one', 'root');
         $this->givenTheTask_In('two', 'root');
@@ -101,6 +101,36 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->thenSlot_ShouldBeTask(1, 'leaf_two');
         $this->thenSlot_ShouldBeTask(2, 'leaf_one');
         $this->thenSlot_ShouldBeTask(3, 'leaf_three');
+    }
+
+    function testTreeWithDoneTasks() {
+        $this->givenTheTask_In('one', 'root');
+        $this->givenTheTask_In('two', 'root');
+        $this->givenTheTask_In('one_one', 'one');
+        $this->givenTheTask_In('leaf_one', 'one');
+        $this->givenTheTask_In('leaf_two', 'one_one');
+        $this->givenTheTask_In('leaf_three', 'two');
+
+        $this->given_IsDone('leaf_two');
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(3);
+        $this->thenSlot_ShouldBeTask(1, 'one_one');
+        $this->thenSlot_ShouldBeTask(2, 'leaf_one');
+        $this->thenSlot_ShouldBeTask(3, 'leaf_three');
+    }
+
+    function testTaskWithoutDuration() {
+        $this->givenTheTask_In('one', 'root');
+        $this->givenTheTask_In('two', 'root');
+        $this->given_Takes_Minutes('one', 0);
+        $this->given_Takes_Minutes('two', 1);
+        $this->givenIHaveLogged_MinutesFor(2, 'two');
+
+        $this->whenICreateTheSchedule();
+        $this->thenThereShouldBe_SlotsInTheSchedule(1);
+        $this->thenSlot_ShouldBeTask(1, 'two');
     }
 
     function testTaskWithMinimalDuration() {

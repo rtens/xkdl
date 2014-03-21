@@ -28,7 +28,7 @@ class ScheduleResource extends DynamicResource {
         $logging = $this->writer->isLogging();
         return new Presenter($this, array(
             'idle' => !$logging ? array(
-                    'taskList' => 'var taskList = ' . json_encode($this->getAllTasksOf($root))
+                    'taskList' => 'var taskList = ' . json_encode($this->getOpenTasksOf($root))
                 ) : null,
             'logging' => $logging ? array(
                     'task' => array('value' => $logging['task']),
@@ -57,13 +57,13 @@ class ScheduleResource extends DynamicResource {
         return new Redirecter($this->getUrl());
     }
 
-    private function getAllTasksOf(Task $task) {
+    private function getOpenTasksOf(Task $task) {
         $tasks = array();
-        foreach ($task->getChildren() as $child) {
+        foreach ($task->getOpenChildren() as $child) {
             $tasks[] = utf8_encode($child->getFullName());
         }
-        foreach ($task->getChildren() as $child) {
-            $tasks = array_merge($tasks, $this->getAllTasksOf($child));
+        foreach ($task->getOpenChildren() as $child) {
+            $tasks = array_merge($tasks, $this->getOpenTasksOf($child));
         }
         return $tasks;
     }
@@ -92,8 +92,12 @@ class ScheduleResource extends DynamicResource {
     }
 
     private function assembleDuration(Task $task) {
-        $logged = round($task->getLoggedDuration(), 1);
         $duration = $task->getDuration();
+        if (!$duration) {
+            return null;
+        }
+
+        $logged = round($task->getLoggedDuration(), 1);
 
         return array(
             'number' => $logged . ' / ' . $duration,

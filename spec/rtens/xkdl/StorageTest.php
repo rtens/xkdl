@@ -18,16 +18,20 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/Task two');
         $this->whenIReadTasksFrom('root');
         $this->thenThereShouldBeATask('Task one');
-        $this->then_ShouldHaveTheDuration('Task one', Reader::MINIMUM_DURATION);
-        $this->thenThereShouldBeATask('Task two', Reader::MINIMUM_DURATION);
+        $this->then_ShouldHaveTheDuration('Task one', Reader::DEFAULT_DURATION);
+        $this->thenThereShouldBeATask('Task two', 0);
     }
 
     function testCompletedTask() {
         $this->givenTheFolder('root/__one');
         $this->givenTheFolder('root/X_two');
+        $this->givenTheFolder('root/x-men');
+
         $this->whenIReadTasksFrom('root');
+
         $this->thenThereShouldBeATask('one');
         $this->then_ShouldBeDone('two');
+        $this->then_ShouldBeOpen('x-men');
     }
 
     function testReadTree() {
@@ -226,6 +230,10 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     private function thenThereShouldBeAFile($path) {
         $fullPath = __DIR__ . '/__usr/' . $path;
         $this->assertFileExists($fullPath);
+    }
+
+    private function then_ShouldBeOpen($task) {
+        $this->assertFalse($this->getTask($task)->isDone());
     }
 
 } 

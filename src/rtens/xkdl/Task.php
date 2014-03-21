@@ -50,7 +50,7 @@ class Task {
     }
 
     public function getFullName() {
-        return ($this->parent ? ($this->parent->getFullName() . '/'. $this->getName()) : '');
+        return ($this->parent ? ($this->parent->getFullName() . '/' . $this->getName()) : '');
     }
 
     public function setDone($done = true) {
@@ -144,7 +144,8 @@ class Task {
      */
     protected function isSchedulable(\DateTime $now, array $schedule, \DateTime $until) {
         return (!$this->done
-            && empty($this->children)
+            && $this->duration
+            && count($this->getOpenChildren()) == 0
             && $this->isInWindow($now, $schedule, $until)
             && $this->areAllDependenciesScheduled($schedule)
             && $this->hasUnscheduledDuration($schedule));
@@ -221,7 +222,7 @@ class Task {
                 return false;
             }
         }
-        return $unscheduledSeconds > 0;
+        return true;
     }
 
     public function getLoggedDuration() {
@@ -244,5 +245,18 @@ class Task {
             }
         }
         throw new \Exception("Child [$name] not found in [{$this->name}]");
+    }
+
+    /**
+     * @return array|Task[]
+     */
+    public function getOpenChildren() {
+        $openChildren = array();
+        foreach ($this->children as $child) {
+            if (!$child->isDone()) {
+                $openChildren[] = $child;
+            }
+        }
+        return $openChildren;
     }
 }
