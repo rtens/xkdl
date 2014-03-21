@@ -5,6 +5,7 @@ use DateTime;
 use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\RepeatedExecutionWindows;
 use rtens\xkdl\lib\Slot;
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 
 class Task {
@@ -24,7 +25,10 @@ class Task {
     /** @var \DateTime|null */
     protected $deadline;
 
-    /** @var float [hours] */
+    /** @var int Priority relative to siblings */
+    protected $priority = 9999;
+
+    /** @var TimeSpan */
     protected $duration;
 
     /** @var array|TimeWindow[] */
@@ -36,9 +40,9 @@ class Task {
     /** @var array|Task[] */
     protected $dependencies = array();
 
-    function __construct($name, $duration) {
+    function __construct($name, TimeSpan $duration = null) {
         $this->name = $name;
-        $this->duration = $duration;
+        $this->duration = $duration ?: new TimeSpan('PT0S');
     }
 
     public function getParent() {
@@ -51,6 +55,11 @@ class Task {
 
     public function getFullName() {
         return ($this->parent ? ($this->parent->getFullName() . '/' . $this->getName()) : '');
+    }
+
+    private function getFullNameWithPriorities() {
+        return ($this->parent ? ($this->parent->getFullNameWithPriorities() . '/'
+            . sprintf('%04d', $this->priority) . $this->getName()) : '');
     }
 
     public function setDone($done = true) {
@@ -72,7 +81,19 @@ class Task {
         $this->deadline = $deadline;
     }
 
-    public function setDuration($duration) {
+    public function setPriority($priority) {
+        $this->priority = $priority;
+    }
+
+    public function getPriority() {
+        return $this->priority;
+    }
+
+    public function hasPriority() {
+        return $this->priority != null;
+    }
+
+    public function setDuration(TimeSpan $duration = null) {
         $this->duration = $duration;
     }
 
@@ -144,7 +165,7 @@ class Task {
      */
     protected function isSchedulable(\DateTime $now, array $schedule, \DateTime $until) {
         return (!$this->done
-            && $this->duration
+            && $this->duration->seconds()
             && count($this->getOpenChildren()) == 0
             && $this->isInWindow($now, $schedule, $until)
             && $this->areAllDependenciesScheduled($schedule)
@@ -213,7 +234,7 @@ class Task {
      * @return float
      */
     private function hasUnscheduledDuration(array $schedule) {
-        $unscheduledSeconds = intval(($this->duration - $this->getLoggedDuration()) * 3600);
+        $unscheduledSeconds = $this->duration->seconds() - $this->getLoggedDuration()->seconds();
         foreach ($schedule as $slot) {
             if ($slot->task == $this) {
                 $unscheduledSeconds -= $slot->window->getSeconds();
@@ -230,7 +251,7 @@ class Task {
         foreach ($this->logs as $log) {
             $durationSeconds += $log->getSeconds();
         }
-        return $durationSeconds / 3600;
+        return new TimeSpan('PT' . $durationSeconds . 'S');
     }
 
     /**
@@ -258,5 +279,9 @@ class Task {
             }
         }
         return $openChildren;
+    }
+
+    public function hasHigherPriorityThen(Task $task) {
+        return $this->getFullNameWithPriorities() < $task->getFullNameWithPriorities();
     }
 }

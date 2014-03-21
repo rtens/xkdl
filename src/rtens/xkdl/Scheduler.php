@@ -29,6 +29,9 @@ class Scheduler {
             usort($tasks, function (Task $a, Task $b) {
                 $deadlineA = $a->getDeadline();
                 $deadlineB = $b->getDeadline();
+                if ($deadlineA == $deadlineB) {
+                    return $a->hasHigherPriorityThen($b) ? -1 : 1;
+                }
                 return $deadlineA && !$deadlineB || $deadlineA && $deadlineB && $deadlineA < $deadlineB ? -1 : 1;
             });
 

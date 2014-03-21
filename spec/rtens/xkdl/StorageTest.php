@@ -1,6 +1,7 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\RepeatingTask;
 use rtens\xkdl\storage\Reader;
@@ -18,7 +19,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/Task two');
         $this->whenIReadTasksFrom('root');
         $this->thenThereShouldBeATask('Task one');
-        $this->then_ShouldHaveTheDuration('Task one', Reader::DEFAULT_DURATION);
+        $this->then_ShouldTake_Minutes('Task one', 15);
         $this->thenThereShouldBeATask('Task two', 0);
     }
 
@@ -35,11 +36,11 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testReadTree() {
-        $this->givenTheFolder('root/__one');
+        $this->givenTheFolder('root/one');
         $this->givenTheFolder('root/__two');
-        $this->givenTheFolder('root/__one/__one one');
-        $this->givenTheFolder('root/__one/__one two');
-        $this->givenTheFolder('root/__one/__one two/__one two one');
+        $this->givenTheFolder('root/one/__one one');
+        $this->givenTheFolder('root/one/__one two');
+        $this->givenTheFolder('root/one/__one two/__one two one');
 
         $this->whenIReadTasksFrom('root');
 
@@ -51,10 +52,26 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->then_ShouldHaveNoChildren('two');
     }
 
-    function testReadDuration() {
-        $this->givenTheFolder('root/__1.5_one');
+    function testReadPriority() {
+        $this->givenTheFolder('root/__1_Some task');
+        $this->givenTheFolder('root/3_other task');
+        $this->givenTheFolder('root/__this task');
+
         $this->whenIReadTasksFrom('root');
-        $this->then_ShouldHaveTheDuration('one', 1.5);
+
+        $this->then_ShouldHaveThePriority('Some task', 1);
+        $this->then_ShouldHaveThePriority('other task', 3);
+        $this->then_ShouldHaveThePriority('this task', 0);
+    }
+
+    function testReadDuration() {
+        $this->givenTheFolder('root/one');
+        $this->givenTheFolder('root/two');
+        $this->givenTheFile_WithContent('root/one/__.txt', 'duration: PT5H');
+        $this->givenTheFile_WithContent('root/two/__.txt', 'duration: PT30M');
+        $this->whenIReadTasksFrom('root');
+        $this->then_ShouldTake_Minutes('one', 300);
+        $this->then_ShouldTake_Minutes('two', 30);
     }
 
     function testReadDeadline() {
@@ -148,12 +165,12 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function givenTheRootTask($name) {
-        $this->root = new Task($name, 0);
+        $this->root = new Task($name);
         $this->tasks[$name] = $this->root;
     }
 
     public function givenTheTask_In($child, $parent) {
-        $this->tasks[$child] = new Task($child, 1 / 60);
+        $this->tasks[$child] = new Task($child, new TimeSpan('PT1M'));
         $this->tasks[$parent]->addChild($this->tasks[$child]);
     }
 
@@ -182,8 +199,9 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->getTask($path)->isDone());
     }
 
-    private function then_ShouldHaveTheDuration($path, $duration) {
-        $this->assertEquals($duration, $this->getTask($path)->getDuration());
+    private function then_ShouldTake_Minutes($path, $duration) {
+        $expected = new TimeSpan('PT' . $duration . 'M');
+        $this->assertEquals($expected->seconds(), $this->getTask($path)->getDuration()->seconds());
     }
 
     private function givenTheFile_WithContent($path, $content) {
@@ -234,6 +252,10 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
 
     private function then_ShouldBeOpen($task) {
         $this->assertFalse($this->getTask($task)->isDone());
+    }
+
+    private function then_ShouldHaveThePriority($task, $priority) {
+        $this->assertEquals($priority, $this->getTask($task)->getPriority());
     }
 
 } 

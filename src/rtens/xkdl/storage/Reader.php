@@ -2,21 +2,23 @@
 namespace rtens\xkdl\storage;
 
 use rtens\xkdl\lib\ExecutionWindow;
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\RepeatingTask;
 use rtens\xkdl\Task;
 
 class Reader {
 
-    const DEFAULT_DURATION = 0.1;
+    const DEFAULT_DURATION = 'PT15M';
+
     private $rootFolder;
 
     function __construct($rootFolder = null) {
-        $this->rootFolder = $rootFolder ?: ROOT . '/user/root';
+        $this->rootFolder = $rootFolder ? : ROOT . '/user/root';
     }
 
     public function read() {
-        $root = new Task('root', 0);
+        $root = new Task('root');
         $this->readChildren($this->rootFolder, $root);
         return $root;
     }
@@ -26,17 +28,18 @@ class Reader {
             if (is_dir($file)) {
                 $fileName = basename($file);
                 $name = $fileName;
-                $duration = 0;
+                $duration = null;
+                $priority = null;
 
-                if (substr($fileName, 1, 1) == '_') {
+                if (in_array(strtolower(substr($fileName, 0, 2)), array('__', 'x_'))) {
                     $name = substr($fileName, 2);
-                    $duration = self::DEFAULT_DURATION;
+                    $duration = new TimeSpan(self::DEFAULT_DURATION);
+                }
 
-                    if (strpos($name, '_')) {
-                        list($durationString, $name) = explode('_', $name, 2);
-                        if (is_numeric($durationString)) {
-                            $duration = floatval($durationString);
-                        }
+                if (strpos($name, '_')) {
+                    list($priorityString, $name) = explode('_', $name, 2);
+                    if (is_numeric($priorityString)) {
+                        $priority = intval($priorityString);
                     }
                 }
 
@@ -49,6 +52,7 @@ class Reader {
                     $child = new Task($name, $duration);
                 }
 
+                $child->setPriority($priority);
                 $child->setDone(strtolower(substr($fileName, 0, 2)) == 'x_');
                 $parent->addChild($child);
 
@@ -68,6 +72,9 @@ class Reader {
 
         $properties = array();
         foreach (explode("\n", file_get_contents($file)) as $line) {
+            if (!strpos($line, ':')) {
+                continue;
+            }
             list($property, $value) = explode(':', trim($line), 2);
             $properties[strtolower(trim($property))] = trim($value);
         }
@@ -79,6 +86,10 @@ class Reader {
             switch ($name) {
                 case 'deadline':
                     $task->setDeadline(new \DateTime($value));
+                    break;
+                case 'duration':
+                    $task->setDuration(new TimeSpan($value));
+                    break;
             }
         }
     }
@@ -97,6 +108,7 @@ class Reader {
 
     /**
      * @param $file
+     * @throws \Exception
      * @return array|TimeWindow[]
      */
     private function readWindows($file) {
@@ -105,7 +117,13 @@ class Reader {
         }
 
         $windows = array();
-        foreach (explode("\n", file_get_contents($file)) as $line) {
+        foreach (explode("\n", file_get_contents($file)) as $i => $line) {
+            if (!trim($line)) {
+                continue;
+            }
+            if (!strpos($line, '>>')) {
+                throw new \Exception("Wrong format in [$file] line [" . ($i + 1) . "]");
+            }
             list($start, $end) = explode('>>', $line);
             $windows[] = new TimeWindow(new \DateTime(trim($start)), new \DateTime(trim($end)));
         }

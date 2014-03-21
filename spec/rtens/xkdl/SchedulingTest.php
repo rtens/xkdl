@@ -3,6 +3,7 @@ namespace spec\rtens\xkdl;
 
 use PHPUnit_Framework_TestCase;
 use rtens\xkdl\lib\ExecutionWindow;
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\RepeatingTask;
 use rtens\xkdl\Scheduler;
@@ -64,6 +65,44 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->thenSlot_ShouldBeTask(3, 'two');
     }
 
+    function testSameDeadlinesWithPriorities() {
+        $this->givenTheTask_In('a', 'root');
+        $this->givenTheTask_In('b', 'root');
+        $this->givenTheTask_In('aa', 'a');
+        $this->givenTheTask_In('ab', 'a');
+        $this->givenTheTask_In('ba', 'b');
+        $this->givenTheTask_In('bb', 'b');
+
+        $this->given_HasThePriority('b', 1);
+        $this->given_HasThePriority('a', 2);
+        $this->given_HasThePriority('ab', 5);
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(4);
+        $this->thenSlot_ShouldBeTask(1, 'ba');
+        $this->thenSlot_ShouldBeTask(2, 'bb');
+        $this->thenSlot_ShouldBeTask(3, 'ab');
+        $this->thenSlot_ShouldBeTask(4, 'aa');
+    }
+
+    function testSameDeadlinesNoPriorities() {
+        $this->givenTheTask_In('a', 'root');
+        $this->givenTheTask_In('b', 'root');
+        $this->givenTheTask_In('one', 'a');
+        $this->givenTheTask_In('two', 'a');
+        $this->givenTheTask_In('three', 'b');
+        $this->givenTheTask_In('four', 'b');
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(4);
+        $this->thenSlot_ShouldBeTask(1, 'one');
+        $this->thenSlot_ShouldBeTask(2, 'two');
+        $this->thenSlot_ShouldBeTask(3, 'four');
+        $this->thenSlot_ShouldBeTask(4, 'three');
+    }
+
     function testCompletedTask() {
         $this->givenTheTask_In('one', 'root');
         $this->givenTheTask_In('two', 'root');
@@ -98,8 +137,8 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(3);
-        $this->thenSlot_ShouldBeTask(1, 'leaf_two');
-        $this->thenSlot_ShouldBeTask(2, 'leaf_one');
+        $this->thenSlot_ShouldBeTask(1, 'leaf_one');
+        $this->thenSlot_ShouldBeTask(2, 'leaf_two');
         $this->thenSlot_ShouldBeTask(3, 'leaf_three');
     }
 
@@ -116,8 +155,8 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(3);
-        $this->thenSlot_ShouldBeTask(1, 'one_one');
-        $this->thenSlot_ShouldBeTask(2, 'leaf_one');
+        $this->thenSlot_ShouldBeTask(1, 'leaf_one');
+        $this->thenSlot_ShouldBeTask(2, 'one_one');
         $this->thenSlot_ShouldBeTask(3, 'leaf_three');
     }
 
@@ -298,17 +337,17 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     private function givenTheRootTask($name) {
-        $this->root = new Task($name, 0);
+        $this->root = new Task($name);
         $this->tasks[$name] = $this->root;
     }
 
     private function givenTheTask_In($child, $parent) {
-        $this->tasks[$child] = new Task($child, 1 / 60);
+        $this->tasks[$child] = new Task($child, new TimeSpan('PT1M'));
         $this->tasks[$parent]->addChild($this->tasks[$child]);
     }
 
     private function givenTheRepeatingTask_In($task, $parent) {
-        $this->tasks[$task] = new RepeatingTask($task, 1 / 60);
+        $this->tasks[$task] = new RepeatingTask($task, new TimeSpan('PT1M'));
         $this->tasks[$parent]->addChild($this->tasks[$task]);
     }
 
@@ -330,7 +369,7 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     private function given_Takes_Minutes($name, $minutes) {
-        $this->tasks[$name]->setDuration($minutes / 60);
+        $this->tasks[$name]->setDuration(new TimeSpan('PT' . $minutes . 'M'));
     }
 
     private function thenSlot_ShouldBe_Minutes($index, $minutes) {
@@ -383,6 +422,10 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
 
     private function thenAnExceptionShouldBeThrown() {
         $this->assertNotNull($this->caught);
+    }
+
+    private function given_HasThePriority($task, $priority) {
+        $this->tasks[$task]->setPriority($priority);
     }
 
 }

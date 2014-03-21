@@ -81,9 +81,9 @@ class ScheduleResource extends DynamicResource {
                     'name' => $slot->task->getName(),
                     'parent' => $slot->task->getParent()->getFullName(),
                     'deadline' => $slot->task->getDeadline() ? array(
-                        'relative' => $slot->task->getDeadline()->diff(new \DateTime())->format('%ad %hh %im'),
-                        'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
-                    ) : null,
+                            'relative' => $slot->task->getDeadline()->diff(new \DateTime())->format('%ad %hh %im'),
+                            'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
+                        ) : null,
                     'duration' => $this->assembleDuration($slot->task)
                 )
             );
@@ -92,16 +92,16 @@ class ScheduleResource extends DynamicResource {
     }
 
     private function assembleDuration(Task $task) {
-        $duration = $task->getDuration();
+        $duration = $task->getDuration()->seconds();
         if (!$duration) {
             return null;
         }
 
-        $logged = round($task->getLoggedDuration(), 1);
+        $logged = $task->getLoggedDuration()->seconds();
 
         $percentage = $logged / $duration * 100;
         return array(
-            'number' => $logged . ' / ' . $duration,
+            'number' => round($logged / 3600, 2) . ' / ' . round($duration / 3600, 2),
             'logged' => array('style' => 'width: ' . min($percentage, 100) . '%')
         );
     }
