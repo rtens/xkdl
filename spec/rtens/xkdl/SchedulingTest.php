@@ -124,13 +124,16 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     function testTaskWithoutDuration() {
         $this->givenTheTask_In('one', 'root');
         $this->givenTheTask_In('two', 'root');
+        $this->givenTheTask_In('three', 'root');
+        $this->given_HasTheDeadline('three', 'today');
         $this->given_Takes_Minutes('one', 0);
         $this->given_Takes_Minutes('two', 1);
         $this->givenIHaveLogged_MinutesFor(2, 'two');
 
         $this->whenICreateTheSchedule();
-        $this->thenThereShouldBe_SlotsInTheSchedule(1);
-        $this->thenSlot_ShouldBeTask(1, 'two');
+        $this->thenThereShouldBe_SlotsInTheSchedule(2);
+        $this->thenSlot_ShouldBeTask(1, 'three');
+        $this->thenSlot_ShouldBeTask(2, 'two');
     }
 
     function testTaskWithMinimalDuration() {

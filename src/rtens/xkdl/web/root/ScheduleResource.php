@@ -99,9 +99,10 @@ class ScheduleResource extends DynamicResource {
 
         $logged = round($task->getLoggedDuration(), 1);
 
+        $percentage = $logged / $duration * 100;
         return array(
             'number' => $logged . ' / ' . $duration,
-            'logged' => array('style' => 'width: ' . ($logged / $duration * 100) . '%')
+            'logged' => array('style' => 'width: ' . min($percentage, 100) . '%')
         );
     }
 

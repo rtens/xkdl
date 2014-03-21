@@ -217,9 +217,9 @@ class Task {
         foreach ($schedule as $slot) {
             if ($slot->task == $this) {
                 $unscheduledSeconds -= $slot->window->getSeconds();
-            }
-            if ($unscheduledSeconds <= 0) {
-                return false;
+                if ($unscheduledSeconds <= 0) {
+                    return false;
+                }
             }
         }
         return true;
