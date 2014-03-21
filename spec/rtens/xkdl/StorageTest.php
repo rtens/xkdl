@@ -61,7 +61,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
 
         $this->then_ShouldHaveThePriority('Some task', 1);
         $this->then_ShouldHaveThePriority('other task', 3);
-        $this->then_ShouldHaveThePriority('this task', 0);
+        $this->then_ShouldHaveThePriority('this task', 9999);
     }
 
     function testReadDuration() {

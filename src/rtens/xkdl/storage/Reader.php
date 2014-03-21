@@ -52,7 +52,9 @@ class Reader {
                     $child = new Task($name, $duration);
                 }
 
-                $child->setPriority($priority);
+                if ($priority) {
+                    $child->setPriority($priority);
+                }
                 $child->setDone(strtolower(substr($fileName, 0, 2)) == 'x_');
                 $parent->addChild($child);
 
