@@ -20,27 +20,30 @@ class ScheduleResource extends DynamicResource {
     /** @var Reader <- */
     public $reader;
 
-    public function doGet(\DateTime $until = null) {
+    public function doGet(\DateTime $from = null, \DateTime $until = null) {
         $until = $until ? : new \DateTime('tomorrow');
+        $from = $from ? : new \DateTime('now');
 
         $root = $this->reader->read();
 
-        $logging = $this->writer->isLogging();
+        $logging = $this->writer->getOngoingLogInfo();
         return new Presenter($this, array(
             'idle' => !$logging ? array(
                     'taskList' => 'var taskList = ' . json_encode($this->getOpenTasksOf($root))
                 ) : null,
             'logging' => $logging ? array(
                     'task' => array('value' => $logging['task']),
-                    'start' => array('value' => date('Y-m-d H:i', strtotime($logging['start'])))
+                    'start' => array('value' => $logging['start']->format('Y-m-d H:i'))
                 ) : null,
-            'slot' => $this->assembleSchedule($root, $until)
+            'slot' => $this->assembleSchedule($root, $from, $until)
         ));
     }
 
-    public function doLog($task, \DateTime $start, $end = null) {
+    public function doLog($task, \DateTime $start, \DateTime $end = null) {
         if ($end) {
-            $this->writer->addLog($task, new TimeWindow($start, new \DateTime($end)));
+            $this->writer->addLog($task, new TimeWindow($start, $end));
+        } else if ($this->writer->getOngoingLogInfo()) {
+            throw new \Exception("Can't start an ongoing log if another task is being logged.");
         } else {
             $this->writer->startLogging($task, $start);
         }
@@ -68,9 +71,9 @@ class ScheduleResource extends DynamicResource {
         return $tasks;
     }
 
-    private function assembleSchedule(Task $root, \DateTime $until) {
+    private function assembleSchedule(Task $root, \DateTime $from, \DateTime $until) {
         $scheduler = new Scheduler($root);
-        $schedule = $scheduler->createSchedule(new \DateTime(), $until ? : new \DateTime('7 days'));
+        $schedule = $scheduler->createSchedule($from, $until);
 
         $model = array();
         foreach ($schedule as $slot) {
@@ -99,7 +102,7 @@ class ScheduleResource extends DynamicResource {
 
         $logged = $task->getLoggedDuration()->seconds();
 
-        $percentage = $logged / $duration * 100;
+        $percentage = round($logged / $duration * 100, 2);
         return array(
             'number' => round($logged / 3600, 2) . ' / ' . round($duration / 3600, 2),
             'logged' => array('style' => 'width: ' . min($percentage, 100) . '%')

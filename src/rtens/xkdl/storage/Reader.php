@@ -9,7 +9,7 @@ use rtens\xkdl\Task;
 
 class Reader {
 
-    const DEFAULT_DURATION = 'PT15M';
+    public static $DEFAULT_DURATION = 'PT15M';
 
     private $rootFolder;
 
@@ -29,7 +29,7 @@ class Reader {
 
         if (in_array(strtolower(substr($fileName, 0, 2)), array('__', 'x_'))) {
             $name = substr($fileName, 2);
-            $duration = new TimeSpan(self::DEFAULT_DURATION);
+            $duration = new TimeSpan(self::$DEFAULT_DURATION);
         }
 
         if (strpos($name, '_')) {

@@ -35,7 +35,7 @@ class Writer {
 
     public function stopLogging(\DateTime $end) {
         $data = $this->readTmpFile();
-        $this->addLog($data['task'], new TimeWindow(new \DateTime($data['start']), $end));
+        $this->addLog($data['task'], new TimeWindow($data['start'], $end));
         $this->cancelLogging();
     }
 
@@ -43,7 +43,10 @@ class Writer {
         unlink($this->tmpFile());
     }
 
-    public function isLogging() {
+    /**
+     * @return array|null|\DateTime[]|string[]
+     */
+    public function getOngoingLogInfo() {
         if (!file_exists($this->tmpFile())) {
             return null;
         }
@@ -62,7 +65,7 @@ class Writer {
         list($task, $start) = explode("\n", file_get_contents($this->tmpFile()));
         return array(
             'task' => $task,
-            'start' => $start
+            'start' => new \DateTime($start)
         );
     }
 }

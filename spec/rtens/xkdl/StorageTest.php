@@ -15,6 +15,7 @@ use rtens\xkdl\Task;
 class StorageTest extends \PHPUnit_Framework_TestCase {
 
     function testReadTask() {
+        $this->givenTheDefaultDurationIs_Minutes(15);
         $this->givenTheFolder('root/__Task one');
         $this->givenTheFolder('root/Task two');
         $this->whenIReadTasksFrom('root');
@@ -256,6 +257,10 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
 
     private function then_ShouldHaveThePriority($task, $priority) {
         $this->assertEquals($priority, $this->getTask($task)->getPriority());
+    }
+
+    private function givenTheDefaultDurationIs_Minutes($int) {
+        Reader::$DEFAULT_DURATION = 'PT' . $int . 'M';
     }
 
 } 
