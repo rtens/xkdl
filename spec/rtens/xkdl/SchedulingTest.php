@@ -54,14 +54,14 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->givenTheTask_In('two', 'root');
         $this->givenTheTask_In('three', 'root');
         $this->given_HasTheDeadline('one', 'tomorrow');
-        $this->given_HasTheDeadline('two', 'next week');
+        $this->given_HasTheDeadline('three', 'next week');
 
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(3);
         $this->thenSlot_ShouldBeTask(1, 'one');
-        $this->thenSlot_ShouldBeTask(2, 'two');
-        $this->thenSlot_ShouldBeTask(3, 'three');
+        $this->thenSlot_ShouldBeTask(2, 'three');
+        $this->thenSlot_ShouldBeTask(3, 'two');
     }
 
     function testCompletedTask() {

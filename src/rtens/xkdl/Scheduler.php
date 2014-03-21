@@ -28,7 +28,8 @@ class Scheduler {
             $tasks = $this->root->getSchedulableTasks($now, $schedule, $until);
             usort($tasks, function (Task $a, Task $b) {
                 $deadlineA = $a->getDeadline();
-                return $deadlineA && $deadlineA < $b->getDeadline() ? -1 : 1;
+                $deadlineB = $b->getDeadline();
+                return $deadlineA && !$deadlineB || $deadlineA && $deadlineB && $deadlineA < $deadlineB ? -1 : 1;
             });
 
             $next = clone $now;
