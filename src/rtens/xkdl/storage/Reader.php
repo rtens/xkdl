@@ -18,51 +18,57 @@ class Reader {
     }
 
     public function read() {
-        $root = new Task('root');
-        $this->readChildren($this->rootFolder, $root);
-        return $root;
+        return $this->readTask($this->rootFolder);
+    }
+
+    private function readTask($file, Task $parent = null) {
+        $fileName = basename($file);
+        $name = $fileName;
+        $duration = null;
+        $priority = null;
+
+        if (in_array(strtolower(substr($fileName, 0, 2)), array('__', 'x_'))) {
+            $name = substr($fileName, 2);
+            $duration = new TimeSpan(self::DEFAULT_DURATION);
+        }
+
+        if (strpos($name, '_')) {
+            list($priorityString, $name) = explode('_', $name, 2);
+            if (is_numeric($priorityString)) {
+                $priority = intval($priorityString);
+            }
+        }
+
+        $properties = $this->readProperties($file . '/__.txt');
+
+        if (array_key_exists('repeat', $properties)) {
+            $child = new RepeatingTask($name, $duration);
+            $child->repeatEvery(new \DateInterval($properties['repeat']));
+        } else {
+            $child = new Task($name, $duration);
+        }
+
+        if ($parent) {
+            $parent->addChild($child);
+        }
+        if ($priority) {
+            $child->setPriority($priority);
+        }
+        $child->setDone(strtolower(substr($fileName, 0, 2)) == 'x_');
+
+        $this->setProperties($child, $properties);
+        $this->setWindows($child, $file . '/windows.txt');
+        $this->setLogs($child, $file . '/logs.txt');
+
+        $this->readChildren($file, $child);
+
+        return $child;
     }
 
     private function readChildren($folder, Task $parent) {
         foreach (glob($folder . '/*') as $file) {
             if (is_dir($file)) {
-                $fileName = basename($file);
-                $name = $fileName;
-                $duration = null;
-                $priority = null;
-
-                if (in_array(strtolower(substr($fileName, 0, 2)), array('__', 'x_'))) {
-                    $name = substr($fileName, 2);
-                    $duration = new TimeSpan(self::DEFAULT_DURATION);
-                }
-
-                if (strpos($name, '_')) {
-                    list($priorityString, $name) = explode('_', $name, 2);
-                    if (is_numeric($priorityString)) {
-                        $priority = intval($priorityString);
-                    }
-                }
-
-                $properties = $this->readProperties($file . '/__.txt');
-
-                if (array_key_exists('repeat', $properties)) {
-                    $child = new RepeatingTask($name, $duration);
-                    $child->repeatEvery(new \DateInterval($properties['repeat']));
-                } else {
-                    $child = new Task($name, $duration);
-                }
-
-                if ($priority) {
-                    $child->setPriority($priority);
-                }
-                $child->setDone(strtolower(substr($fileName, 0, 2)) == 'x_');
-                $parent->addChild($child);
-
-                $this->setProperties($child, $properties);
-                $this->setWindows($child, $file . '/windows.txt');
-                $this->setLogs($child, $file . '/logs.txt');
-
-                $this->readChildren($file, $child);
+                $this->readTask($file, $parent);
             }
         }
     }
