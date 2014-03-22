@@ -20,9 +20,9 @@ class ScheduleResource extends DynamicResource {
     /** @var Reader <- */
     public $reader;
 
-    public function doGet(\DateTime $from = null, \DateTime $until = null) {
-        $until = $until ? : new \DateTime('tomorrow');
-        $from = $from ? : new \DateTime('now');
+    public function doGet($from = null, $until = null) {
+        $until = $until ? new \DateTime($until) : new \DateTime('tomorrow');
+        $from = $from ? new \DateTime($from) : new \DateTime('now');
 
         $root = $this->reader->read();
 
@@ -39,9 +39,9 @@ class ScheduleResource extends DynamicResource {
         ));
     }
 
-    public function doLog($task, \DateTime $start, \DateTime $end = null) {
+    public function doLog($task, \DateTime $start, $end = null) {
         if ($end) {
-            $this->writer->addLog($task, new TimeWindow($start, $end));
+            $this->writer->addLog($task, new TimeWindow($start, new \DateTime($end)));
         } else if ($this->writer->getOngoingLogInfo()) {
             throw new \Exception("Can't start an ongoing log if another task is being logged.");
         } else {

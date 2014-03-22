@@ -210,11 +210,11 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function givenIHaveEnteredTheEndTime($string) {
-        $this->fieldEnd = new \DateTime($string);
+        $this->fieldEnd = $string;
     }
 
     private function whenIFinishLogging() {
-        $this->resource->doFinish($this->fieldEnd);
+        $this->resource->doFinish(new \DateTime($this->fieldEnd));
     }
 
     private function thenNoLoggingShouldBeGoingOn() {
@@ -230,7 +230,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function whenIGetTheResource() {
-        $this->presenter = $this->resource->doGet(new \DateTime('12:00'), new \DateTime('12:10'));
+        $this->presenter = $this->resource->doGet('12:00', '12:10');
     }
 
     private function thenTheActiveLoggerShould_BeShown($not) {
