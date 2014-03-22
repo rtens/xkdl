@@ -11,6 +11,7 @@ use rtens\xkdl\Task;
 /**
  * @property Task root
  * @property Task[] tasks
+ * @property MockConfiguration config
  */
 class StorageTest extends \PHPUnit_Framework_TestCase {
 
@@ -18,7 +19,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheDefaultDurationIs_Minutes(15);
         $this->givenTheFolder('root/__Task one');
         $this->givenTheFolder('root/Task two');
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
         $this->thenThereShouldBeATask('Task one');
         $this->then_ShouldTake_Minutes('Task one', 15);
         $this->thenThereShouldBeATask('Task two', 0);
@@ -29,7 +30,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/X_two');
         $this->givenTheFolder('root/x-men');
 
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
 
         $this->thenThereShouldBeATask('one');
         $this->then_ShouldBeDone('two');
@@ -43,7 +44,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/one/__one two');
         $this->givenTheFolder('root/one/__one two/__one two one');
 
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
 
         $this->thenThereShouldBeATask('one');
         $this->thenThereShouldBeATask('two');
@@ -58,7 +59,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/3_other task');
         $this->givenTheFolder('root/__this task');
 
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
 
         $this->then_ShouldHaveThePriority('Some task', 1);
         $this->then_ShouldHaveThePriority('other task', 3);
@@ -70,7 +71,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/two');
         $this->givenTheFile_WithContent('root/one/__.txt', 'duration: PT5H');
         $this->givenTheFile_WithContent('root/two/__.txt', 'duration: PT30M');
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
         $this->then_ShouldTake_Minutes('one', 300);
         $this->then_ShouldTake_Minutes('two', 30);
     }
@@ -78,7 +79,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     function testReadDeadline() {
         $this->givenTheFolder('root/__one');
         $this->givenTheFile_WithContent('root/__one/__.txt', 'deadline: 2014-12-31 12:00');
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
         $this->then_ShouldHaveTheDeadline('one', '2014-12-31 12:00');
         $this->then_ShouldHaveNoChildren('one');
     }
@@ -86,7 +87,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     function testReadRepeatingTask() {
         $this->givenTheFolder('root/__one');
         $this->givenTheFile_WithContent('root/__one/__.txt', 'repeat: PT1H');
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
         $this->then_ShouldBeARepeatingTask('one');
         $this->thenTheRepetitionOf_ShouldBe('one', 'PT1H');
     }
@@ -94,14 +95,14 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     function testReadWindows() {
         $this->givenTheFolder('root/__one');
         $this->givenTheFile_WithContent('root/__one/windows.txt', "2014-01-01 12:00 >> 2014-01-01 13:00\n2014-01-01 14:00 >> 2014-01-01 15:00");
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
         $this->then_ShouldHave_Windows('one', 2);
     }
 
     function testReadLogs() {
         $this->givenTheFolder('root/__one');
         $this->givenTheFile_WithContent('root/__one/logs.txt', "2014-01-01 12:00 >> 2014-01-01 13:00\n2014-01-01 14:00 >> 2014-01-01 15:00");
-        $this->whenIReadTasksFrom('root');
+        $this->whenIReadTheTasks();
         $this->then_ShouldHave_Logs('one', 2);
     }
 
@@ -151,6 +152,12 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
 
     ###################### SETUP ########################
 
+    protected function setUp() {
+        parent::setUp();
+
+        $this->config = new MockConfiguration(__DIR__);
+    }
+
     protected function tearDown() {
         $rm = function ($dir) use (&$rm) {
             foreach (glob($dir . '/*') as $file) {
@@ -162,7 +169,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
             }
             rmdir($dir);
         };
-        $rm(__DIR__ . '/__usr');
+        $rm($this->config->userFolder());
     }
 
     public function givenTheRootTask($name) {
@@ -184,11 +191,12 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function givenTheFolder($name) {
-        @mkdir(__DIR__ . '/__usr/' . $name, 0777, true);
+        @mkdir($this->config->userFolder() . '/' . $name, 0777, true);
     }
 
-    private function whenIReadTasksFrom($rootFolder) {
-        $reader = new Reader(__DIR__ . '/__usr/' . $rootFolder);
+    private function whenIReadTheTasks() {
+        $reader = new Reader();
+        $reader->config = $this->config;
         $this->root = $reader->read();
     }
 
@@ -206,7 +214,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function givenTheFile_WithContent($path, $content) {
-        file_put_contents(__DIR__ . '/__usr/' . $path, $content);
+        file_put_contents($this->config->userFolder() . '/' . $path, $content);
     }
 
     private function then_ShouldHaveTheDeadline($path, $deadline) {
@@ -236,18 +244,19 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function whenIAddALogFrom_Until_To($start, $end, $task) {
-        $writer = new Writer(__DIR__ . '/__usr');
+        $writer = new Writer();
+        $writer->config = $this->config;
         $writer->addLog($task, new TimeWindow(new \DateTime($start), new \DateTime($end)));
     }
 
     private function thenThereShouldBeAFile_WithTheContent($path, $content) {
-        $fullPath = __DIR__ . '/__usr/' . $path;
+        $fullPath = $this->config->userFolder() . '/' . $path;
         $this->assertFileExists($fullPath);
         $this->assertEquals($content, file_get_contents($fullPath));
     }
 
     private function thenThereShouldBeAFile($path) {
-        $fullPath = __DIR__ . '/__usr/' . $path;
+        $fullPath = $this->config->userFolder() . '/' . $path;
         $this->assertFileExists($fullPath);
     }
 
@@ -260,7 +269,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function givenTheDefaultDurationIs_Minutes($int) {
-        Reader::$DEFAULT_DURATION = 'PT' . $int . 'M';
+        $this->config->defaultDuration = new TimeSpan('PT' . $int . 'M');
     }
 
 } 

@@ -1,18 +1,16 @@
 <?php
 namespace rtens\xkdl\storage;
 
+use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
 
 class Writer {
 
-    private $userFolder;
-
-    public function __construct($userFolder = null) {
-        $this->userFolder = $userFolder ?: ROOT . '/user';
-    }
+    /** @var Configuration <- */
+    public $config;
 
     public function addLog($fullTaskName, TimeWindow $window) {
-        $dir = $this->userFolder . '/root';
+        $dir = $this->config->rootTaskFolder();
 
         foreach (explode('/', trim($fullTaskName, '/')) as $taskName) {
             foreach (glob($dir . '/*') as $file) {
@@ -55,7 +53,7 @@ class Writer {
     }
 
     private function tmpFile() {
-        return $this->userFolder . '/logging';
+        return $this->config->userFolder() . '/logging';
     }
 
     /**

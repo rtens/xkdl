@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\storage;
 
+use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
@@ -9,16 +10,11 @@ use rtens\xkdl\Task;
 
 class Reader {
 
-    public static $DEFAULT_DURATION = 'PT15M';
-
-    private $rootFolder;
-
-    function __construct($rootFolder = null) {
-        $this->rootFolder = $rootFolder ? : ROOT . '/user/root';
-    }
+    /** @var Configuration <- */
+    public $config;
 
     public function read() {
-        return $this->readTask($this->rootFolder);
+        return $this->readTask($this->config->rootTaskFolder());
     }
 
     private function readTask($file, Task $parent = null) {
@@ -29,7 +25,7 @@ class Reader {
 
         if (in_array(strtolower(substr($fileName, 0, 2)), array('__', 'x_'))) {
             $name = substr($fileName, 2);
-            $duration = new TimeSpan(self::$DEFAULT_DURATION);
+            $duration = $this->config->defaultDuration();
         }
 
         if (strpos($name, '_')) {

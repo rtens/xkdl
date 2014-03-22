@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "8424f644d3ebfd2cc47a8e99c57969b5",
+    "hash": "8feda14940b0066117a08aa2cc885dff",
     "packages": [
         {
             "name": "nikic/php-parser",
@@ -48,6 +48,53 @@
                 "php"
             ],
             "time": "2013-08-25 17:11:40"
+        },
+        {
+            "name": "watoki/cfg",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/watoki/cfg.git",
+                "reference": "302c997fe89b7389d4916d0e7df8fa1f53e14533"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/watoki/cfg/zipball/302c997fe89b7389d4916d0e7df8fa1f53e14533",
+                "reference": "302c997fe89b7389d4916d0e7df8fa1f53e14533",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.8",
+                "watoki/factory": "*"
+            },
+            "require-dev": {
+                "watoki/scrut": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "watoki\\cfg": "src/",
+                    "spec\\watoki\\cfg": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nikolas Martens",
+                    "email": "Nikolas.M@rtens.org",
+                    "homepage": "http://rtens.org"
+                }
+            ],
+            "description": "Configuration loader",
+            "homepage": "http://github.com/watoki/cfg",
+            "keywords": [
+                "configuration",
+                "watoki"
+            ],
+            "time": "2013-11-21 12:47:38"
         },
         {
             "name": "watoki/collections",
@@ -100,12 +147,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "a9afb35a1b6f3180235c95d891d909d5abb0e9c5"
+                "reference": "7e2f0a839470f41d34c41327d4c495f3ae68f3d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/a9afb35a1b6f3180235c95d891d909d5abb0e9c5",
-                "reference": "a9afb35a1b6f3180235c95d891d909d5abb0e9c5",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/7e2f0a839470f41d34c41327d4c495f3ae68f3d3",
+                "reference": "7e2f0a839470f41d34c41327d4c495f3ae68f3d3",
                 "shasum": ""
             },
             "require": {
@@ -142,7 +189,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2014-03-19 23:34:03"
+            "time": "2014-03-22 12:45:03"
         },
         {
             "name": "watoki/dom",

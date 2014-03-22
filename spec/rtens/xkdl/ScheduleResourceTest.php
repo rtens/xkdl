@@ -1,6 +1,7 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\storage\Reader;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\web\Presenter;
@@ -12,7 +13,6 @@ use watoki\curir\http\Url;
  * @property ScheduleResource resource
  * @property \DateTime|null fieldStart
  * @property \DateTime|null fieldEnd
- * @property string userFolder
  * @property \Exception|null caught
  * @property Presenter presenter
  */
@@ -132,14 +132,16 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         parent::setUp();
-        $this->userFolder = __DIR__ . '/__user';
-        mkdir($this->userFolder);
 
-        Reader::$DEFAULT_DURATION = 'PT1M';
+        $config = new MockConfiguration(__DIR__);
+        $config->defaultDuration = new TimeSpan('PT1M');
+        mkdir($config->userFolder(), 0777, true);
 
         $this->resource = new ScheduleResource(Url::parse('schedule'));
-        $this->resource->writer = new Writer($this->userFolder);
-        $this->resource->reader = new Reader($this->userFolder . '/root');
+        $this->resource->writer = new Writer();
+        $this->resource->writer->config = $config;
+        $this->resource->reader = new Reader();
+        $this->resource->reader->config = $config;
 
         $this->fieldEnd = null;
     }
@@ -155,11 +157,11 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
             }
             rmdir($dir);
         };
-        $rm($this->userFolder);
+        $rm($this->resource->writer->config->userFolder());
     }
 
     private function givenTheFolder($name) {
-        @mkdir($this->userFolder . '/' . $name, 0777, true);
+        @mkdir($this->resource->writer->config->userFolder() . '/' . $name, 0777, true);
     }
 
     private function givenIHaveEnteredTheTask($string) {
@@ -198,13 +200,13 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function thenThereShouldBeAFile_WithTheContent($path, $content) {
-        $fullPath = $this->userFolder . '/' . $path;
+        $fullPath = $this->resource->writer->config->userFolder() . '/' . $path;
         $this->assertFileExists($fullPath);
         $this->assertEquals($content, file_get_contents($fullPath));
     }
 
     private function givenTheFile_WithContent($path, $content) {
-        file_put_contents($this->userFolder . '/' . $path, $content);
+        file_put_contents($this->resource->writer->config->userFolder() . '/' . $path, $content);
     }
 
     private function givenIHaveEnteredTheEndTime($string) {
@@ -224,7 +226,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function thenThereShouldBeNoFile($path) {
-        $this->assertFileNotExists($this->userFolder . '/' . $path);
+        $this->assertFileNotExists($this->resource->writer->config->userFolder() . '/' . $path);
     }
 
     private function whenIGetTheResource() {
