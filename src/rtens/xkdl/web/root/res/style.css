@@ -28,15 +28,23 @@
     margin-right: 2%;
 }
 
+.item .info h4 {
+    margin: 5px 0;
+}
+
 .item .info .btn {
-    width: 3em;
-    height: 3em;
+    width: 2em;
+    height: 2em;
     padding: 0;
     color: transparent;
 }
 
 .slot.item .main {
     width: 60%;
+}
+
+.slot.item h3 {
+    margin-top: 5px;
 }
 
 .slot.item .main .duration {

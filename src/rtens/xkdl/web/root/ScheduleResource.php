@@ -9,6 +9,7 @@ use rtens\xkdl\Task;
 use rtens\xkdl\web\Presenter;
 use watoki\curir\resource\DynamicResource;
 use watoki\curir\responder\Redirecter;
+use watoki\dom\Element;
 
 class ScheduleResource extends DynamicResource {
 
@@ -87,13 +88,23 @@ class ScheduleResource extends DynamicResource {
 
         $model = array();
         foreach ($schedule as $slot) {
+            $markDone = function (Element $e) use ($slot) {
+                if ($slot->task->isDone()) {
+                    return str_replace(array('info', 'warning'), 'success',
+                        $e->getAttribute('class')->getValue());
+                } else {
+                    return $e->getAttribute('class')->getValue();
+                }
+            };
             $model[] = array(
+                'class' => $markDone,
+                'done' => array('class' => $markDone),
                 'start' => $slot->window->start->format('H:i'),
                 'end' => $slot->window->end->format('H:i'),
                 'task' => array(
                     'name' => $slot->task->getName(),
                     'parent' => $slot->task->getParent()->getFullName(),
-                    'deadline' => $slot->task->getDeadline() ? array(
+                    'deadline' => !$slot->task->isDone() && $slot->task->getDeadline() ? array(
                             'relative' => $slot->task->getDeadline()->diff(new \DateTime())->format('%ad %hh %im'),
                             'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
                         ) : null,
