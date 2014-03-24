@@ -164,6 +164,12 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->thenThereShouldBe_Slots(0);
     }
 
+    function testInvalidCache() {
+        $this->givenTheFile_WithContent('schedule.txt', "now >> tomorrow >> not/existing/task");
+        $this->whenIGetTheSchedule();
+        $this->thenThereShouldBe_Slots(0);
+    }
+
     ################ SETUP ####################
 
     protected function setUp() {

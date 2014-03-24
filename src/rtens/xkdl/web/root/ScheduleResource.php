@@ -79,7 +79,11 @@ class ScheduleResource extends DynamicResource {
     }
 
     private function assembleSchedule($root) {
-        $schedule = $this->writer->readSchedule($root);
+        try {
+            $schedule = $this->writer->readSchedule($root);
+        } catch (\Exception $e) {
+            return array();
+        }
 
         $model = array();
         foreach ($schedule as $slot) {
