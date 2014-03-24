@@ -190,6 +190,31 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->thenThereShouldBe_Slots(0);
     }
 
+    function testMarkTaskDone() {
+        $this->givenTheFolder('root/__a');
+        $this->givenTheFolder('root/__a/b');
+
+        $this->whenIMark_AsDone('/a');
+        $this->whenIMark_AsDone('/a/b');
+        $this->whenIMark_AsDone('/c');
+
+        $this->thenThereShouldBeAFolder('root/X_a');
+        $this->thenThereShouldBeAFolder('root/X_a/X_b');
+        $this->thenThereShouldBeAFolder('root/X_c');
+    }
+
+    function testMarkDoneTaskAsDone() {
+        $this->givenTheFolder('root/X_a');
+        $this->whenIMark_AsDone('/a');
+        $this->thenThereShouldBeAFolder('root/X_a');
+    }
+
+    function testMarkDoneTaskAsOpen() {
+        $this->givenTheFolder('root/X_a');
+        $this->whenIMark_AsOpen('/a');
+        $this->thenThereShouldBeAFolder('root/__a');
+    }
+
     ################ SETUP ####################
 
     protected function setUp() {
@@ -232,6 +257,14 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
 
     private function whenIStartLogging() {
         $this->resource->doLog($this->fieldTask, $this->fieldStart, $this->fieldEnd);
+    }
+
+    private function whenIMark_AsDone($task) {
+        $this->resource->doMarkDone($task);
+    }
+
+    private function whenIMark_AsOpen($task) {
+        $this->resource->doMarkOpen($task);
     }
 
     private function givenIHaveEnteredTheStartTime($string) {
@@ -277,6 +310,11 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
 
     private function whenIFinishLogging() {
         $this->resource->doFinish(new \DateTime($this->fieldEnd));
+    }
+
+    private function thenThereShouldBeAFolder($path) {
+        $fullPath = $this->resource->writer->config->userFolder() . '/' . $path;
+        $this->assertFileExists($fullPath);
     }
 
     private function thenNoLoggingShouldBeGoingOn() {

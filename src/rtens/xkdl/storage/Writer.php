@@ -13,6 +13,33 @@ class Writer {
     public $config;
 
     public function addLog($fullTaskName, TimeWindow $window) {
+        $data = $window->start->format('c') . ' >> ' . $window->end->format('c') . "\n";
+        file_put_contents($this->getTaskFolder($fullTaskName) . '/logs.txt', $data, FILE_APPEND);
+    }
+
+    public function markDone($fullTaskName) {
+        $this->prepend('X_', $fullTaskName);
+    }
+
+    public function markOpen($fullTaskName) {
+        $this->prepend('__', $fullTaskName);
+    }
+
+    private function prepend($prefix, $fullTaskName) {
+        $taskDirPath = $this->getTaskFolder($fullTaskName);
+        $parentFolder = dirname($taskDirPath);
+        $oldFolderName = basename($taskDirPath);
+        $newFolderName = $oldFolderName;
+
+        if (substr($newFolderName, 1, 1) == '_') {
+            $newFolderName = substr($newFolderName, 2);
+        }
+        $newFolderName = $prefix . $newFolderName;
+
+        rename($parentFolder . '/' . $oldFolderName, $parentFolder . '/' . $newFolderName);
+    }
+
+    private function getTaskFolder($fullTaskName) {
         $dir = $this->config->rootTaskFolder();
 
         foreach (explode('/', trim($fullTaskName, '/')) as $taskName) {
@@ -24,10 +51,8 @@ class Writer {
             }
             $dir = $dir . '/' . $taskName;
             mkdir($dir);
-         }
-
-        $data = $window->start->format('c') . ' >> ' . $window->end->format('c') . "\n";
-        file_put_contents($dir . '/logs.txt', $data, FILE_APPEND);
+        }
+        return $dir;
     }
 
     public function startLogging($task, \DateTime $start) {

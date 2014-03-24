@@ -162,12 +162,12 @@ class StorageTest extends \PHPUnit_Framework_TestCase {
         $rm = function ($dir) use (&$rm) {
             foreach (glob($dir . '/*') as $file) {
                 if (is_file($file)) {
-                    unlink($file);
+                    @unlink($file);
                 } else {
                     $rm($file);
                 }
             }
-            rmdir($dir);
+            @rmdir($dir);
         };
         $rm($this->config->userFolder());
     }

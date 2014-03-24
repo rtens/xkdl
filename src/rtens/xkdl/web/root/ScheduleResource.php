@@ -69,6 +69,16 @@ class ScheduleResource extends DynamicResource {
         return new Redirecter($this->getUrl());
     }
 
+    public function doMarkDone($task) {
+        $this->writer->markDone($task);
+        return new Redirecter($this->getUrl());
+    }
+
+    public function doMarkOpen($task) {
+        $this->writer->markOpen($task);
+        return new Redirecter($this->getUrl());
+    }
+
     private function getOpenTasksOf(Task $task) {
         $tasks = array();
         foreach ($task->getOpenChildren() as $child) {
@@ -91,6 +101,9 @@ class ScheduleResource extends DynamicResource {
         foreach ($schedule->slots as $slot) {
             $markDone = function (Element $e) use ($slot) {
                 if ($slot->task->isDone()) {
+                    if ($e->getAttribute('value')) {
+                        $e->setAttribute('value', 'markOpen');
+                    }
                     return str_replace(array('info', 'warning'), 'success',
                         $e->getAttribute('class')->getValue());
                 } else {
