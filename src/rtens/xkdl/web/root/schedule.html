@@ -39,7 +39,7 @@
             <div class="main">
                 <label for="task">Log unscheduled task</label>
                 <input class="form-control" required="true" type="text" id="task" name="task"
-                       placeholder="full/task/name"/>
+                       placeholder="/full/task/name"/>
             </div>
             <div class="logging">
                 <div class="form-group">
@@ -97,8 +97,9 @@
         </div>
 
         <div property="slot" class="slot item clearfix bg-info">
-            <form property="form" action="some/task/name" method="post">
+            <form property="form" method="post">
                 <div property="task" class="main">
+                    <input type="hidden" name="task" property="target" value="/some/task"/>
                     <div class="info">
                         <h4 property="start">14:02</h4>
                         <input property="done" type="submit" name="method" value="done" class="btn btn-warning"/>

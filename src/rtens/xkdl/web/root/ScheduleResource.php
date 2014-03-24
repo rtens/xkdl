@@ -50,9 +50,10 @@ class ScheduleResource extends DynamicResource {
     public function doLog($task, \DateTime $start, $end = null) {
         if ($end) {
             $this->writer->addLog($task, new TimeWindow($start, new \DateTime($end)));
-        } else if ($this->writer->getOngoingLogInfo()) {
-            throw new \Exception("Can't start an ongoing log if another task is being logged.");
         } else {
+            if ($this->writer->getOngoingLogInfo()) {
+                $this->writer->stopLogging($start);
+            }
             $this->writer->startLogging($task, $start);
         }
         return new Redirecter($this->getUrl());
@@ -103,6 +104,7 @@ class ScheduleResource extends DynamicResource {
                 'end' => $slot->window->end->format('H:i'),
                 'task' => array(
                     'name' => $slot->task->getName(),
+                    'target' => array('value' => $slot->task->getFullName()),
                     'parent' => $slot->task->getParent()->getFullName(),
                     'deadline' => !$slot->task->isDone() && $slot->task->getDeadline() ? array(
                             'relative' => $slot->task->getDeadline()->diff(new \DateTime())->format('%ad %hh %im'),

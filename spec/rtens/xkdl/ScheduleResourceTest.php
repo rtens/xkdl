@@ -25,12 +25,15 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->thenLoggingShouldBeStarted_At('/some/task', '2001-01-01 12:00');
     }
 
-    function testDontStartLoggingIfAlreadyLogging() {
+    function testStartLogWhileLoggingOngoing() {
+        $this->givenTheFolder('root');
         $this->givenALogHasBeenStartedFor_At('/some/task', '2011-11-11 11:11');
         $this->givenIHaveEnteredTheTask('/my/task');
-        $this->givenIHaveEnteredTheStartTime('tomorrow');
-        $this->whenITryToStartLogging();
-        $this->thenAnExceptionShouldBeThrown();
+        $this->givenIHaveEnteredTheStartTime('2011-11-11 12:12');
+        $this->whenIStartLogging();
+        $this->thenLoggingShouldBeStarted_At('/my/task', '2011-11-11 12:12');
+        $this->thenThereShouldBeAFile_WithTheContent('root/some/task/logs.txt',
+            "2011-11-11T11:11:00+01:00 >> 2011-11-11T12:12:00+01:00\n");
     }
 
     function testFinishLoggingForNewTask() {
@@ -60,6 +63,19 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->givenIHaveEnteredTheEndTime('2011-11-11 11:12');
         $this->whenIStartLogging();
         $this->thenNoLoggingShouldBeGoingOn();
+        $this->thenThereShouldBeAFile_WithTheContent('root/some/task/logs.txt',
+            "now >> then\n2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
+    }
+
+    function testAddLogWhileOngoingLogging() {
+        $this->givenALogHasBeenStartedFor_At('/some/other/task', 'yesterday');
+        $this->givenTheFolder('root/some/task');
+        $this->givenTheFile_WithContent('root/some/task/logs.txt', "now >> then\n");
+        $this->givenIHaveEnteredTheTask('/some/task');
+        $this->givenIHaveEnteredTheStartTime('2011-11-11 11:11');
+        $this->givenIHaveEnteredTheEndTime('2011-11-11 11:12');
+        $this->whenIStartLogging();
+        $this->thenLoggingShouldBeStarted_At('/some/other/task', 'yesterday');
         $this->thenThereShouldBeAFile_WithTheContent('root/some/task/logs.txt',
             "now >> then\n2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
     }
@@ -125,6 +141,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->thenTheEndOfSlot_ShouldBe(1, '12:01');
         $this->thenTheDeadlineOfSlot_ShouldBe(1, '1d 2h 5m');
         $this->thenTheDurationOfSlot_ShouldBe_With_Completed(1, '0.05 / 0.02', '100%');
+        $this->thenTheActionTargetOfSlot_ShouldBe(1, '/a/ab');
 
         $this->thenTheNameOfSlot_ShouldBe(2, 'aa');
         $this->thenTheStartOfSlot_ShouldBe(2, '12:01');
@@ -337,6 +354,10 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
 
     private function whenICreateANewScheduleFrom_Until($from, $until) {
         $this->resource->doPost(new \DateTime($from), new \DateTime($until));
+    }
+
+    private function thenTheActionTargetOfSlot_ShouldBe($int, $string) {
+        $this->assertEquals($string, $this->getSlot($int)['task']['target']['value']);
     }
 
 }
