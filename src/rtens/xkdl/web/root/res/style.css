@@ -6,7 +6,7 @@
 
 .item .main {
     float: left;
-    width: 70%;
+    width: 65%;
 }
 
 .item .main label {
@@ -15,8 +15,7 @@
 }
 
 .item .logging {
-    width: 25%;
-    min-width: 10em;
+    width: 30%;
     float: right;
 }
 
@@ -24,7 +23,6 @@
     text-align: center;
     float: left;
     width: 8%;
-    min-width: 4em;
     margin-right: 2%;
 }
 
@@ -70,7 +68,62 @@
     width: 100%;
 }
 
-.logging .actions .btn {
-    text-align: center;
-    margin: 5px auto;
+.logging .form-group {
+    margin-bottom: 10px;
+}
+
+.logging .form-group * {
+    width: auto;
+    display: inline-block;
+}
+
+.refresh.item .main {
+    width: 10%;
+}
+
+.refresh.item .logging {
+    text-align: right;
+    width: 85%;
+}
+
+@media (max-width: 768px) {
+
+    .item .info {
+        float: left;
+        width: 15%;
+    }
+
+    .item .main {
+        float: none;
+        width: 100%;
+    }
+
+    .item .logging {
+        margin-top: 10px;
+        padding-top: 10px;
+        width: 100%;
+        float: none;
+    }
+
+    .refresh.item .logging .form-group {
+        width: 100%;
+    }
+
+    .item .logging .form-group {
+        width: 70%;
+        display: inline-block;
+    }
+
+    .item .logging .actions {
+        width: 28%;
+        display: inline-block;
+    }
+
+    .refresh.item .logging {
+        width: 100%;
+    }
+
+    .slot.item .main {
+        width: 80%;
+    }
 }

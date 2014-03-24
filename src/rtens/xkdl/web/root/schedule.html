@@ -15,16 +15,15 @@
 
 <div class="container">
 
-    <div class="item bg-primary clearfix">
+    <div class="refresh item bg-primary clearfix">
         <form method="post" class="form-inline">
-            <div class="main" style="width: 20%">
+            <div class="main">
                 <h4>xkdl</h4>
             </div>
-            <div class="logging" style="width: 50%; text-align: right;">
-                <input class="form-control" type="text" name="from" value="now"/>
-                -
-                <input class="form-control" type="text" name="until" value="tomorrow"/>
-                <input class="btn btn-info" type="submit" value="refresh"/>
+            <div class="logging">
+                <div class="form-group">
+                    <input style="width: 40%" class="form-control" type="text" name="from" value="now"/><div style="display: inline-block; text-align: center; width: 5%;">-</div><input style="width: 40%;" class="form-control" type="text" name="until" value="tomorrow"/><input style="width: 15%" class="btn btn-info" type="submit" value="refresh"/>
+                </div>
             </div>
         </form>
     </div>
@@ -55,8 +54,8 @@
                        placeholder="full/task/name"/>
             </div>
             <div class="logging">
-                <div class="inline-form">
-                    <input style="display: inline-block; width: 47%;" class="form-control" required="true" type="text" name="start" value="now"/><div style="display: inline-block; width: 5%; text-align: center;">-</div><input style="display: inline-block; width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+                <div class="form-group">
+                    <input style="width: 47%;" class="form-control" required="true" type="text" name="start" value="now"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
                 </div>
 
                 <div class="actions btn-group">
@@ -76,8 +75,8 @@
             </div>
 
             <div class="logging">
-                <div class="inline-form">
-                    <input disabled="disabled" value="2014-03-19 20:12" style="display: inline-block; width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="display: inline-block; width: 5%; text-align: center;">-</div><input style="display: inline-block; width: 47%;" class="form-control" type="text" name="end" value="now"/>
+                <div class="form-group">
+                    <input disabled="disabled" property="start" value="2014-03-19 20:12" style="width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" value="now"/>
                 </div>
 
                 <div class="actions btn-group">
@@ -115,8 +114,8 @@
             </div>
 
             <div class="logging">
-                <div class="inline-form">
-                    <input value="now" style="display: inline-block; width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="display: inline-block; width: 5%; text-align: center;">-</div><input style="display: inline-block; width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+                <div class="form-group">
+                    <input value="now" style="width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
                 </div>
 
                 <div class="actions btn-group">
