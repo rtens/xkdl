@@ -2,6 +2,7 @@
 namespace rtens\xkdl;
 
 use DateTime;
+use rtens\xkdl\lib\Schedule;
 use rtens\xkdl\lib\Slot;
 
 class Scheduler {
@@ -17,15 +18,14 @@ class Scheduler {
     /**
      * @param DateTime $from
      * @param DateTime $until
-     * @return array|Slot[]
+     * @return Schedule
      */
     public function createSchedule(\DateTime $from, \DateTime $until) {
         $now = new \DateTime($from->format('Y-m-d H:i:0'));
 
-        /** @var Slot[] $schedule */
-        $schedule = array();
+        $schedule = new Schedule($from, $until);
         while ($now < $until) {
-            $tasks = $this->root->getSchedulableTasks($now, $schedule, $until);
+            $tasks = $this->root->getSchedulableTasks($now, $schedule->slots, $until);
             usort($tasks, function (Task $a, Task $b) {
                 $deadlineA = $a->getDeadline();
                 $deadlineB = $b->getDeadline();
@@ -39,12 +39,12 @@ class Scheduler {
             $next->add(new \DateInterval(self::RESOLUTION));
 
             if (count($tasks) > 0) {
-                if (count($schedule) && $schedule[count($schedule) - 1]->task == $tasks[0]
-                    && $schedule[count($schedule) - 1]->window->end == $now
+                if (count($schedule->slots) && $schedule->slots[count($schedule->slots) - 1]->task == $tasks[0]
+                    && $schedule->slots[count($schedule->slots) - 1]->window->end == $now
                 ) {
-                    $schedule[count($schedule) - 1]->window->end = $next;
+                    $schedule->slots[count($schedule->slots) - 1]->window->end = $next;
                 } else {
-                    $schedule[] = new Slot($tasks[0], new lib\TimeWindow($now, $next));
+                    $schedule->slots[] = new Slot($tasks[0], new lib\TimeWindow($now, $next));
                 }
             }
 

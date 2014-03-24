@@ -3,6 +3,7 @@ namespace spec\rtens\xkdl;
 
 use PHPUnit_Framework_TestCase;
 use rtens\xkdl\lib\ExecutionWindow;
+use rtens\xkdl\lib\Schedule;
 use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\RepeatingTask;
@@ -13,7 +14,7 @@ use rtens\xkdl\Task;
 /**
  * @property Task root
  * @property array|Task[]|RepeatingTask[] tasks
- * @property array|Slot[] schedule
+ * @property Schedule schedule
  * @property \Exception|null caught
  */
 class SchedulingTest extends PHPUnit_Framework_TestCase {
@@ -357,11 +358,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     private function thenThereShouldBe_SlotsInTheSchedule($count) {
-        $this->assertCount($count, $this->schedule);
+        $this->assertCount($count, $this->schedule->slots);
     }
 
     private function thenSlot_ShouldBeTask($index, $name) {
-        $this->assertEquals($name, $this->schedule[$index - 1]->task->getName());
+        $this->assertEquals($name, $this->schedule->slots[$index - 1]->task->getName());
     }
 
     private function given_HasTheDeadline($task, $deadline) {
@@ -373,11 +374,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     private function thenSlot_ShouldBe_Minutes($index, $minutes) {
-        $this->assertEquals($minutes, $this->schedule[$index - 1]->window->getSeconds() / 60);
+        $this->assertEquals($minutes, $this->schedule->slots[$index - 1]->window->getSeconds() / 60);
     }
 
     private function thenSlot_ShouldStart($index, $when) {
-        $this->assertEquals($this->aligned($when), $this->schedule[$index - 1]->window->start);
+        $this->assertEquals($this->aligned($when), $this->schedule->slots[$index - 1]->window->start);
     }
 
     private function givenIHaveLogged_MinutesFor($minutes, $name) {

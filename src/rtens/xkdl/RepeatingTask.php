@@ -20,17 +20,17 @@ class RepeatingTask extends Task {
         return $this->repetition;
     }
 
-    protected function isSchedulable(\DateTime $now, array $schedule, \DateTime $until) {
+    protected function isSchedulable(\DateTime $now, array $slots, \DateTime $until) {
         return false;
     }
 
-    public function getSchedulableTasks(\DateTime $now, array $schedule, \DateTime $until) {
+    public function getSchedulableTasks(\DateTime $now, array $slots, \DateTime $until) {
         for ($i = 0; true; $i++) {
             $task = $this->generateRepetition($i);
             if (!$this->hasWindowsContaining($task, $until)) {
                 return array();
             }
-            if ($task->isSchedulable($now, $schedule, $until)) {
+            if ($task->isSchedulable($now, $slots, $until)) {
                 return array($task);
             }
         }

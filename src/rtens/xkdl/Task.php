@@ -136,21 +136,21 @@ class Task {
 
     /**
      * @param \DateTime $now
-     * @param array|Slot[] $schedule
+     * @param array|Slot[] $slots
      * @param DateTime $until
      * @return array|Task[]
      */
-    public function getSchedulableTasks(\DateTime $now, array $schedule, \DateTime $until) {
-        if ($this->done || !$this->isInWindow($now, $schedule, $until)) {
+    public function getSchedulableTasks(\DateTime $now, array $slots, \DateTime $until) {
+        if ($this->done || !$this->isInWindow($now, $slots, $until)) {
             return array();
         }
 
         $tasks = array();
         foreach ($this->children as $child) {
-            foreach ($child->getSchedulableTasks($now, $schedule, $until) as $task) {
+            foreach ($child->getSchedulableTasks($now, $slots, $until) as $task) {
                 $tasks[] = $task;
             }
-            if ($child->isSchedulable($now, $schedule, $until)) {
+            if ($child->isSchedulable($now, $slots, $until)) {
                 $tasks[] = $child;
             }
         }
@@ -159,26 +159,26 @@ class Task {
 
     /**
      * @param DateTime $now
-     * @param array|Slot[] $schedule
+     * @param array|Slot[] $slots
      * @param \DateTime $until
      * @return bool
      */
-    protected function isSchedulable(\DateTime $now, array $schedule, \DateTime $until) {
+    protected function isSchedulable(\DateTime $now, array $slots, \DateTime $until) {
         return (!$this->done
             && $this->duration->seconds()
             && count($this->getOpenChildren()) == 0
-            && $this->isInWindow($now, $schedule, $until)
-            && $this->areAllDependenciesScheduled($schedule)
-            && $this->hasUnscheduledDuration($schedule));
+            && $this->isInWindow($now, $slots, $until)
+            && $this->areAllDependenciesScheduled($slots)
+            && $this->hasUnscheduledDuration($slots));
     }
 
     /**
      * @param \DateTime $now
-     * @param array|Slot[] $schedule
+     * @param array|Slot[] $slots
      * @param $until
      * @return bool
      */
-    private function isInWindow(\DateTime $now, $schedule, $until) {
+    private function isInWindow(\DateTime $now, $slots, $until) {
         if (empty($this->windows)) {
             return true;
         }
@@ -189,7 +189,7 @@ class Task {
             }
 
             if ($window->start <= $now && $now < $window->end
-                && $this->isScheduledTimeSmallerThanQuota($window, $schedule)
+                && $this->isScheduledTimeSmallerThanQuota($window, $slots)
             ) {
                 return true;
             }
@@ -199,16 +199,16 @@ class Task {
 
     /**
      * @param \rtens\xkdl\lib\ExecutionWindow $window
-     * @param array|Slot[] $schedule
+     * @param array|Slot[] $slots
      * @return bool
      */
-    private function isScheduledTimeSmallerThanQuota(ExecutionWindow $window, $schedule) {
+    private function isScheduledTimeSmallerThanQuota(ExecutionWindow $window, $slots) {
         if (!$window->quota) {
             return true;
         }
 
         $secondsScheduledInWindow = 0;
-        foreach ($schedule as $slot) {
+        foreach ($slots as $slot) {
             if ($slot->task == $this && $window->start <= $slot->window->start && $slot->window->end <= $window->end) {
                 $secondsScheduledInWindow += $slot->window->getSeconds();
             }
@@ -217,12 +217,12 @@ class Task {
     }
 
     /**
-     * @param array|Slot[] $schedule
+     * @param array|Slot[] $slots
      * @return bool
      */
-    private function areAllDependenciesScheduled($schedule) {
+    private function areAllDependenciesScheduled($slots) {
         foreach ($this->dependencies as $task) {
-            if ($task->hasUnscheduledDuration($schedule)) {
+            if ($task->hasUnscheduledDuration($slots)) {
                 return false;
             }
         }
@@ -230,12 +230,12 @@ class Task {
     }
 
     /**
-     * @param array|Slot[] $schedule
+     * @param array|Slot[] $slots
      * @return float
      */
-    private function hasUnscheduledDuration(array $schedule) {
+    private function hasUnscheduledDuration(array $slots) {
         $unscheduledSeconds = $this->duration->seconds() - $this->getLoggedDuration()->seconds();
-        foreach ($schedule as $slot) {
+        foreach ($slots as $slot) {
             if ($slot->task == $this) {
                 $unscheduledSeconds -= $slot->window->getSeconds();
                 if ($unscheduledSeconds <= 0) {

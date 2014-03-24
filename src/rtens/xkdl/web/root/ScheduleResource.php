@@ -33,7 +33,7 @@ class ScheduleResource extends DynamicResource {
                     'task' => array('value' => $logging['task']),
                     'start' => array('value' => $logging['start']->format('Y-m-d H:i'))
                 ) : null,
-            'slot' => $this->assembleSchedule($root)
+            'schedule' => $this->assembleSchedule($root)
         ));
     }
 
@@ -86,8 +86,8 @@ class ScheduleResource extends DynamicResource {
             return array();
         }
 
-        $model = array();
-        foreach ($schedule as $slot) {
+        $slots = array();
+        foreach ($schedule->slots as $slot) {
             $markDone = function (Element $e) use ($slot) {
                 if ($slot->task->isDone()) {
                     return str_replace(array('info', 'warning'), 'success',
@@ -96,7 +96,7 @@ class ScheduleResource extends DynamicResource {
                     return $e->getAttribute('class')->getValue();
                 }
             };
-            $model[] = array(
+            $slots[] = array(
                 'class' => $markDone,
                 'done' => array('class' => $markDone),
                 'start' => $slot->window->start->format('H:i'),
@@ -112,7 +112,11 @@ class ScheduleResource extends DynamicResource {
                 )
             );
         }
-        return $model;
+        return array(
+            'from' => $schedule->from->format('Y-m-d H:i'),
+            'until' => $schedule->until->format('Y-m-d H:i'),
+            'slot' => $slots
+        );
     }
 
     private function assembleDuration(Task $task) {

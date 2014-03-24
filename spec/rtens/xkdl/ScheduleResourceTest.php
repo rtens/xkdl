@@ -110,6 +110,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/b/ab/__abc');
 
         $this->givenTheFile_WithContent('schedule.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
             "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
             "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
@@ -146,12 +147,14 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->whenICreateANewScheduleFrom_Until("2001-01-01 12:00", "2001-01-01 12:10");
 
         $this->thenThereShouldBeAFile_WithTheContent('schedule.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
             "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
             "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
             "");
 
         $this->thenThereShouldBeAFile_WithTheContent('schedules/2001-01-01_10-10-10.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
             "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
             "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
@@ -192,12 +195,12 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $rm = function ($dir) use (&$rm) {
             foreach (glob($dir . '/*') as $file) {
                 if (is_file($file)) {
-                    unlink($file);
+                    @unlink($file);
                 } else {
                     $rm($file);
                 }
             }
-            rmdir($dir);
+            @rmdir($dir);
         };
         $rm($this->resource->writer->config->userFolder());
     }
@@ -296,11 +299,11 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function thenThereShouldBe_Slots($int) {
-        $this->assertCount($int, $this->presenter->getModel()['slot']);
+        $this->assertCount($int, $this->presenter->getModel()['schedule']['slot']);
     }
 
     private function getSlot($position) {
-        return $this->presenter->getModel()['slot'][$position - 1];
+        return $this->presenter->getModel()['schedule']['slot'][$position - 1];
     }
 
     private function thenTheStartOfSlot_ShouldBe($int, $string) {

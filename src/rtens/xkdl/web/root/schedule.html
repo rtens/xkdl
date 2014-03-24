@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>xkdl</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
@@ -15,19 +15,6 @@
 <body>
 
 <div class="container">
-
-    <div class="refresh item bg-primary clearfix">
-        <form method="post" class="form-inline">
-            <div class="main">
-                <h4>xkdl</h4>
-            </div>
-            <div class="logging">
-                <div class="form-group">
-                    <input style="width: 40%" class="form-control" type="text" name="from" value="now"/><div style="display: inline-block; text-align: center; width: 5%;">-</div><input style="width: 40%;" class="form-control" type="text" name="until" value="tomorrow"/><input style="width: 15%" class="btn btn-info" type="submit" value="refresh"/>
-                </div>
-            </div>
-        </form>
-    </div>
 
     <div property="idle" class="unscheduled item clearfix bg-success">
         <script property="taskList">
@@ -90,38 +77,61 @@
         </form>
     </div>
 
-    <div property="slot" class="slot item clearfix bg-info">
-        <form property="form" action="some/task/name" method="post">
-            <div property="task" class="main">
-                <div class="info">
-                    <h4 property="start">14:02</h4>
-                    <input property="done" type="submit" name="method" value="done" class="btn btn-warning"/>
-                    <h4 property="end">15:32</h4>
+    <div property="schedule">
+
+        <div class="refresh item bg-primary clearfix">
+            <form method="post" class="form-inline">
+                <div class="main">
+                    <h4>
+                        <span property="from">2001-01-01 10:10</span>
+                        -
+                        <span property="until">2001-01-01 11:11</span>
+                    </h4>
+                </div>
+                <div class="logging">
+                    <div class="form-group">
+                        <input style="width: 39%" class="form-control" type="text" name="from" value="now"/><div style="display: inline-block; text-align: center; width: 5%;">-</div><input style="width: 39%;" class="form-control" type="text" name="until" value="tomorrow"/><input style="width: 16%; margin-left: 1%;" class="btn btn-info" type="submit" value="refresh"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div property="slot" class="slot item clearfix bg-info">
+            <form property="form" action="some/task/name" method="post">
+                <div property="task" class="main">
+                    <div class="info">
+                        <h4 property="start">14:02</h4>
+                        <input property="done" type="submit" name="method" value="done" class="btn btn-warning"/>
+                        <h4 property="end">15:32</h4>
+                    </div>
+
+                    <p property="parent" class="text-muted">the/full/name/of/the/parent</p>
+
+                    <h3 property="name">Name of this task</h3>
+
+                    <p property="deadline" class="text-danger">
+                        Due in
+                        <span property="relative" style="font-weight: bold">4 days 2 hours</span>
+                        (<span property="absolute">2014-02-13 14:00</span>)
+                    </p>
+
+                    <div property="duration" class="duration">
+                        <span property="logged" class="logged" style="width: 40%;"></span>
+                        <span property="number" class="number">4.7 / 15</span>
+                    </div>
                 </div>
 
-                <p property="parent" class="text-muted">the/full/name/of/the/parent</p>
-                <h3 property="name">Name of this task</h3>
-                <p property="deadline" class="text-danger">
-                    Due in
-                    <span property="relative" style="font-weight: bold">4 days 2 hours</span>
-                    (<span property="absolute">2014-02-13 14:00</span>)
-                </p>
-                <div property="duration" class="duration">
-                    <span property="logged" class="logged" style="width: 40%;"></span>
-                    <span property="number" class="number">4.7 / 15</span>
-                </div>
-            </div>
+                <div class="logging">
+                    <div class="form-group">
+                        <input value="now" style="width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+                    </div>
 
-            <div class="logging">
-                <div class="form-group">
-                    <input value="now" style="width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+                    <div class="actions btn-group">
+                        <input style="width: 100%;" class="btn btn-primary" type="submit" name="method" value="log"/>
+                    </div>
                 </div>
-
-                <div class="actions btn-group">
-                    <input style="width: 100%;" class="btn btn-primary" type="submit" name="method" value="log"/>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
 </div>

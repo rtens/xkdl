@@ -2,6 +2,7 @@
 namespace rtens\xkdl\storage;
 
 use rtens\xkdl\lib\Configuration;
+use rtens\xkdl\lib\Schedule;
 use rtens\xkdl\lib\Slot;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\Task;
@@ -77,12 +78,10 @@ class Writer {
         );
     }
 
-    /**
-     * @param Slot[] $schedule
-     */
-    public function saveSchedule($schedule) {
-        $content = '';
-        foreach ($schedule as $slot) {
+    public function saveSchedule(Schedule $schedule) {
+        $content = $schedule->from->format('c') . ' >> ' . $schedule->until->format('c') . "\n";
+
+        foreach ($schedule->slots as $slot) {
             $content .= $slot->window->start->format('c') . ' >> ' .
                 $slot->window->end->format('c') . ' >> ' .
                 $slot->task->getFullName() . "\n";
@@ -104,16 +103,26 @@ class Writer {
     }
 
     public function readSchedule(Task $root) {
-        $schedule = array();
+        $schedule = new Schedule(new \DateTime(), new \DateTime());
+
         if (!file_exists($this->scheduleFile())) {
             return $schedule;
         }
-        foreach (explode("\n", file_get_contents($this->scheduleFile())) as $line) {
+
+        foreach (explode("\n", file_get_contents($this->scheduleFile())) as $i => $line) {
             if (!trim($line)) {
                 continue;
             }
-            list($start, $end, $task) = explode(" >> ", trim($line));
-            $schedule[] = new Slot($this->findTask($root, $task), new TimeWindow(new \DateTime($start), new \DateTime($end)));
+
+            if ($i == 0) {
+                list($start, $end) = explode(" >> ", trim($line));
+                $schedule->from = new \DateTime($start);
+                $schedule->until = new \DateTime($end);
+            } else {
+                list($start, $end, $task) = explode(" >> ", trim($line));
+                $schedule->slots[] = new Slot($this->findTask($root, $task),
+                    new TimeWindow(new \DateTime($start), new \DateTime($end)));
+            }
         }
         return $schedule;
     }

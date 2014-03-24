@@ -79,12 +79,12 @@
 }
 
 .refresh.item .main {
-    width: 10%;
+    width: 22em;
 }
 
 .refresh.item .logging {
     text-align: right;
-    width: 85%;
+    width: 50%;
 }
 
 @media (max-width: 768px) {
