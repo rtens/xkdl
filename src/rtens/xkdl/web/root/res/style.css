@@ -89,6 +89,15 @@
 
 @media (max-width: 768px) {
 
+    .container {
+        padding: 0;
+    }
+
+    .item {
+        margin: 10px;
+        padding: 15px;
+    }
+
     .item .info {
         float: left;
         width: 15%;
