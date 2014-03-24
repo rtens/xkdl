@@ -260,11 +260,11 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function whenIMark_AsDone($task) {
-        $this->resource->doMarkDone($task);
+        $this->resource->doDone($task);
     }
 
     private function whenIMark_AsOpen($task) {
-        $this->resource->doMarkOpen($task);
+        $this->resource->doOpen($task);
     }
 
     private function givenIHaveEnteredTheStartTime($string) {

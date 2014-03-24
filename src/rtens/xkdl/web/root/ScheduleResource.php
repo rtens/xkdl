@@ -69,12 +69,12 @@ class ScheduleResource extends DynamicResource {
         return new Redirecter($this->getUrl());
     }
 
-    public function doMarkDone($task) {
+    public function doDone($task) {
         $this->writer->markDone($task);
         return new Redirecter($this->getUrl());
     }
 
-    public function doMarkOpen($task) {
+    public function doOpen($task) {
         $this->writer->markOpen($task);
         return new Redirecter($this->getUrl());
     }
@@ -102,7 +102,7 @@ class ScheduleResource extends DynamicResource {
             $markDone = function (Element $e) use ($slot) {
                 if ($slot->task->isDone()) {
                     if ($e->getAttribute('value')) {
-                        $e->setAttribute('value', 'markOpen');
+                        $e->setAttribute('value', 'open');
                     }
                     return str_replace(array('info', 'warning'), 'success',
                         $e->getAttribute('class')->getValue());
