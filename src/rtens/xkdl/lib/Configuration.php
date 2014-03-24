@@ -23,4 +23,8 @@ class Configuration {
         return $this->root . '/user';
     }
 
+    public function scheduleArchiveFileName() {
+        return date('Y-m-d_H-i-s') . '.txt';
+    }
+
 } 

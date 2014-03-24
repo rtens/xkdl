@@ -79,7 +79,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->givenTheFolder('root/second/task');
         $this->givenTheFolder('root/done/X_task');
         $this->givenTheFolder('root/X_parent/done');
-        $this->whenIGetTheResource();
+        $this->whenIGetTheSchedule();
         $this->thenTheActiveLoggerShould_BeShown('not');
         $this->thenTheIdleLoggerShould_BeShown('');
         $this->thenTheAutoCompleteListOfTasksShouldBe([
@@ -92,24 +92,30 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     function testShowActiveLogger() {
-        $this->givenALogHasBeenStartedFor_At('/some/task', '2011-01-01 11:01:00');
-        $this->whenIGetTheResource();
+        $this->givenALogHasBeenStartedFor_At('/some/task', '2001-01-01 11:01:00');
+        $this->whenIGetTheSchedule();
         $this->thenTheIdleLoggerShould_BeShown('not');
         $this->thenTheActiveLoggerShould_BeShown('');
         $this->thenTheActiveTaskShouldBe('/some/task');
-        $this->thenTheStartTimeShouldBe('2011-01-01 11:01');
+        $this->thenTheStartTimeShouldBe('2001-01-01 11:01');
     }
 
-    function testShowSchedule() {
+    function testCreateSchedule() {
         $this->givenTheFolder('root/a/__aa');
         $this->givenTheFile_WithContent('root/a/__aa/__.txt', 'duration: PT3M');
-        $this->givenTheFile_WithContent('root/a/__aa/logs.txt', "9:00 >> 9:01");
+        $this->givenTheFile_WithContent('root/a/__aa/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:01");
         $this->givenTheFolder('root/a/__ab');
         $this->givenTheFile_WithContent('root/a/__ab/__.txt', 'deadline: 1 day 2 hours 5 minutes');
-        $this->givenTheFile_WithContent('root/a/__ab/logs.txt', "9:00 >> 9:03");
+        $this->givenTheFile_WithContent('root/a/__ab/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:03");
         $this->givenTheFolder('root/b/ab/__abc');
 
-        $this->whenIGetTheResource();
+        $this->givenTheFile_WithContent('schedule.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
+            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
+            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
+            "");
+
+        $this->whenIGetTheSchedule();
 
         $this->thenThereShouldBe_Slots(3);
 
@@ -128,6 +134,36 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->thenParentOfSlot_ShouldBe(3, '/b/ab');
     }
 
+    function testWriteScheduleCache() {
+        $this->givenTheFolder('root/a/__aa');
+        $this->givenTheFile_WithContent('root/a/__aa/__.txt', 'duration: PT3M');
+        $this->givenTheFile_WithContent('root/a/__aa/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:01");
+        $this->givenTheFolder('root/a/__ab');
+        $this->givenTheFile_WithContent('root/a/__ab/__.txt', 'deadline: 1 day 2 hours 5 minutes');
+        $this->givenTheFile_WithContent('root/a/__ab/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:03");
+        $this->givenTheFolder('root/b/ab/__abc');
+
+        $this->whenICreateANewScheduleFrom_Until("2001-01-01 12:00", "2001-01-01 12:10");
+
+        $this->thenThereShouldBeAFile_WithTheContent('schedule.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
+            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
+            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
+            "");
+
+        $this->thenThereShouldBeAFile_WithTheContent('schedules/2001-01-01_10-10-10.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
+            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
+            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
+            "");
+    }
+
+    function testEmptyCache() {
+        $this->givenTheFolder('root/__a');
+        $this->whenIGetTheSchedule();
+        $this->thenThereShouldBe_Slots(0);
+    }
+
     ################ SETUP ####################
 
     protected function setUp() {
@@ -135,7 +171,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
 
         $config = new MockConfiguration(__DIR__);
         $config->defaultDuration = new TimeSpan('PT1M');
-        mkdir($config->userFolder(), 0777, true);
+        @mkdir($config->userFolder(), 0777, true);
 
         $this->resource = new ScheduleResource(Url::parse('schedule'));
         $this->resource->writer = new Writer();
@@ -229,8 +265,8 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->assertFileNotExists($this->resource->writer->config->userFolder() . '/' . $path);
     }
 
-    private function whenIGetTheResource() {
-        $this->presenter = $this->resource->doGet('12:00', '12:10');
+    private function whenIGetTheSchedule() {
+        $this->presenter = $this->resource->doGet();
     }
 
     private function thenTheActiveLoggerShould_BeShown($not) {
@@ -288,6 +324,10 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
 
     private function thenParentOfSlot_ShouldBe($int, $string) {
         $this->assertEquals($string, $this->getSlot($int)['task']['parent']);
+    }
+
+    private function whenICreateANewScheduleFrom_Until($from, $until) {
+        $this->resource->doPost(new \DateTime($from), new \DateTime($until));
     }
 
 }

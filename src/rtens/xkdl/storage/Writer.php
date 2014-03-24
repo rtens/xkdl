@@ -2,7 +2,9 @@
 namespace rtens\xkdl\storage;
 
 use rtens\xkdl\lib\Configuration;
+use rtens\xkdl\lib\Slot;
 use rtens\xkdl\lib\TimeWindow;
+use rtens\xkdl\Task;
 
 class Writer {
 
@@ -28,7 +30,7 @@ class Writer {
     }
 
     public function startLogging($task, \DateTime $start) {
-        file_put_contents($this->tmpFile(), $task . "\n" . $start->format('c'));
+        file_put_contents($this->loggingFile(), $task . "\n" . $start->format('c'));
     }
 
     public function stopLogging(\DateTime $end) {
@@ -38,32 +40,88 @@ class Writer {
     }
 
     public function cancelLogging() {
-        unlink($this->tmpFile());
+        unlink($this->loggingFile());
     }
 
     /**
      * @return array|null|\DateTime[]|string[]
      */
     public function getOngoingLogInfo() {
-        if (!file_exists($this->tmpFile())) {
+        if (!file_exists($this->loggingFile())) {
             return null;
         }
 
         return $this->readTmpFile();
     }
 
-    private function tmpFile() {
+    private function loggingFile() {
         return $this->config->userFolder() . '/logging';
+    }
+
+    private function scheduleFile() {
+        return $this->config->userFolder() . '/schedule.txt';
+    }
+
+    private function scheduleArchiveFile() {
+        return $this->scheduleArchiveFolder() . '/' . $this->config->scheduleArchiveFileName();
     }
 
     /**
      * @return array
      */
     private function readTmpFile() {
-        list($task, $start) = explode("\n", file_get_contents($this->tmpFile()));
+        list($task, $start) = explode("\n", file_get_contents($this->loggingFile()));
         return array(
             'task' => $task,
             'start' => new \DateTime($start)
         );
+    }
+
+    /**
+     * @param Slot[] $schedule
+     */
+    public function saveSchedule($schedule) {
+        $content = '';
+        foreach ($schedule as $slot) {
+            $content .= $slot->window->start->format('c') . ' >> ' .
+                $slot->window->end->format('c') . ' >> ' .
+                $slot->task->getFullName() . "\n";
+        }
+
+        if (!file_exists($this->scheduleArchiveFolder())) {
+            mkdir($this->scheduleArchiveFolder(), 0777, true);
+        }
+
+        file_put_contents($this->scheduleArchiveFile(), $content);
+        file_put_contents($this->scheduleFile(), $content);
+    }
+
+    /**
+     * @return string
+     */
+    private function scheduleArchiveFolder() {
+        return $this->config->userFolder() . '/schedules';
+    }
+
+    public function readSchedule(Task $root) {
+        $schedule = array();
+        if (!file_exists($this->scheduleFile())) {
+            return $schedule;
+        }
+        foreach (explode("\n", file_get_contents($this->scheduleFile())) as $line) {
+            if (!trim($line)) {
+                continue;
+            }
+            list($start, $end, $task) = explode(" >> ", trim($line));
+            $schedule[] = new Slot($this->findTask($root, $task), new TimeWindow(new \DateTime($start), new \DateTime($end)));
+        }
+        return $schedule;
+    }
+
+    private function findTask(Task $parent, $fullName) {
+        foreach (explode('/', trim($fullName, '/')) as $name) {
+            $parent = $parent->getChild($name);
+        }
+        return $parent;
     }
 }

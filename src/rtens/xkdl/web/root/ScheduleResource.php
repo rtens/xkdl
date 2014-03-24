@@ -20,10 +20,7 @@ class ScheduleResource extends DynamicResource {
     /** @var Reader <- */
     public $reader;
 
-    public function doGet($from = null, $until = null) {
-        $until = $until ? new \DateTime($until) : new \DateTime('tomorrow');
-        $from = $from ? new \DateTime($from) : new \DateTime('now');
-
+    public function doGet() {
         $root = $this->reader->read();
 
         $logging = $this->writer->getOngoingLogInfo();
@@ -35,8 +32,18 @@ class ScheduleResource extends DynamicResource {
                     'task' => array('value' => $logging['task']),
                     'start' => array('value' => $logging['start']->format('Y-m-d H:i'))
                 ) : null,
-            'slot' => $this->assembleSchedule($root, $from, $until)
+            'slot' => $this->assembleSchedule($root)
         ));
+    }
+
+    public function doPost(\DateTime $from, \DateTime $until) {
+        $root = $this->reader->read();
+
+        $scheduler = new Scheduler($root);
+        $schedule = $scheduler->createSchedule($from, $until);
+
+        $this->writer->saveSchedule($schedule);
+        return new Redirecter($this->getUrl());
     }
 
     public function doLog($task, \DateTime $start, $end = null) {
@@ -71,9 +78,8 @@ class ScheduleResource extends DynamicResource {
         return $tasks;
     }
 
-    private function assembleSchedule(Task $root, \DateTime $from, \DateTime $until) {
-        $scheduler = new Scheduler($root);
-        $schedule = $scheduler->createSchedule($from, $until);
+    private function assembleSchedule($root) {
+        $schedule = $this->writer->readSchedule($root);
 
         $model = array();
         foreach ($schedule as $slot) {

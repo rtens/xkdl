@@ -10,4 +10,8 @@ class MockConfiguration extends Configuration {
         return $this->defaultDuration ? : parent::defaultDuration();
     }
 
+    public function scheduleArchiveFileName() {
+        return date('Y-m-d_H-i-s', strtotime('2001-01-01 10:10:10')) . '.txt';
+    }
+
 } 

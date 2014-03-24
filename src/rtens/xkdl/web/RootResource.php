@@ -9,7 +9,7 @@ class RootResource extends Container {
     public static $CLASS = __CLASS__;
 
     public function doGet() {
-        return new Redirecter($this->getUrl('tracking'));
+        return new Redirecter($this->getUrl('schedule'));
     }
 
 } 
