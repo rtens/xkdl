@@ -6,6 +6,7 @@
 
 .item .main {
     float: left;
+    width: 65%;
 }
 
 .item .main label {
