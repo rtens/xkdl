@@ -6,7 +6,6 @@
 
 .item .main {
     float: left;
-    width: 65%;
 }
 
 .item .main label {
@@ -17,13 +16,6 @@
 .item .logging {
     width: 30%;
     float: right;
-}
-
-.item .info {
-    text-align: center;
-    float: left;
-    width: 8%;
-    margin-right: 2%;
 }
 
 .item .info h4 {
@@ -38,7 +30,15 @@
 }
 
 .slot.item .main {
+    margin-left: 8%;
     width: 60%;
+}
+
+.slot.item .main .info {
+    text-align: center;
+    float: left;
+    width: 8%;
+    margin-left: -12%;
 }
 
 .slot.item h3 {
@@ -124,6 +124,12 @@
     }
 
     .slot.item .main {
-        width: 80%;
+        width: auto;
+        margin-left: 5em;
+    }
+
+    .slot.item .main .info {
+        width: 4em;
+        margin-left: -5em;
     }
 }
