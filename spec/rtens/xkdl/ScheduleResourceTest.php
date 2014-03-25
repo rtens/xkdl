@@ -170,7 +170,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
             "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
             "");
 
-        $this->thenThereShouldBeAFile_WithTheContent('schedules/2001-01-01_10-10-10.txt',
+        $this->thenThereShouldBeAFile_WithTheContent('schedules/20010101T101010.txt',
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
             "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
@@ -256,7 +256,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function whenIStartLogging() {
-        $this->resource->doLog($this->fieldTask, $this->fieldStart, $this->fieldEnd);
+        $this->resource->doStart($this->fieldTask, $this->fieldStart, $this->fieldEnd);
     }
 
     private function whenIMark_AsDone($task) {
@@ -282,18 +282,6 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
         $this->resource->writer->startLogging($task, new \DateTime($start));
     }
 
-    private function whenITryToStartLogging() {
-        try {
-            $this->whenIStartLogging();
-        } catch (\Exception $e) {
-            $this->caught = $e;
-        }
-    }
-
-    private function thenAnExceptionShouldBeThrown() {
-        $this->assertNotNull($this->caught);
-    }
-
     private function thenThereShouldBeAFile_WithTheContent($path, $content) {
         $fullPath = $this->resource->writer->config->userFolder() . '/' . $path;
         $this->assertFileExists($fullPath);
@@ -309,7 +297,7 @@ class ScheduleResourceTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function whenIFinishLogging() {
-        $this->resource->doFinish(new \DateTime($this->fieldEnd));
+        $this->resource->doStop(new \DateTime($this->fieldEnd));
     }
 
     private function thenThereShouldBeAFolder($path) {

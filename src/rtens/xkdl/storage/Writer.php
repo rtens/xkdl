@@ -88,12 +88,16 @@ class Writer {
         return $this->config->userFolder() . '/schedule.txt';
     }
 
+    private function scheduleArchiveFolder() {
+        return $this->config->userFolder() . '/schedules';
+    }
+
     private function scheduleArchiveFile() {
         return $this->scheduleArchiveFolder() . '/' . $this->config->scheduleArchiveFileName();
     }
 
     /**
-     * @return array
+     * @return array with 'task' and 'start' keys
      */
     private function readTmpFile() {
         list($task, $start) = explode("\n", file_get_contents($this->loggingFile()));
@@ -118,13 +122,6 @@ class Writer {
 
         file_put_contents($this->scheduleArchiveFile(), $content);
         file_put_contents($this->scheduleFile(), $content);
-    }
-
-    /**
-     * @return string
-     */
-    private function scheduleArchiveFolder() {
-        return $this->config->userFolder() . '/schedules';
     }
 
     public function readSchedule(Task $root) {

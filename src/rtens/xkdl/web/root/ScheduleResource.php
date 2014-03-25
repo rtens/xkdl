@@ -47,7 +47,7 @@ class ScheduleResource extends DynamicResource {
         return new Redirecter($this->getUrl());
     }
 
-    public function doLog($task, \DateTime $start, $end = null) {
+    public function doStart($task, \DateTime $start, $end = null) {
         if ($end) {
             $this->writer->addLog($task, new TimeWindow($start, new \DateTime($end)));
         } else {
@@ -59,7 +59,7 @@ class ScheduleResource extends DynamicResource {
         return new Redirecter($this->getUrl());
     }
 
-    public function doFinish(\DateTime $end) {
+    public function doStop(\DateTime $end) {
         $this->writer->stopLogging($end);
         return new Redirecter($this->getUrl());
     }
