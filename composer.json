@@ -15,9 +15,12 @@
         "php": ">=5.4",
         "watoki/curir": "*",
         "watoki/tempan": "*",
-        "watoki/cfg": "*"
+        "watoki/cfg": "*",
+        "google/apiclient": "1.0.*"
     },
     "require-dev": {
+        "rtens/mockster": "*",
+        "watoki/scrut": "*"
     },
     "autoload": {
         "psr-0": {

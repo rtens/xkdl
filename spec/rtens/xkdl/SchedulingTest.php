@@ -2,25 +2,21 @@
 namespace spec\rtens\xkdl;
 
 use PHPUnit_Framework_TestCase;
-use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\Schedule;
-use rtens\xkdl\lib\TimeSpan;
-use rtens\xkdl\lib\TimeWindow;
-use rtens\xkdl\RepeatingTask;
 use rtens\xkdl\Scheduler;
-use rtens\xkdl\lib\Slot;
-use rtens\xkdl\Task;
+use spec\rtens\xkdl\fixtures\TaskFixture;
+use watoki\scrut\Specification;
 
 /**
- * @property Task root
- * @property array|Task[]|RepeatingTask[] tasks
  * @property Schedule schedule
  * @property \Exception|null caught
+ *
+ * @property TaskFixture task <-
  */
-class SchedulingTest extends PHPUnit_Framework_TestCase {
+class SchedulingTest extends Specification {
 
     public function background() {
-        $this->givenTheRootTask('root');
+        $this->task->givenTheRootTask('root');
     }
 
     function testEmptyRoot() {
@@ -29,19 +25,19 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testSingleTask() {
-        $this->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('one', 'root');
         $this->whenICreateTheSchedule();
         $this->thenThereShouldBe_SlotsInTheSchedule(1);
         $this->thenSlot_ShouldBeTask(1, 'one');
     }
 
     function testEarliestDeadlineFirst() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('three', 'root');
-        $this->given_HasTheDeadline('one', 'tomorrow');
-        $this->given_HasTheDeadline('two', 'next week');
-        $this->given_HasTheDeadline('three', 'today');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('three', 'root');
+        $this->task->given_HasTheDeadline('one', 'tomorrow');
+        $this->task->given_HasTheDeadline('two', 'next week');
+        $this->task->given_HasTheDeadline('three', 'today');
 
         $this->whenICreateTheSchedule();
 
@@ -52,11 +48,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testNoDeadline() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('three', 'root');
-        $this->given_HasTheDeadline('one', 'tomorrow');
-        $this->given_HasTheDeadline('three', 'next week');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('three', 'root');
+        $this->task->given_HasTheDeadline('one', 'tomorrow');
+        $this->task->given_HasTheDeadline('three', 'next week');
 
         $this->whenICreateTheSchedule();
 
@@ -67,16 +63,16 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testSameDeadlinesWithPriorities() {
-        $this->givenTheTask_In('a', 'root');
-        $this->givenTheTask_In('b', 'root');
-        $this->givenTheTask_In('aa', 'a');
-        $this->givenTheTask_In('ab', 'a');
-        $this->givenTheTask_In('ba', 'b');
-        $this->givenTheTask_In('bb', 'b');
+        $this->task->givenTheTask_In('a', 'root');
+        $this->task->givenTheTask_In('b', 'root');
+        $this->task->givenTheTask_In('aa', 'a');
+        $this->task->givenTheTask_In('ab', 'a');
+        $this->task->givenTheTask_In('ba', 'b');
+        $this->task->givenTheTask_In('bb', 'b');
 
-        $this->given_HasThePriority('b', 1);
-        $this->given_HasThePriority('a', 2);
-        $this->given_HasThePriority('ab', 5);
+        $this->task->given_HasThePriority('b', 1);
+        $this->task->given_HasThePriority('a', 2);
+        $this->task->given_HasThePriority('ab', 5);
 
         $this->whenICreateTheSchedule();
 
@@ -88,12 +84,12 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testSameDeadlinesNoPriorities() {
-        $this->givenTheTask_In('a', 'root');
-        $this->givenTheTask_In('b', 'root');
-        $this->givenTheTask_In('one', 'a');
-        $this->givenTheTask_In('two', 'a');
-        $this->givenTheTask_In('three', 'b');
-        $this->givenTheTask_In('four', 'b');
+        $this->task->givenTheTask_In('a', 'root');
+        $this->task->givenTheTask_In('b', 'root');
+        $this->task->givenTheTask_In('one', 'a');
+        $this->task->givenTheTask_In('two', 'a');
+        $this->task->givenTheTask_In('three', 'b');
+        $this->task->givenTheTask_In('four', 'b');
 
         $this->whenICreateTheSchedule();
 
@@ -105,9 +101,9 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testCompletedTask() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->given_IsDone('one');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->given_IsDone('one');
 
         $this->whenICreateTheSchedule();
 
@@ -116,10 +112,10 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testCascadingCompleteness() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('one_one', 'one');
-        $this->given_IsDone('one');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('one_one', 'one');
+        $this->task->given_IsDone('one');
 
         $this->whenICreateTheSchedule();
 
@@ -128,12 +124,12 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testTaskTree() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('one_one', 'one');
-        $this->givenTheTask_In('leaf_one', 'one');
-        $this->givenTheTask_In('leaf_two', 'one_one');
-        $this->givenTheTask_In('leaf_three', 'two');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('one_one', 'one');
+        $this->task->givenTheTask_In('leaf_one', 'one');
+        $this->task->givenTheTask_In('leaf_two', 'one_one');
+        $this->task->givenTheTask_In('leaf_three', 'two');
 
         $this->whenICreateTheSchedule();
 
@@ -144,14 +140,14 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testTreeWithDoneTasks() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('one_one', 'one');
-        $this->givenTheTask_In('leaf_one', 'one');
-        $this->givenTheTask_In('leaf_two', 'one_one');
-        $this->givenTheTask_In('leaf_three', 'two');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('one_one', 'one');
+        $this->task->givenTheTask_In('leaf_one', 'one');
+        $this->task->givenTheTask_In('leaf_two', 'one_one');
+        $this->task->givenTheTask_In('leaf_three', 'two');
 
-        $this->given_IsDone('leaf_two');
+        $this->task->given_IsDone('leaf_two');
 
         $this->whenICreateTheSchedule();
 
@@ -162,13 +158,13 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testTaskWithoutDuration() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('three', 'root');
-        $this->given_HasTheDeadline('three', 'today');
-        $this->given_Takes_Minutes('one', 0);
-        $this->given_Takes_Minutes('two', 1);
-        $this->givenIHaveLogged_MinutesFor(2, 'two');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('three', 'root');
+        $this->task->given_HasTheDeadline('three', 'today');
+        $this->task->given_Takes_Minutes('one', 0);
+        $this->task->given_Takes_Minutes('two', 1);
+        $this->task->givenIHaveLogged_MinutesFor(2, 'two');
 
         $this->whenICreateTheSchedule();
         $this->thenThereShouldBe_SlotsInTheSchedule(2);
@@ -177,8 +173,8 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testTaskWithMinimalDuration() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', 1);
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', 1);
 
         $this->whenICreateTheSchedule();
 
@@ -187,8 +183,8 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testTaskWithLargerDuration() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', 11);
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', 11);
 
         $this->whenICreateTheSchedule();
 
@@ -197,14 +193,14 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testInheritDeadline() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('one_one', 'one');
-        $this->givenTheTask_In('one_two', 'one');
-        $this->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('one_one', 'one');
+        $this->task->givenTheTask_In('one_two', 'one');
+        $this->task->givenTheTask_In('two', 'root');
 
-        $this->given_HasTheDeadline('one', 'today');
-        $this->given_HasTheDeadline('one_two', 'next week');
-        $this->given_HasTheDeadline('two', 'tomorrow');
+        $this->task->given_HasTheDeadline('one', 'today');
+        $this->task->given_HasTheDeadline('one_two', 'next week');
+        $this->task->given_HasTheDeadline('two', 'tomorrow');
 
         $this->whenICreateTheSchedule();
 
@@ -215,9 +211,9 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testLoggedTime() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', 12);
-        $this->givenIHaveLogged_MinutesFor(5, 'one');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', 12);
+        $this->task->givenIHaveLogged_MinutesFor(5, 'one');
 
         $this->whenICreateTheSchedule();
 
@@ -225,10 +221,10 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testTimeWindowConstraint() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', 12);
-        $this->given_HasAWindowFrom_Until('one', 'now', '5 minutes');
-        $this->given_HasAWindowFrom_Until('one', '7 minutes', '17 minutes');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', 12);
+        $this->task->given_HasAWindowFrom_Until('one', 'now', '5 minutes');
+        $this->task->given_HasAWindowFrom_Until('one', '7 minutes', '17 minutes');
 
         $this->whenICreateTheSchedule();
 
@@ -238,12 +234,12 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testCascadingTimeWindows() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', 12);
-        $this->given_HasAWindowFrom_Until('root', '2 minutes', '20 minutes');
-        $this->given_HasAWindowFrom_Until('one', 'now', '5 minutes');
-        $this->given_HasAWindowFrom_Until('one', '7 minutes', '14 minutes');
-        $this->given_HasAWindowFrom_Until('one', '15 minutes', '20 minutes');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', 12);
+        $this->task->given_HasAWindowFrom_Until('root', '2 minutes', '20 minutes');
+        $this->task->given_HasAWindowFrom_Until('one', 'now', '5 minutes');
+        $this->task->given_HasAWindowFrom_Until('one', '7 minutes', '14 minutes');
+        $this->task->given_HasAWindowFrom_Until('one', '15 minutes', '20 minutes');
 
         $this->whenICreateTheSchedule();
 
@@ -254,11 +250,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testWindowWithQuota() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', 10);
-        $this->given_HasAWindowFrom_Until_WithAQuotaOf_Minutes('one', 'now', '5 minutes', 2);
-        $this->given_HasAWindowFrom_Until_WithAQuotaOf_Minutes('one', '7 minutes', '17 minutes', 5);
-        $this->given_HasAWindowFrom_Until_WithAQuotaOf_Minutes('one', '20 minutes', '25 minutes', 5);
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', 10);
+        $this->task->given_HasAWindowFrom_Until_WithAQuotaOf_Minutes('one', 'now', '5 minutes', 2);
+        $this->task->given_HasAWindowFrom_Until_WithAQuotaOf_Minutes('one', '7 minutes', '17 minutes', 5);
+        $this->task->given_HasAWindowFrom_Until_WithAQuotaOf_Minutes('one', '20 minutes', '25 minutes', 5);
 
         $this->whenICreateTheSchedule();
 
@@ -269,16 +265,16 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testDependencies() {
-        $this->givenTheTask_In('one', 'root');
-        $this->givenTheTask_In('two', 'root');
-        $this->givenTheTask_In('three', 'root');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->givenTheTask_In('two', 'root');
+        $this->task->givenTheTask_In('three', 'root');
 
-        $this->given_HasTheDeadline('one', 'today');
-        $this->given_HasTheDeadline('two', 'tomorrow');
-        $this->given_HasTheDeadline('three', 'next week');
+        $this->task->given_HasTheDeadline('one', 'today');
+        $this->task->given_HasTheDeadline('two', 'tomorrow');
+        $this->task->given_HasTheDeadline('three', 'next week');
 
-        $this->given_DependsOn('one', 'two');
-        $this->given_DependsOn('two', 'three');
+        $this->task->given_DependsOn('one', 'two');
+        $this->task->given_DependsOn('two', 'three');
 
         $this->whenICreateTheSchedule();
 
@@ -289,11 +285,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testRepeatingTask() {
-        $this->givenTheRepeatingTask_In('one', 'root');
-        $this->given_IsRepeatedEach_Minutes('one', 30);
-        $this->given_Takes_Minutes('one', 5);
-        $this->given_HasAWindowFrom_Until('one', 'now', '2 minutes');
-        $this->given_HasAWindowFrom_Until('one', '4 minutes', '8 minutes');
+        $this->task->givenTheRepeatingTask_In('one', 'root');
+        $this->task->given_IsRepeatedEach_Minutes('one', 30);
+        $this->task->given_Takes_Minutes('one', 5);
+        $this->task->given_HasAWindowFrom_Until('one', 'now', '2 minutes');
+        $this->task->given_HasAWindowFrom_Until('one', '4 minutes', '8 minutes');
 
         $this->whenICreateTheSchedule();
 
@@ -308,11 +304,11 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testRepeatingExecutionWindow() {
-        $this->givenTheTask_In('one', 'root');
-        $this->given_Takes_Minutes('one', '10');
-        $this->given_HasAWindowFrom_Until('one', 'now', '2 minutes');
-        $this->givenTheWindowsOf_AreRepeatedEvery_Minutes('one', 15);
-        $this->given_HasAWindowFrom_Until('one', '4 minutes', '6 minutes');
+        $this->task->givenTheTask_In('one', 'root');
+        $this->task->given_Takes_Minutes('one', '10');
+        $this->task->given_HasAWindowFrom_Until('one', 'now', '2 minutes');
+        $this->task->givenTheWindowsOf_AreRepeatedEvery_Minutes('one', 15);
+        $this->task->given_HasAWindowFrom_Until('one', '4 minutes', '6 minutes');
 
         $this->whenICreateTheSchedule();
 
@@ -325,7 +321,7 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
     }
 
     function testRepeatingTaskWithRepeatingWindows() {
-        $this->givenTheRepeatingTask_In('one', 'root');
+        $this->task->givenTheRepeatingTask_In('one', 'root');
         $this->whenITryToRepeatTheWindowsOf('one');
         $this->thenAnExceptionShouldBeThrown();
     }
@@ -337,23 +333,8 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->background();
     }
 
-    private function givenTheRootTask($name) {
-        $this->root = new Task($name);
-        $this->tasks[$name] = $this->root;
-    }
-
-    private function givenTheTask_In($child, $parent) {
-        $this->tasks[$child] = new Task($child, new TimeSpan('PT1M'));
-        $this->tasks[$parent]->addChild($this->tasks[$child]);
-    }
-
-    private function givenTheRepeatingTask_In($task, $parent) {
-        $this->tasks[$task] = new RepeatingTask($task, new TimeSpan('PT1M'));
-        $this->tasks[$parent]->addChild($this->tasks[$task]);
-    }
-
     private function whenICreateTheSchedule() {
-        $scheduler = new Scheduler($this->root);
+        $scheduler = new Scheduler($this->task->root);
         $this->schedule = $scheduler->createSchedule(new \DateTime(), $this->aligned('2 hours'));
     }
 
@@ -365,14 +346,6 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($name, $this->schedule->slots[$index - 1]->task->getName());
     }
 
-    private function given_HasTheDeadline($task, $deadline) {
-        $this->tasks[$task]->setDeadline(new \DateTime($deadline));
-    }
-
-    private function given_Takes_Minutes($name, $minutes) {
-        $this->tasks[$name]->setDuration(new TimeSpan('PT' . $minutes . 'M'));
-    }
-
     private function thenSlot_ShouldBe_Minutes($index, $minutes) {
         $this->assertEquals($minutes, $this->schedule->slots[$index - 1]->window->getSeconds() / 60);
     }
@@ -381,41 +354,13 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($this->aligned($when), $this->schedule->slots[$index - 1]->window->start);
     }
 
-    private function givenIHaveLogged_MinutesFor($minutes, $name) {
-        $this->tasks[$name]->addLog(new TimeWindow(new \DateTime(), new \DateTime($minutes . ' minutes')));
-    }
-
-    private function given_HasAWindowFrom_Until($task, $from, $until) {
-        $this->tasks[$task]->addWindow(new ExecutionWindow($this->aligned($from), $this->aligned($until)));
-    }
-
-    private function given_HasAWindowFrom_Until_WithAQuotaOf_Minutes($task, $from, $until, $quota) {
-        $this->tasks[$task]->addWindow(new ExecutionWindow($this->aligned($from), $this->aligned($until), $quota / 60));
-    }
-
     private function aligned($from) {
         return new \DateTime(date('Y-m-d H:i:0', strtotime($from)));
     }
 
-    private function given_DependsOn($task, $dependency) {
-        $this->tasks[$task]->addDependency($this->tasks[$dependency]);
-    }
-
-    private function given_IsRepeatedEach_Minutes($task, $minutes) {
-        $this->tasks[$task]->repeatEvery(new \DateInterval('PT' . $minutes . 'M'));
-    }
-
-    private function given_IsDone($task) {
-        $this->tasks[$task]->setDone();
-    }
-
-    private function givenTheWindowsOf_AreRepeatedEvery_Minutes($task, $minutes) {
-        $this->tasks[$task]->repeatWindow(new \DateInterval("PT{$minutes}M"));
-    }
-
     private function whenITryToRepeatTheWindowsOf($task) {
         try {
-            $this->givenTheWindowsOf_AreRepeatedEvery_Minutes($task, 1);
+            $this->task->givenTheWindowsOf_AreRepeatedEvery_Minutes($task, 1);
         } catch (\Exception $e) {
             $this->caught = $e;
         }
@@ -423,10 +368,6 @@ class SchedulingTest extends PHPUnit_Framework_TestCase {
 
     private function thenAnExceptionShouldBeThrown() {
         $this->assertNotNull($this->caught);
-    }
-
-    private function given_HasThePriority($task, $priority) {
-        $this->tasks[$task]->setPriority($priority);
     }
 
 }

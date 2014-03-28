@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\web\root;
 
+use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\Scheduler;
 use rtens\xkdl\storage\Reader;
@@ -20,6 +21,9 @@ class ScheduleResource extends DynamicResource {
 
     /** @var Reader <- */
     public $reader;
+
+    /** @var Configuration <- */
+    public $config;
 
     public function doGet() {
         $root = $this->reader->read();
@@ -120,7 +124,7 @@ class ScheduleResource extends DynamicResource {
                     'target' => array('value' => $slot->task->getFullName()),
                     'parent' => $slot->task->getParent()->getFullName(),
                     'deadline' => !$slot->task->isDone() && $slot->task->getDeadline() ? array(
-                            'relative' => $slot->task->getDeadline()->diff(new \DateTime())->format('%ad %hh %im'),
+                            'relative' => $slot->task->getDeadline()->diff($this->config->now())->format('%ad %hh %im'),
                             'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
                         ) : null,
                     'duration' => $this->assembleDuration($slot->task)

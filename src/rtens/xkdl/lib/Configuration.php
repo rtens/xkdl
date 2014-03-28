@@ -23,9 +23,12 @@ class Configuration {
         return $this->root . '/user';
     }
 
-    public function scheduleArchiveFileName(\DateTime $date = null) {
-        $date = $date ? : new \DateTime();
-        return $date->format('Ymd\THis') . '.txt';
+    public function scheduleArchiveFileName() {
+        return $this->now()->format('Ymd\THis') . '.txt';
+    }
+
+    public function now() {
+        return new \DateTime();
     }
 
 } 
