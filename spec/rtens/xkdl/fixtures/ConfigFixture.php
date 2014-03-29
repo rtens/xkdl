@@ -19,7 +19,7 @@ class ConfigFixture extends Fixture {
         $root = $this->tmpDir();
 
         $mf = new MockFactory();
-        $this->config = $mf->getInstance(Configuration::$CLASS, [$root]);
+        $this->config = $mf->getInstance(Configuration::CLASS, [$root]);
         $this->config->__mock()->mockMethods(Mockster::F_NONE);
 
         @mkdir($root);

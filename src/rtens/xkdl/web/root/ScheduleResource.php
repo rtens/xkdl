@@ -14,8 +14,6 @@ use watoki\dom\Element;
 
 class ScheduleResource extends DynamicResource {
 
-    public static $CLASS = __CLASS__;
-
     /** @var Writer <- */
     public $writer;
 

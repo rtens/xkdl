@@ -3,8 +3,6 @@ namespace rtens\xkdl\lib;
 
 class Configuration {
 
-    public static $CLASS = __CLASS__;
-
     private $root;
 
     function __construct($root) {
