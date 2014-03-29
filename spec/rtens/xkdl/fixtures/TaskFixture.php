@@ -130,4 +130,4 @@ class TaskFixture extends Fixture {
         $this->tasks[$task]->setPriority($priority);
     }
 
-} 
+}

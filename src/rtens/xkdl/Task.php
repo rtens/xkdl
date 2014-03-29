@@ -146,7 +146,7 @@ class Task {
         }
 
         $tasks = array();
-        foreach ($this->children as $child) {
+        foreach ($this->getChildren() as $child) {
             foreach ($child->getSchedulableTasks($now, $slots, $until) as $task) {
                 $tasks[] = $task;
             }
@@ -260,7 +260,7 @@ class Task {
      * @throws \Exception
      */
     public function getChild($name) {
-        foreach ($this->children as $child) {
+        foreach ($this->getChildren() as $child) {
             if ($child->name == $name) {
                 return $child;
             }
@@ -273,7 +273,7 @@ class Task {
      */
     public function getOpenChildren() {
         $openChildren = array();
-        foreach ($this->children as $child) {
+        foreach ($this->getChildren() as $child) {
             if (!$child->isDone()) {
                 $openChildren[] = $child;
             }
