@@ -4,7 +4,7 @@ namespace spec\rtens\xkdl\fixtures;
 use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
-use rtens\xkdl\RepeatingTask;
+use rtens\xkdl\task\RepeatingTask;
 use rtens\xkdl\Task;
 use watoki\scrut\Fixture;
 
@@ -56,7 +56,7 @@ class TaskFixture extends Fixture {
     }
 
     public function thenTheRepetitionOf_ShouldBe($path, $interval) {
-        /** @var RepeatingTask $repeatingTask */
+        /** @var \rtens\xkdl\task\RepeatingTask $repeatingTask */
         $repeatingTask = $this->getTask($path);
         $this->spec->assertEquals(new \DateInterval($interval), $repeatingTask->getRepetition());
     }

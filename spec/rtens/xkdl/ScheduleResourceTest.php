@@ -1,8 +1,6 @@
 <?php
 namespace spec\rtens\xkdl;
 
-use rtens\xkdl\storage\Reader;
-use rtens\xkdl\storage\Writer;
 use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
@@ -228,12 +226,7 @@ class ScheduleResourceTest extends Specification {
 
     protected function setUp() {
         parent::setUp();
-        $this->resource = new ScheduleResource(Url::parse('schedule'));
-        $this->resource->config = $this->config->getConfig();
-        $this->resource->writer = new Writer();
-        $this->resource->writer->config = $this->config->getConfig();
-        $this->resource->reader = new Reader();
-        $this->resource->reader->config = $this->config->getConfig();
+        $this->resource = $this->factory->getInstance(ScheduleResource::CLASS, [Url::parse('schedule')]);
 
         $this->fieldEnd = null;
 

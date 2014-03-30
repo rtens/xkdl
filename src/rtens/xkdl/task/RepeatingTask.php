@@ -1,7 +1,8 @@
 <?php
-namespace rtens\xkdl;
+namespace rtens\xkdl\task;
 
 use rtens\xkdl\lib\ExecutionWindow;
+use rtens\xkdl\Task;
 
 class RepeatingTask extends Task {
 

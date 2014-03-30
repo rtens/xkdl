@@ -4,7 +4,7 @@ namespace rtens\xkdl\web\root;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\Scheduler;
-use rtens\xkdl\storage\Reader;
+use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
 use rtens\xkdl\web\Presenter;
@@ -17,14 +17,14 @@ class ScheduleResource extends DynamicResource {
     /** @var Writer <- */
     public $writer;
 
-    /** @var Reader <- */
-    public $reader;
+    /** @var TaskStore <- */
+    public $store;
 
     /** @var Configuration <- */
     public $config;
 
     public function doGet() {
-        $root = $this->reader->read();
+        $root = $this->store->getRoot();
 
         $logging = $this->writer->getOngoingLogInfo();
         return new Presenter($this, array(
@@ -40,7 +40,7 @@ class ScheduleResource extends DynamicResource {
     }
 
     public function doPost(\DateTime $from, \DateTime $until) {
-        $root = $this->reader->read();
+        $root = $this->store->getRoot();
 
         $scheduler = new Scheduler($root);
         $schedule = $scheduler->createSchedule($from, $until);

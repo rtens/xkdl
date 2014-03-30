@@ -2,7 +2,7 @@
 namespace spec\rtens\xkdl;
 
 use rtens\xkdl\lib\TimeWindow;
-use rtens\xkdl\storage\Reader;
+use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
@@ -87,7 +87,9 @@ class StorageTest extends Specification {
 
     function testReadRepeatingTask() {
         $this->file->givenTheFolder('root/__one');
-        $this->file->givenTheFile_WithContent('root/__one/__.txt', 'repeat: PT1H');
+        $this->file->givenTheFile_WithContent('root/__one/__.txt',
+            "type: rtens\\xkdl\\task\\RepeatingTask\n" .
+            "repeat: PT1H");
         $this->whenIReadTheTasks();
         $this->task->then_ShouldBeARepeatingTask('one');
         $this->task->thenTheRepetitionOf_ShouldBe('one', 'PT1H');
@@ -163,9 +165,9 @@ class StorageTest extends Specification {
     }
 
     private function whenIReadTheTasks() {
-        $reader = new Reader();
-        $reader->config = $this->config->getConfig();
-        $this->task->root = $reader->read();
+        /** @var TaskStore $store */
+        $store = $this->factory->getInstance(TaskStore::CLASS);
+        $this->task->root = $store->getRoot();
     }
 
     public function whenIAddALogFrom_Until_To($start, $end, $task) {

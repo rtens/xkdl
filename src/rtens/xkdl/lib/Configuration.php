@@ -10,7 +10,11 @@ class Configuration {
     }
 
     public function defaultDuration() {
-        return new TimeSpan('PT15M');
+        return new TimeSpan($this->defaultDurationString());
+    }
+
+    public function defaultDurationString() {
+        return 'PT15M';
     }
 
     public function rootTaskFolder() {

@@ -39,6 +39,7 @@ class ConfigFixture extends Fixture {
 
     public function givenTheDefaultDurationIs_Minutes($int) {
         $this->config->__mock()->method('defaultDuration')->willReturn(new TimeSpan('PT' . $int . 'M'));
+        $this->config->__mock()->method('defaultDurationString')->willReturn('PT' . $int . 'M');
     }
 
     public function givenNowIs($when) {
