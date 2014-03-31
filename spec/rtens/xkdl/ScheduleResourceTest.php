@@ -84,20 +84,20 @@ class ScheduleResourceTest extends Specification {
     }
 
     function testAddLogToTasksWithMetaInformation() {
-        $this->file->givenTheFolder('root/__meta/X_info/__1_task');
+        $this->file->givenTheFolder('root/__meta/x_info/__1_task');
         $this->givenIHaveEnteredTheTask('/meta/info/task');
         $this->givenIHaveEnteredTheStartTime('2011-11-11 11:11');
         $this->givenIHaveEnteredTheEndTime('2011-11-11 11:12');
         $this->whenIStartLogging();
-        $this->file->thenThereShouldBeAFile_WithTheContent('root/__meta/X_info/__1_task/logs.txt',
+        $this->file->thenThereShouldBeAFile_WithTheContent('root/__meta/x_info/__1_task/logs.txt',
             "2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
     }
 
     function testShowIdleLogger() {
         $this->file->givenTheFolder('root/first/task');
         $this->file->givenTheFolder('root/second/task');
-        $this->file->givenTheFolder('root/done/X_task');
-        $this->file->givenTheFolder('root/X_parent/done');
+        $this->file->givenTheFolder('root/done/x_task');
+        $this->file->givenTheFolder('root/x_parent/done');
         $this->whenIGetTheSchedule();
         $this->thenTheActiveLoggerShould_BeShown('not');
         $this->thenTheIdleLoggerShould_BeShown('');
@@ -208,19 +208,19 @@ class ScheduleResourceTest extends Specification {
         $this->whenIMark_AsDone('/a/b');
         $this->whenIMark_AsDone('/c');
 
-        $this->file->thenThereShouldBeAFolder('root/X_a');
-        $this->file->thenThereShouldBeAFolder('root/X_a/X_b');
-        $this->file->thenThereShouldBeAFolder('root/X_c');
+        $this->file->thenThereShouldBeAFolder('root/x_a');
+        $this->file->thenThereShouldBeAFolder('root/x_a/x_b');
+        $this->file->thenThereShouldBeAFolder('root/x_c');
     }
 
     function testMarkDoneTaskAsDone() {
-        $this->file->givenTheFolder('root/X_a');
+        $this->file->givenTheFolder('root/x_a');
         $this->whenIMark_AsDone('/a');
-        $this->file->thenThereShouldBeAFolder('root/X_a');
+        $this->file->thenThereShouldBeAFolder('root/x_a');
     }
 
     function testMarkDoneTaskAsOpen() {
-        $this->file->givenTheFolder('root/X_a');
+        $this->file->givenTheFolder('root/x_a');
         $this->whenIMark_AsOpen('/a');
         $this->file->thenThereShouldBeAFolder('root/__a');
     }

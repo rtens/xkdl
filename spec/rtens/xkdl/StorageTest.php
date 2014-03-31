@@ -29,12 +29,14 @@ class StorageTest extends Specification {
     function testDoneTask() {
         $this->file->givenTheFolder('root/__one');
         $this->file->givenTheFolder('root/X_two');
+        $this->file->givenTheFolder('root/x_three');
         $this->file->givenTheFolder('root/x-men');
 
         $this->whenIReadTheTasks();
 
         $this->task->thenThereShouldBeATask('one');
         $this->task->then_ShouldBeDone('two');
+        $this->task->then_ShouldBeDone('three');
         $this->task->then_ShouldBeOpen('x-men');
     }
 
@@ -144,17 +146,17 @@ class StorageTest extends Specification {
         $this->task->givenTheTask_In('three', 'root');
         $this->task->givenTheTask_In('four', 'root');
 
-        $this->file->givenTheFolder('root/__one/X_two');
+        $this->file->givenTheFolder('root/__one/x_two');
         $this->file->givenTheFolder('root/__10_three');
-        $this->file->givenTheFolder('root/X_2_four');
+        $this->file->givenTheFolder('root/x_2_four');
 
         $this->whenIAddALogFrom_Until_To('2014-01-01 12:00', '2014-01-01 13:00', 'one/two');
         $this->whenIAddALogFrom_Until_To('2014-01-01 12:00', '2014-01-01 13:00', 'three');
         $this->whenIAddALogFrom_Until_To('2014-01-01 12:00', '2014-01-01 13:00', 'four');
 
-        $this->file->thenThereShouldBeAFile('root/__one/X_two/logs.txt');
+        $this->file->thenThereShouldBeAFile('root/__one/x_two/logs.txt');
         $this->file->thenThereShouldBeAFile('root/__10_three/logs.txt');
-        $this->file->thenThereShouldBeAFile('root/X_2_four/logs.txt');
+        $this->file->thenThereShouldBeAFile('root/x_2_four/logs.txt');
     }
 
     ###################### SETUP ########################

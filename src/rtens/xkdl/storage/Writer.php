@@ -18,7 +18,7 @@ class Writer {
     }
 
     public function markDone($fullTaskName) {
-        $this->prepend('X_', $fullTaskName);
+        $this->prepend('x_', $fullTaskName);
     }
 
     public function markOpen($fullTaskName) {
