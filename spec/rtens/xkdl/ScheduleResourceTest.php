@@ -192,7 +192,10 @@ class ScheduleResourceTest extends Specification {
     }
 
     function testInvalidCache() {
-        $this->file->givenTheFile_WithContent('schedule.txt', "now >> tomorrow >> not/existing/task");
+        $this->file->givenTheFolder('root/not');
+        $this->file->givenTheFile_WithContent('schedule.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
+            "now >> tomorrow >> /not/existing/task");
         $this->whenIGetTheSchedule();
         $this->thenThereShouldBe_Slots(0);
     }

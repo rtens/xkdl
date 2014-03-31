@@ -96,7 +96,11 @@ class ScheduleResource extends DynamicResource {
         try {
             $schedule = $this->writer->readSchedule($root);
         } catch (\Exception $e) {
-            return array();
+            return array(
+                'from' => date('Y-m-d H:i'),
+                'until' => date('Y-m-d H:i'),
+                'slot' => array()
+            );
         }
 
         $slots = array();
