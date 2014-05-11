@@ -90,7 +90,7 @@ class LogsReportTest extends Specification {
         $this->task->givenIHaveLoggedFrom_Until_For('2011-11-11 12:00', '2011-11-11 13:00', 'task1');
         $this->task->givenIHaveLoggedFrom_Until_For('2011-11-11 10:00', '2011-11-11 11:00', 'task2');
 
-        $this->whenIRequestAReportOfLogs();
+        $this->whenIRequestAReportOfLogsSortedByTime();
 
         $this->thenThereShouldBe_Logs(2);
         $this->thenLog_ShouldHave(1, 'task', '/task2');
@@ -118,10 +118,14 @@ class LogsReportTest extends Specification {
         $this->whenIRequestAReportOfLogsUnder_Between_And($task, null, null);
     }
 
-    private function whenIRequestAReportOfLogsUnder_Between_And($task, $start, $end) {
+    private function whenIRequestAReportOfLogsSortedByTime() {
+        $this->whenIRequestAReportOfLogsUnder_Between_And('', null, null, true);
+    }
+
+    private function whenIRequestAReportOfLogsUnder_Between_And($task, $start, $end, $sortByTime = false) {
         /** @var LogsResource $resource */
         $resource = $this->factory->getInstance(LogsResource::CLASS, [Url::parse('report')]);
-        $this->responder = $resource->doGet($task, $start, $end);
+        $this->responder = $resource->doGet($task, $start, $end, $sortByTime);
     }
 
     private function thenThereShouldBe_Logs($count) {

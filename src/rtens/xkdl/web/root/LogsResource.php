@@ -11,14 +11,23 @@ class LogsResource extends DynamicResource {
     /** @var TaskStore <- */
     public $store;
 
-    public function doGet($task = '', $from = null, $until = null) {
+    /**
+     * @param string $task
+     * @param null|string $from
+     * @param null|string $until
+     * @param bool $sortByTime
+     * @return Presenter
+     */
+    public function doGet($task = '', $from = null, $until = null, $sortByTime = false) {
         $from = $from ? new \DateTime($from) : null;
         $until = $until ? new \DateTime($until) : null;
 
         $logs = $this->assembleLogs($this->store->getTask($task), $from, $until);
-        usort($logs, function ($a, $b) {
-            return $a['start'] < $b['start'] ? -1 : 1;
-        });
+        if ($sortByTime) {
+            usort($logs, function ($a, $b) {
+                return $a['start'] < $b['start'] ? -1 : 1;
+            });
+        }
 
         $totalSeconds = array_sum(array_map(function ($l) {
             return $l['s'];
