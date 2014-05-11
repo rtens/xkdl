@@ -20,8 +20,19 @@ class LogsResource extends DynamicResource {
             return $a['start'] < $b['start'] ? -1 : 1;
         });
 
+        $totalSeconds = array_sum(array_map(function ($l) {
+            return $l['s'];
+        }, $logs));
+        $totalHours = intval($totalSeconds / 3600);
+        $totalMinutes = intval(($totalSeconds % 3600) / 60);
+
         return new Presenter($this, [
-            'log' => $logs
+            'from' => ['value' => $from ? $from->format('Y-m-d H:i') : ''],
+            'until' => ['value' => $until ? $until->format('Y-m-d H:i') : ''],
+            'task' => ['value' => $task],
+            'log' => $logs,
+            'total' => sprintf('%d:%02d', $totalHours, $totalMinutes),
+            'taskList' => 'var taskList = ' . json_encode($this->getTasksOf($this->store->getRoot()))
         ]);
     }
 
@@ -35,6 +46,8 @@ class LogsResource extends DynamicResource {
                     'task' => $under->getFullName(),
                     'start' => $log->start->format('Y-m-d H:i'),
                     'end' => $log->end->format('Y-m-d H:i'),
+                    'time' => $log->start->diff($log->end)->format('%h:%I'),
+                    's' => $log->end->getTimestamp() - $log->start->getTimestamp()
                 );
             }
         }
@@ -44,5 +57,16 @@ class LogsResource extends DynamicResource {
         }
 
         return $logs;
+    }
+
+    private function getTasksOf(Task $task) {
+        $tasks = array();
+        foreach ($task->getOpenChildren() as $child) {
+            $tasks[] = $child->getFullName();
+        }
+        foreach ($task->getChildren() as $child) {
+            $tasks = array_merge($tasks, $this->getTasksOf($child));
+        }
+        return $tasks;
     }
 }

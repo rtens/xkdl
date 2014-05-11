@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>xkdl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="utf-8"/>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="res/style.css"/>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="unscheduled item clearfix bg-success">
+        <script property="taskList">
+            var taskList = [
+                "some",
+                "some other",
+                "some/task",
+                "some other/task",
+                "some/task/subtask",
+                "some other/task/with subtask"
+            ];
+        </script>
+        <script>
+            $(function () {
+                $("#task").autocomplete({
+                    source: taskList
+                });
+            });
+        </script>
+
+        <form method="get">
+            <div class="main">
+                <label for="task">Logs of</label>
+                <input class="form-control" type="text" id="task" name="task" property="task"
+                       placeholder="/full/task/name" value=""/>
+            </div>
+            <div class="logging">
+                <div class="form-group">
+                    <input style="width: 47%;" class="form-control" type="text" name="from"
+                           value="today" property="from"/><div style="width: 5%; text-align: center;">-</div><input
+                        style="width: 47%;" class="form-control" type="text" name="until" placeholder="open end"
+                        property="until" value=""/>
+                </div>
+
+                <div class="actions btn-group">
+                    <input style="width: 100%;" class="btn btn-primary" type="submit" name="submit" value="show"/>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="item">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Task</th>
+                <th>Start</th>
+                <th>End</th>
+                <th style="text-align: right">Time</th>
+            </tr>
+            </thead>
+            <tr property="log">
+                <td property="task">/some/task</td>
+                <td property="start">2011-11-11 10:00</td>
+                <td property="end">2011-11-11 11:00</td>
+                <td style="text-align: right" property="time">1:00</td>
+            </tr>
+            <tr property="log">
+                <td>/some/other/task</td>
+                <td>2011-11-11 10:00</td>
+                <td>2011-11-11 11:00</td>
+                <td style="text-align: right" property="time">1:00</td>
+            </tr>
+            <tr property="log">
+                <td>/this/task</td>
+                <td>2011-11-11 10:00</td>
+                <td>2011-11-11 11:00</td>
+                <td style="text-align: right" property="time">1:00</td>
+            </tr>
+            <tr class="success">
+                <td colspan="3">Total</td>
+                <td style="text-align: right" property="total">33:00</td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

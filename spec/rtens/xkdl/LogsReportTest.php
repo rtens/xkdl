@@ -45,6 +45,10 @@ class LogsReportTest extends Specification {
         $this->thenLog_ShouldHave(2, 'start', '2011-11-11 12:15');
         $this->thenLog_ShouldHave(3, 'start', '2011-11-11 13:00');
         $this->thenLog_ShouldHave(3, 'end', '2011-11-11 14:30');
+
+        $this->thenLog_ShouldHave(1, 'time', '2:00');
+        $this->thenLog_ShouldHave(2, 'time', '0:15');
+        $this->thenTheTotalShouldBe('3:45');
     }
 
     public function testAfterDate() {
@@ -126,6 +130,10 @@ class LogsReportTest extends Specification {
 
     private function thenLog_ShouldHave($pos, $key, $value) {
         $this->assertEquals($value, $this->responder->getModel()['log'][$pos - 1][$key]);
+    }
+
+    private function thenTheTotalShouldBe($string) {
+        $this->assertEquals($string, $this->responder->getModel()['total']);
     }
 
 } 
