@@ -39,7 +39,7 @@
         <form method="get">
             <div class="main">
                 <label for="task">Logs of</label>
-                <input class="form-control" type="text" id="task" name="task" property="task"
+                <input class="form-control" required="true" type="text" id="task" name="task" property="task"
                        placeholder="/full/task/name" value=""/>
             </div>
             <div class="logging">
@@ -58,7 +58,7 @@
         </form>
     </div>
 
-    <div class="item">
+    <div class="item" property="hasLogs">
         <table class="table table-striped">
             <thead>
             <tr>

@@ -111,7 +111,7 @@ class LogsReportTest extends Specification {
     }
 
     private function whenIRequestAReportOfLogsBetween_And($start, $end) {
-        $this->whenIRequestAReportOfLogsUnder_Between_And('', $start, $end);
+        $this->whenIRequestAReportOfLogsUnder_Between_And('/', $start, $end);
     }
 
     private function whenIRequestAReportOfLogsUnder($task) {
@@ -119,7 +119,7 @@ class LogsReportTest extends Specification {
     }
 
     private function whenIRequestAReportOfLogsSortedByTime() {
-        $this->whenIRequestAReportOfLogsUnder_Between_And('', null, null, true);
+        $this->whenIRequestAReportOfLogsUnder_Between_And('/', null, null, true);
     }
 
     private function whenIRequestAReportOfLogsUnder_Between_And($task, $start, $end, $sortByTime = false) {

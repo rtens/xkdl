@@ -24,11 +24,15 @@ class LogsResource extends DynamicResource {
         $from = $from ? new \DateTime($from) : null;
         $until = $until ? new \DateTime($until) : null;
 
-        $logs = $this->assembleLogs($this->store->getTask($task), $from, $until);
-        if ($sortByTime) {
-            usort($logs, function ($a, $b) {
-                return $a['start'] < $b['start'] ? -1 : 1;
-            });
+        $logs = array();
+
+        if ($task) {
+            $logs = $this->assembleLogs($this->store->getTask($task), $from, $until);
+            if ($sortByTime) {
+                usort($logs, function ($a, $b) {
+                    return $a['start'] < $b['start'] ? -1 : 1;
+                });
+            }
         }
 
         $totalSeconds = array_sum(array_map(function ($l) {
@@ -42,6 +46,7 @@ class LogsResource extends DynamicResource {
             'until' => ['value' => $until ? $until->format('Y-m-d H:i') : ''],
             'task' => ['value' => $task],
             'log' => $logs,
+            'hasLogs' => !empty($logs),
             'total' => sprintf('%d:%02d', $totalHours, $totalMinutes),
             'taskList' => 'var taskList = ' . json_encode($this->getTasksOf($this->store->getRoot()))
         ]);
