@@ -10,6 +10,8 @@ use rtens\xkdl\lib\TimeWindow;
 
 class Task {
 
+    public static $CLASS = __CLASS__;
+
     /** @var string */
     protected $name;
 

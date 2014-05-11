@@ -6,6 +6,8 @@ use rtens\xkdl\Task;
 
 class TaskStore {
 
+    public static $CLASS = __CLASS__;
+
     const PROPERTY_FILE_NAME = '__.txt';
 
     /** @var Configuration <- */
@@ -35,7 +37,7 @@ class TaskStore {
     private function readTask($folder, Task $parent = null) {
         $properties = $this->readProperties($folder);
         if (!isset($properties['type'])) {
-            $properties['type'] = Task::CLASS;
+            $properties['type'] = Task::$CLASS;
         }
 
         $task = $this->createTask($folder, $properties);

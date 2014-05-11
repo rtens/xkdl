@@ -229,7 +229,7 @@ class ScheduleResourceTest extends Specification {
 
     protected function setUp() {
         parent::setUp();
-        $this->resource = $this->factory->getInstance(ScheduleResource::CLASS, [Url::parse('schedule')]);
+        $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS, [Url::parse('schedule')]);
 
         $this->fieldEnd = null;
 

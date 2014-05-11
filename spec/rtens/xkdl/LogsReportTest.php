@@ -124,7 +124,7 @@ class LogsReportTest extends Specification {
 
     private function whenIRequestAReportOfLogsUnder_Between_And($task, $start, $end, $sortByTime = false) {
         /** @var LogsResource $resource */
-        $resource = $this->factory->getInstance(LogsResource::CLASS, [Url::parse('report')]);
+        $resource = $this->factory->getInstance(LogsResource::$CLASS, [Url::parse('report')]);
         $this->responder = $resource->doGet($task, $start, $end, $sortByTime);
     }
 

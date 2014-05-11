@@ -21,10 +21,10 @@ class TaskStorageFixture extends Fixture {
         $this->tasks['.'] = $this->root;
 
         $mf = new MockFactory();
-        $store = $mf->getInstance(TaskStore::CLASS);
+        $store = $mf->getInstance(TaskStore::$CLASS);
         $store->__mock()->method('getRoot')->willReturn($this->root);
 
-        $this->spec->factory->setSingleton(TaskStore::CLASS, $store);
+        $this->spec->factory->setSingleton(TaskStore::$CLASS, $store);
     }
 
     public function givenTheTask_OfType($fullName, $class) {

@@ -9,7 +9,6 @@ use watoki\curir\http\Request;
 use watoki\curir\http\Response;
 use watoki\curir\http\Url;
 use watoki\curir\Responder;
-use watoki\curir\responder\Redirecter;
 use watoki\scrut\Fixture;
 
 /**
@@ -35,9 +34,9 @@ class WebInterfaceFixture extends Fixture {
     protected function setUp() {
         parent::setUp();
         $this->session = new Map();
-        $this->spec->factory->setSingleton(Session::CLASS, $this->session);
+        $this->spec->factory->setSingleton(Session::$CLASS, $this->session);
 
-        $this->root = $this->spec->factory->getInstance(RootResource::CLASS, [Url::parse('http://xkdl')]);
+        $this->root = $this->spec->factory->getInstance(RootResource::$CLASS, [Url::parse('http://xkdl')]);
     }
 
     public function givenTheSessionContains_WithTheValue($key, $value) {

@@ -168,7 +168,7 @@ class StorageTest extends Specification {
 
     private function whenIReadTheTasks() {
         /** @var TaskStore $store */
-        $store = $this->factory->getInstance(TaskStore::CLASS);
+        $store = $this->factory->getInstance(TaskStore::$CLASS);
         $this->task->root = $store->getRoot();
     }
 

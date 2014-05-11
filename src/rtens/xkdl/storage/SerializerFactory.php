@@ -15,8 +15,8 @@ class SerializerFactory {
     function __construct(Factory $factory) {
         $factory->setSingleton(get_class($this), $this);
 
-        $this->register(Task::CLASS, new TaskSerializer());
-        $this->register(RepeatingTask::CLASS, new RepeatingTaskSerializer());
+        $this->register(Task::$CLASS, new TaskSerializer());
+        $this->register(RepeatingTask::$CLASS, new RepeatingTaskSerializer());
     }
 
     public function register($class, Serializer $serializer) {

@@ -10,6 +10,8 @@ use watoki\curir\responder\Redirecter;
 
 class RootResource extends Container {
 
+    public static $CLASS = __CLASS__;
+
     /** @var \Google_Client <- */
     public $client;
 

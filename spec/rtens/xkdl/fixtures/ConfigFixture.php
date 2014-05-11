@@ -19,10 +19,10 @@ class ConfigFixture extends Fixture {
         $root = $this->tmpDir();
 
         $mf = new MockFactory();
-        $this->config = $mf->getInstance(Configuration::CLASS, [$root]);
+        $this->config = $mf->getInstance(Configuration::$CLASS, [$root]);
         $this->config->__mock()->mockMethods(Mockster::F_NONE);
 
-        $this->spec->factory->setSingleton(Configuration::CLASS, $this->config);
+        $this->spec->factory->setSingleton(Configuration::$CLASS, $this->config);
 
         @mkdir($root);
         $this->spec->undos[] = function () use ($root) {

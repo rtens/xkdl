@@ -3,8 +3,6 @@ namespace spec\rtens\xkdl\fixtures;
 
 use rtens\mockster\Mock;
 use rtens\mockster\MockFactory;
-use rtens\xkdl\web\Session;
-use watoki\collections\Map;
 use watoki\scrut\Fixture;
 
 class GoogleApiFixture extends Fixture {
@@ -18,11 +16,11 @@ class GoogleApiFixture extends Fixture {
         parent::setUp();
 
         $mf = new MockFactory();
-        $this->client = $mf->getInstance(\Google_Client::CLASS);
+        $this->client = $mf->getInstance('Google_Client');
         $this->client->__mock()->method('getAccessToken')->willCall(function () {
             return $this->token;
         });
-        $this->spec->factory->setSingleton(\Google_Client::CLASS, $this->client);
+        $this->spec->factory->setSingleton('Google_Client', $this->client);
     }
 
     public function thenTheAccesToken_ShouldBeSet($token) {

@@ -8,6 +8,8 @@ use watoki\curir\resource\DynamicResource;
 
 class LogsResource extends DynamicResource {
 
+    public static $CLASS = __CLASS__;
+
     /** @var TaskStore <- */
     public $store;
 
