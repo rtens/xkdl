@@ -38,8 +38,6 @@ class LogsResource extends DynamicResource {
         $totalSeconds = array_sum(array_map(function ($l) {
             return $l['s'];
         }, $logs));
-        $totalHours = intval($totalSeconds / 3600);
-        $totalMinutes = intval(($totalSeconds % 3600) / 60);
 
         return new Presenter($this, [
             'from' => ['value' => $from ? $from->format('Y-m-d H:i') : ''],
@@ -47,7 +45,7 @@ class LogsResource extends DynamicResource {
             'task' => ['value' => $task],
             'log' => $logs,
             'hasLogs' => !empty($logs),
-            'total' => sprintf('%d:%02d', $totalHours, $totalMinutes),
+            'total' => $this->formatSeconds($totalSeconds),
             'taskList' => 'var taskList = ' . json_encode($this->getTasksOf($this->store->getRoot()))
         ]);
     }
@@ -62,7 +60,7 @@ class LogsResource extends DynamicResource {
                     'task' => $under->getFullName(),
                     'start' => $log->start->format('Y-m-d H:i'),
                     'end' => $log->end->format('Y-m-d H:i'),
-                    'time' => $log->start->diff($log->end)->format('%h:%I'),
+                    'time' => $this->formatSeconds($log->end->getTimestamp() - $log->start->getTimestamp()),
                     's' => $log->end->getTimestamp() - $log->start->getTimestamp()
                 );
             }
@@ -73,6 +71,14 @@ class LogsResource extends DynamicResource {
         }
 
         return $logs;
+    }
+
+    private function formatSeconds($seconds) {
+        $hours = $seconds / 3600;
+        $fullHours = intval($seconds / 3600);
+        $minutes = intval(($seconds % 3600) / 60);
+
+        return sprintf('%d:%02d (%.2f)', $fullHours, $minutes, $hours);
     }
 
     private function getTasksOf(Task $task) {

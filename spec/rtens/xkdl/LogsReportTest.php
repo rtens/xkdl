@@ -46,9 +46,9 @@ class LogsReportTest extends Specification {
         $this->thenLog_ShouldHave(3, 'start', '2011-11-11 13:00');
         $this->thenLog_ShouldHave(3, 'end', '2011-11-11 14:30');
 
-        $this->thenLog_ShouldHave(1, 'time', '2:00');
-        $this->thenLog_ShouldHave(2, 'time', '0:15');
-        $this->thenTheTotalShouldBe('3:45');
+        $this->thenLog_ShouldHave(1, 'time', '2:00 (2.00)');
+        $this->thenLog_ShouldHave(2, 'time', '0:15 (0.25)');
+        $this->thenTheTotalShouldBe('3:45 (3.75)');
     }
 
     public function testAfterDate() {
