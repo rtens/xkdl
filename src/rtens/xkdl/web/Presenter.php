@@ -10,4 +10,8 @@ class Presenter extends \watoki\curir\responder\Presenter {
         return $renderer->render($this->getModel());
     }
 
+    public function renderJson() {
+        return json_encode($this->getModel(), JSON_PRETTY_PRINT);
+    }
+
 } 

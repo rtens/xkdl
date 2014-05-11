@@ -1,9 +1,11 @@
 <?php
 namespace spec\rtens\xkdl\fixtures;
 
+use rtens\mockster\MockFactory;
 use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
+use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\task\RepeatingTask;
 use rtens\xkdl\Task;
 use watoki\scrut\Fixture;
@@ -27,6 +29,12 @@ class TaskFixture extends Fixture {
     public function givenTheRootTask($name) {
         $this->root = new Task($name);
         $this->tasks[$name] = $this->root;
+
+        $mf = new MockFactory();
+        $store = $mf->getInstance(TaskStore::CLASS);
+        $store->__mock()->method('getRoot')->willReturn($this->root);
+        $store->__mock()->method('getTask')->dontMock();
+        $this->spec->factory->setSingleton(TaskStore::CLASS, $store);
     }
 
     public function givenTheTask_In($child, $parent) {
@@ -95,7 +103,11 @@ class TaskFixture extends Fixture {
     }
 
     public function givenIHaveLogged_MinutesFor($minutes, $name) {
-        $this->tasks[$name]->addLog(new TimeWindow(new \DateTime(), new \DateTime($minutes . ' minutes')));
+        $this->givenIHaveLoggedFrom_Until_For('now', "$minutes minutes", $name);
+    }
+
+    public function givenIHaveLoggedFrom_Until_For($from, $to, $name) {
+        $this->tasks[$name]->addLog(new TimeWindow(new \DateTime($from), new \DateTime($to)));
     }
 
     public function given_HasAWindowFrom_Until($task, $from, $until) {

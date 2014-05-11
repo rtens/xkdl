@@ -24,6 +24,14 @@ class TaskStore {
         return $this->root;
     }
 
+    public function getTask($path) {
+        $task = $this->getRoot();
+        foreach (array_filter(explode('/', $path)) as $name) {
+            $task = $task->getChild($name);
+        }
+        return $task;
+    }
+
     private function readTask($folder, Task $parent = null) {
         $properties = $this->readProperties($folder);
         if (!isset($properties['type'])) {
@@ -93,7 +101,7 @@ class TaskStore {
         }
 
         if (!isset($properties['name'])) {
-            $properties['name'] = $name;
+            $properties['name'] = utf8_encode($name);
         }
 
         return $properties;
