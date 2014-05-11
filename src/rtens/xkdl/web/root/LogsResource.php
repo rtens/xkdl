@@ -83,7 +83,7 @@ class LogsResource extends DynamicResource {
 
     private function getTasksOf(Task $task) {
         $tasks = array();
-        foreach ($task->getOpenChildren() as $child) {
+        foreach ($task->getChildren() as $child) {
             $tasks[] = $child->getFullName();
         }
         foreach ($task->getChildren() as $child) {
