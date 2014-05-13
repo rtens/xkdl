@@ -49,6 +49,15 @@ class ScheduleResourceTest extends Specification {
             "2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
     }
 
+    function testShowTaskWhenFinishOngoingLogging() {
+        $this->markTestIncomplete();
+        $this->file->givenTheFolder('root');
+        $this->givenALogHasBeenStartedFor_At('/some/task', '2011-11-11 11:11');
+        $this->givenIHaveEnteredTheEndTime('2011-11-11 11:12');
+        $this->whenIFinishLogging();
+        $this->thenTheTask_ShouldBePresetForLogging('/some/task');
+    }
+
     function testCancelLogging() {
         $this->file->givenTheFolder('root');
         $this->givenALogHasBeenStartedFor_At('/this/new/task', '2011-11-11 11:11');
@@ -351,6 +360,10 @@ class ScheduleResourceTest extends Specification {
 
     private function thenTheActionTargetOfSlot_ShouldBe($int, $string) {
         $this->assertEquals($string, $this->getSlot($int)['task']['target']['value']);
+    }
+
+    private function thenTheTask_ShouldBePresetForLogging($string) {
+        $this->assertEquals($string, $this->presenter->getModel()['task']);
     }
 
 }

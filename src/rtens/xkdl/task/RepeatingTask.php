@@ -6,6 +6,8 @@ use rtens\xkdl\Task;
 
 class RepeatingTask extends Task {
 
+    public static $CLASS = __CLASS__;
+
     /** @var \DateInterval */
     private $repetition;
 

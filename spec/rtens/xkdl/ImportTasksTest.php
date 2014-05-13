@@ -16,6 +16,8 @@ use watoki\scrut\Specification;
 class ImportGoogleCalendarTest extends Specification {
 
     function testAuthenticationWithGoogleApi() {
+        $this->markTestIncomplete();
+
         $this->task->givenTheTask_OfType('gc', GoogleCalendarTask::$CLASS);
         $this->api->givenTheAuthenticationUrlIs('http://auth.example.com');
         $this->api->givenIAmNotAuthenticated();
