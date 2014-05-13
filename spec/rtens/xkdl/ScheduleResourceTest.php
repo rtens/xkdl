@@ -6,6 +6,7 @@ use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use watoki\curir\http\Url;
+use watoki\curir\responder\Redirecter;
 use watoki\scrut\Specification;
 
 /**
@@ -15,6 +16,7 @@ use watoki\scrut\Specification;
  * @property \DateTime|null fieldEnd
  * @property \Exception|null caught
  * @property Presenter presenter
+ * @property Redirecter redirecter
  *
  * @property ConfigFixture config <-
  * @property FileFixture file <-
@@ -50,7 +52,6 @@ class ScheduleResourceTest extends Specification {
     }
 
     function testShowTaskWhenFinishOngoingLogging() {
-        $this->markTestIncomplete();
         $this->file->givenTheFolder('root');
         $this->givenALogHasBeenStartedFor_At('/some/task', '2011-11-11 11:11');
         $this->givenIHaveEnteredTheEndTime('2011-11-11 11:12');
@@ -282,7 +283,7 @@ class ScheduleResourceTest extends Specification {
     }
 
     private function whenIFinishLogging() {
-        $this->resource->doStop(new \DateTime($this->fieldEnd));
+        $this->redirecter = $this->resource->doStop(new \DateTime($this->fieldEnd));
     }
 
     private function thenNoLoggingShouldBeGoingOn() {
@@ -363,7 +364,7 @@ class ScheduleResourceTest extends Specification {
     }
 
     private function thenTheTask_ShouldBePresetForLogging($string) {
-        $this->assertEquals($string, $this->presenter->getModel()['task']);
+        $this->assertEquals($string, $this->redirecter->getTarget()->getParameters()->get('task'));
     }
 
 }

@@ -63,6 +63,7 @@ class Writer {
         $data = $this->readTmpFile();
         $this->addLog($data['task'], new TimeWindow($data['start'], $end));
         $this->cancelLogging();
+        return $data['task'];
     }
 
     public function cancelLogging() {

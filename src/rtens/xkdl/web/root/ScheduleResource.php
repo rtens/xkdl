@@ -25,11 +25,12 @@ class ScheduleResource extends DynamicResource {
     /** @var Configuration <- */
     public $config;
 
-    public function doGet() {
+    public function doGet($task = '') {
         $root = $this->store->getRoot();
 
         $logging = $this->writer->getOngoingLogInfo();
         return new Presenter($this, array(
+            'task' => array('value' => $task),
             'idle' => !$logging ? array(
                     'taskList' => 'var taskList = ' . json_encode($this->getOpenTasksOf($root))
                 ) : null,
@@ -64,8 +65,10 @@ class ScheduleResource extends DynamicResource {
     }
 
     public function doStop(\DateTime $end) {
-        $this->writer->stopLogging($end);
-        return new Redirecter($this->getUrl());
+        $task = $this->writer->stopLogging($end);
+        $url = $this->getUrl();
+        $url->getParameters()->set('task', $task);
+        return new Redirecter($url);
     }
 
     public function doCancel() {
