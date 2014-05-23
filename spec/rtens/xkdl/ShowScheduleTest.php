@@ -17,7 +17,7 @@ use watoki\scrut\Specification;
  */
 class ShowScheduleTest extends Specification {
 
-    function testCreateSchedule() {
+    function testShowScheduleWthBunchOfTasks() {
         $this->file->givenTheFolder('root/a/__aa');
         $this->file->givenTheFile_WithContent('root/a/__aa/__.txt', 'duration: PT3M');
         $this->file->givenTheFile_WithContent('root/a/__aa/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:01");
@@ -25,8 +25,6 @@ class ShowScheduleTest extends Specification {
         $this->file->givenTheFile_WithContent('root/a/__ab/__.txt', 'deadline: 2001-01-10 10:00');
         $this->file->givenTheFile_WithContent('root/a/__ab/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:03");
         $this->file->givenTheFolder('root/b/ab/__abc');
-
-        $this->config->givenNowIs('2001-01-09 7:55');
 
         $this->file->givenTheFile_WithContent('schedule.txt',
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
@@ -42,7 +40,8 @@ class ShowScheduleTest extends Specification {
         $this->thenTheNameOfSlot_ShouldBe(1, 'ab');
         $this->thenTheStartOfSlot_ShouldBe(1, '12:00');
         $this->thenTheEndOfSlot_ShouldBe(1, '12:01');
-        $this->thenTheDeadlineOfSlot_ShouldBe(1, '1d 2h 5m');
+        $this->thenTheDeadlineOfSlot_ShouldBe(1, '2001-01-10 10:00');
+        $this->thenTheBufferOfSlot_ShouldBe(1, '8d 21h 59m');
         $this->thenTheDurationOfSlot_ShouldBe_With_Completed(1, '0.05 / 0.02', '100%');
         $this->thenTheActionTargetOfSlot_ShouldBe(1, '/a/ab');
 
@@ -55,7 +54,39 @@ class ShowScheduleTest extends Specification {
         $this->thenParentOfSlot_ShouldBe(3, '/b/ab');
     }
 
-    function testWriteScheduleCache() {
+    function testLateTask() {
+        $this->file->givenTheFolder('root/a');
+        $this->file->givenTheFile_WithContent('root/a/__.txt', 'deadline: 2001-01-01 12:01');
+        $this->file->givenTheFolder('root/b');
+        $this->file->givenTheFile_WithContent('root/b/__.txt', 'deadline: 2001-01-01 12:01');
+        $this->file->givenTheFolder('root/x_done');
+        $this->file->givenTheFile_WithContent('root/x_done/__.txt', 'deadline: 2001-01-01 12:01');
+        $this->file->givenTheFolder('root/anytime');
+
+        $this->file->givenTheFile_WithContent('schedule.txt',
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
+            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a\n" .
+            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:02:00+01:00 >> /b\n" .
+            "2001-01-01T12:02:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /done\n" .
+            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /anytime\n" .
+            "");
+
+        $this->whenIGetTheSchedule();
+
+        $this->thenTheBufferOfSlot_ShouldBe(1, '0d 0h 0m');
+        $this->thenSlot_ShouldNotBeLate(1);
+
+        $this->thenTheBufferOfSlot_ShouldBe(2, '0d 0h 1m');
+        $this->thenSlot_ShouldBeLate(2);
+
+        $this->thenSlot_ShouldHaveNoDeadline(3);
+        $this->thenSlot_ShouldNotBeLate(3);
+
+        $this->thenSlot_ShouldHaveNoDeadline(4);
+        $this->thenSlot_ShouldNotBeLate(4);
+    }
+
+    function testCreateNewSchedule() {
         $this->file->givenTheFolder('root/a/__aa');
         $this->file->givenTheFile_WithContent('root/a/__aa/__.txt', 'duration: PT3M');
         $this->file->givenTheFile_WithContent('root/a/__aa/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:01");
@@ -83,13 +114,13 @@ class ShowScheduleTest extends Specification {
             "");
     }
 
-    function testEmptyCache() {
+    function testEmptySchedule() {
         $this->file->givenTheFolder('root/__a');
         $this->whenIGetTheSchedule();
         $this->thenThereShouldBe_Slots(0);
     }
 
-    function testInvalidCache() {
+    function testInvalidScheduleFile() {
         $this->file->givenTheFolder('root/not');
         $this->file->givenTheFile_WithContent('schedule.txt',
             "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
@@ -175,7 +206,11 @@ class ShowScheduleTest extends Specification {
     }
 
     private function thenTheDeadlineOfSlot_ShouldBe($int, $string) {
-        $this->assertEquals($string, $this->getSlot($int)['task']['deadline']['relative']);
+        $this->assertEquals($string, $this->getSlot($int)['task']['deadline']['absolute']);
+    }
+
+    private function thenTheBufferOfSlot_ShouldBe($int, $string) {
+        $this->assertEquals($string, $this->getSlot($int)['task']['deadline']['buffer']);
     }
 
     private function thenParentOfSlot_ShouldBe($int, $string) {
@@ -188,6 +223,14 @@ class ShowScheduleTest extends Specification {
 
     private function thenTheActionTargetOfSlot_ShouldBe($int, $string) {
         $this->assertEquals($string, $this->getSlot($int)['task']['target']['value']);
+    }
+
+    private function thenSlot_ShouldBeLate($int) {
+        $this->assertTrue($this->getSlot($int)['isLate']);
+    }
+
+    private function thenSlot_ShouldNotBeLate($int) {
+        $this->assertFalse($this->getSlot($int)['isLate']);
     }
 
 }

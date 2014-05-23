@@ -110,28 +110,37 @@ class ScheduleResource extends DynamicResource {
 
         $slots = array();
         foreach ($schedule->slots as $slot) {
-            $markDone = function (Element $e) use ($slot) {
+            $isActive = !$slot->task->isDone() && $slot->task->getDeadline();
+            $isLate = $isActive && $slot->window->end > $slot->task->getDeadline();
+
+            $markDone = function (Element $e) use ($slot, $isLate) {
                 if ($slot->task->isDone()) {
                     if ($e->getAttribute('value')) {
                         $e->setAttribute('value', 'open');
                     }
                     return str_replace(array('info', 'warning'), 'success',
                         $e->getAttribute('class')->getValue());
+                } else if ($isLate) {
+                    return str_replace(array('info', 'warning'), 'danger',
+                        $e->getAttribute('class')->getValue());
                 } else {
                     return $e->getAttribute('class')->getValue();
                 }
             };
+
             $slots[] = array(
                 'class' => $markDone,
                 'done' => array('class' => $markDone),
                 'start' => $slot->window->start->format('H:i'),
                 'end' => $slot->window->end->format('H:i'),
+                'isLate' => $isLate,
                 'task' => array(
                     'name' => $slot->task->getName(),
                     'target' => array('value' => $slot->task->getFullName()),
                     'parent' => $slot->task->getParent()->getFullName(),
-                    'deadline' => !$slot->task->isDone() && $slot->task->getDeadline() ? array(
+                    'deadline' => $isActive ? array(
                             'relative' => $slot->task->getDeadline()->diff($this->config->now())->format('%ad %hh %im'),
+                            'buffer' => $slot->task->getDeadline()->diff($slot->window->end)->format('%ad %hh %im'),
                             'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
                         ) : null,
                     'duration' => $this->assembleDuration($slot->task)
