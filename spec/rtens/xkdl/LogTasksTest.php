@@ -1,6 +1,7 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use spec\rtens\xkdl\fixtures\TimeFixture;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 use rtens\xkdl\web\Presenter;
@@ -19,8 +20,13 @@ use watoki\curir\responder\Redirecter;
  *
  * @property ConfigFixture config <-
  * @property FileFixture file <-
+ * @property TimeFixture time <-
  */
 class LogTasksTest extends Specification {
+
+    protected function background() {
+        $this->time->givenTheTimeZoneIs('GMT0');
+    }
 
     function testStartLogging() {
         $this->givenIHaveEnteredTheTask('/some/task');
@@ -37,7 +43,7 @@ class LogTasksTest extends Specification {
         $this->whenIStartLogging();
         $this->thenLoggingShouldBeStarted_At('/my/task', '2011-11-11 12:12');
         $this->file->thenThereShouldBeAFile_WithTheContent('root/some/task/logs.txt',
-            "2011-11-11T11:11:00+01:00 >> 2011-11-11T12:12:00+01:00\n");
+            "2011-11-11T11:11:00+00:00 >> 2011-11-11T12:12:00+00:00\n");
     }
 
     function testFinishLoggingForNewTask() {
@@ -47,7 +53,7 @@ class LogTasksTest extends Specification {
         $this->whenIFinishLogging();
         $this->thenNoLoggingShouldBeGoingOn();
         $this->file->thenThereShouldBeAFile_WithTheContent('root/this/new/task/logs.txt',
-            "2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
+            "2011-11-11T11:11:00+00:00 >> 2011-11-11T11:12:00+00:00\n");
     }
 
     function testShowTaskWhenFinishOngoingLogging() {
@@ -76,7 +82,7 @@ class LogTasksTest extends Specification {
         $this->whenIStartLogging();
         $this->thenNoLoggingShouldBeGoingOn();
         $this->file->thenThereShouldBeAFile_WithTheContent('root/some/task/logs.txt',
-            "now >> then\n2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
+            "now >> then\n2011-11-11T11:11:00+00:00 >> 2011-11-11T11:12:00+00:00\n");
     }
 
     function testAddLogWhileOngoingLogging() {
@@ -89,7 +95,7 @@ class LogTasksTest extends Specification {
         $this->whenIStartLogging();
         $this->thenLoggingShouldBeStarted_At('/some/other/task', 'yesterday');
         $this->file->thenThereShouldBeAFile_WithTheContent('root/some/task/logs.txt',
-            "now >> then\n2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
+            "now >> then\n2011-11-11T11:11:00+00:00 >> 2011-11-11T11:12:00+00:00\n");
     }
 
     function testAddLogToTasksWithMetaInformation() {
@@ -99,7 +105,7 @@ class LogTasksTest extends Specification {
         $this->givenIHaveEnteredTheEndTime('2011-11-11 11:12');
         $this->whenIStartLogging();
         $this->file->thenThereShouldBeAFile_WithTheContent('root/__meta/x_info/__1_task/logs.txt',
-            "2011-11-11T11:11:00+01:00 >> 2011-11-11T11:12:00+01:00\n");
+            "2011-11-11T11:11:00+00:00 >> 2011-11-11T11:12:00+00:00\n");
     }
 
     function testShowIdleLogger() {

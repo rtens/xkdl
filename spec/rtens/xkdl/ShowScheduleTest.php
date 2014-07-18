@@ -5,6 +5,7 @@ use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
+use spec\rtens\xkdl\fixtures\TimeFixture;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 
@@ -14,8 +15,13 @@ use watoki\scrut\Specification;
  *
  * @property ConfigFixture config <-
  * @property FileFixture file <-
+ * @property TimeFixture time <-
  */
 class ShowScheduleTest extends Specification {
+
+    protected function background() {
+        $this->time->givenTheTimeZoneIs('GMT0');
+    }
 
     function testShowScheduleWthBunchOfTasks() {
         $this->file->givenTheFolder('root/a/__aa');
@@ -27,10 +33,10 @@ class ShowScheduleTest extends Specification {
         $this->file->givenTheFolder('root/b/ab/__abc');
 
         $this->file->givenTheFile_WithContent('schedule.txt',
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
-            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
-            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:10:00+00:00\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:01:00+00:00 >> /a/ab\n" .
+            "2001-01-01T12:01:00+00:00 >> 2001-01-01T12:03:00+00:00 >> /a/aa\n" .
+            "2001-01-01T12:03:00+00:00 >> 2001-01-01T12:04:00+00:00 >> /b/ab/abc\n" .
             "");
 
         $this->whenIGetTheSchedule();
@@ -64,11 +70,11 @@ class ShowScheduleTest extends Specification {
         $this->file->givenTheFolder('root/anytime');
 
         $this->file->givenTheFile_WithContent('schedule.txt',
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a\n" .
-            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:02:00+01:00 >> /b\n" .
-            "2001-01-01T12:02:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /done\n" .
-            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /anytime\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:10:00+00:00\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:01:00+00:00 >> /a\n" .
+            "2001-01-01T12:01:00+00:00 >> 2001-01-01T12:02:00+00:00 >> /b\n" .
+            "2001-01-01T12:02:00+00:00 >> 2001-01-01T12:03:00+00:00 >> /done\n" .
+            "2001-01-01T12:03:00+00:00 >> 2001-01-01T12:04:00+00:00 >> /anytime\n" .
             "");
 
         $this->whenIGetTheSchedule();
@@ -100,17 +106,17 @@ class ShowScheduleTest extends Specification {
         $this->whenICreateANewScheduleFrom_Until("2001-01-01 12:00", "2001-01-01 12:10");
 
         $this->file->thenThereShouldBeAFile_WithTheContent('schedule.txt',
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
-            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
-            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:10:00+00:00\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:01:00+00:00 >> /a/ab\n" .
+            "2001-01-01T12:01:00+00:00 >> 2001-01-01T12:03:00+00:00 >> /a/aa\n" .
+            "2001-01-01T12:03:00+00:00 >> 2001-01-01T12:04:00+00:00 >> /b/ab/abc\n" .
             "");
 
         $this->file->thenThereShouldBeAFile_WithTheContent('schedules/20010101T101010.txt',
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:01:00+01:00 >> /a/ab\n" .
-            "2001-01-01T12:01:00+01:00 >> 2001-01-01T12:03:00+01:00 >> /a/aa\n" .
-            "2001-01-01T12:03:00+01:00 >> 2001-01-01T12:04:00+01:00 >> /b/ab/abc\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:10:00+00:00\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:01:00+00:00 >> /a/ab\n" .
+            "2001-01-01T12:01:00+00:00 >> 2001-01-01T12:03:00+00:00 >> /a/aa\n" .
+            "2001-01-01T12:03:00+00:00 >> 2001-01-01T12:04:00+00:00 >> /b/ab/abc\n" .
             "");
     }
 
@@ -123,7 +129,7 @@ class ShowScheduleTest extends Specification {
     function testInvalidScheduleFile() {
         $this->file->givenTheFolder('root/not');
         $this->file->givenTheFile_WithContent('schedule.txt',
-            "2001-01-01T12:00:00+01:00 >> 2001-01-01T12:10:00+01:00\n" .
+            "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:10:00+00:00\n" .
             "now >> tomorrow >> /not/existing/task");
         $this->whenIGetTheSchedule();
         $this->thenThereShouldBe_Slots(0);

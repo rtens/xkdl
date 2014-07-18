@@ -7,14 +7,20 @@ use rtens\xkdl\storage\Writer;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\TaskFixture;
+use spec\rtens\xkdl\fixtures\TimeFixture;
 use watoki\scrut\Specification;
 
 /**
  * @property TaskFixture task <-
  * @property ConfigFixture config <-
  * @property FileFixture file <-
+ * @property TimeFixture time <-
  */
 class StorageTest extends Specification {
+
+    protected function background() {
+        $this->time->givenTheTimeZoneIs('GMT0');
+    }
 
     function testReadTask() {
         $this->config->givenTheDefaultDurationIs_Minutes(15);
@@ -122,7 +128,7 @@ class StorageTest extends Specification {
 
         $this->whenIAddALogFrom_Until_To('2014-01-01 12:00', '2014-01-01 13:00', 'one');
         $this->file->thenThereShouldBeAFile_WithTheContent('root/one/logs.txt',
-            "2014-01-01T12:00:00+01:00 >> 2014-01-01T13:00:00+01:00\n");
+            "2014-01-01T12:00:00+00:00 >> 2014-01-01T13:00:00+00:00\n");
     }
 
     function testAddLogToExistingTask() {
@@ -136,7 +142,7 @@ class StorageTest extends Specification {
         $this->whenIAddALogFrom_Until_To('2014-01-01 12:00', '2014-01-01 13:00', 'one/two');
 
         $this->file->thenThereShouldBeAFile_WithTheContent('root/one/two/logs.txt',
-            "now >> tomorrow\n2014-01-01T12:00:00+01:00 >> 2014-01-01T13:00:00+01:00\n");
+            "now >> tomorrow\n2014-01-01T12:00:00+00:00 >> 2014-01-01T13:00:00+00:00\n");
     }
 
     function testAddLogToExistingTaskWithStateAndDuration() {
