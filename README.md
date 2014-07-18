@@ -1,6 +1,6 @@
 # xkdl #
 
-*xkdl* (pronounced like *schedule*) is a simple task manager, scheduler and time tracker.
+*xkdl* (pronounced like "*schedule*") is a simple task manager, scheduler and time tracker.
 
 ## Tasks ##
 
