@@ -1,4 +1,4 @@
-# xkdl #
+# xkdl [![Build Status](https://travis-ci.org/rtens/xkdl.png?branch=master)](https://travis-ci.org/rtens/xkdl)
 
 *xkdl* (pronounced like "*schedule*") is a simple task manager, scheduler and time tracker.
 
