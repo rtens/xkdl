@@ -25,7 +25,7 @@ class Scheduler {
 
         $schedule = new Schedule($from, $until);
         while ($now < $until) {
-            $tasks = $this->root->getSchedulableTasks($now, $schedule->slots, $until);
+            $tasks = $this->root->getSchedulableTasks($now, $schedule->slots);
             usort($tasks, function (Task $a, Task $b) {
                 $deadlineA = $a->getDeadline();
                 $deadlineB = $b->getDeadline();

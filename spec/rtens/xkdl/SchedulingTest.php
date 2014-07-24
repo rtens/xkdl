@@ -296,6 +296,7 @@ class SchedulingTest extends Specification {
         $this->thenThereShouldBe_SlotsInTheSchedule(8);
         $this->thenSlot_ShouldStart(1, 'now');
         $this->thenSlot_ShouldBe_Minutes(1, 2);
+        $this->thenSlot_ShouldStart(2, '4 minutes');
         $this->thenSlot_ShouldBe_Minutes(2, 3);
         $this->thenSlot_ShouldStart(3, '30 minutes');
         $this->thenSlot_ShouldBe_Minutes(3, 2);

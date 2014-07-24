@@ -23,17 +23,17 @@ class RepeatingTask extends Task {
         return $this->repetition;
     }
 
-    protected function isSchedulable(\DateTime $now, array $slots, \DateTime $until) {
+    protected function isSchedulable(\DateTime $now, array $slots) {
         return false;
     }
 
-    public function getSchedulableTasks(\DateTime $now, array $slots, \DateTime $until) {
+    public function getSchedulableTasks(\DateTime $now, array $slots) {
         for ($i = 0; true; $i++) {
             $task = $this->generateRepetition($i);
-            if (!$this->hasWindowsContaining($task, $until)) {
+            if (!$this->hasWindowBefore($task, $now)) {
                 return array();
             }
-            if ($task->isSchedulable($now, $slots, $until)) {
+            if ($task->isSchedulable($now, $slots)) {
                 return array($task);
             }
         }
@@ -70,9 +70,9 @@ class RepeatingTask extends Task {
         return $task;
     }
 
-    private function hasWindowsContaining(Task $task, \DateTime $until) {
+    private function hasWindowBefore(Task $task, \DateTime $now) {
         foreach ($task->windows as $window) {
-            if ($window->start < $until) {
+            if ($window->start <= $now) {
                 return true;
             }
         }

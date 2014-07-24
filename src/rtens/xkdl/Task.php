@@ -139,20 +139,19 @@ class Task {
     /**
      * @param \DateTime $now
      * @param array|Slot[] $slots
-     * @param DateTime $until
      * @return array|Task[]
      */
-    public function getSchedulableTasks(\DateTime $now, array $slots, \DateTime $until) {
-        if ($this->done || !$this->isInWindow($now, $slots, $until)) {
+    public function getSchedulableTasks(\DateTime $now, array $slots) {
+        if ($this->done || !$this->isInWindow($now, $slots)) {
             return array();
         }
 
         $tasks = array();
         foreach ($this->getChildren() as $child) {
-            foreach ($child->getSchedulableTasks($now, $slots, $until) as $task) {
+            foreach ($child->getSchedulableTasks($now, $slots) as $task) {
                 $tasks[] = $task;
             }
-            if ($child->isSchedulable($now, $slots, $until)) {
+            if ($child->isSchedulable($now, $slots)) {
                 $tasks[] = $child;
             }
         }
@@ -162,14 +161,13 @@ class Task {
     /**
      * @param DateTime $now
      * @param array|Slot[] $slots
-     * @param \DateTime $until
      * @return bool
      */
-    protected function isSchedulable(\DateTime $now, array $slots, \DateTime $until) {
+    protected function isSchedulable(\DateTime $now, array $slots) {
         return (!$this->done
             && $this->duration->seconds()
             && count($this->getOpenChildren()) == 0
-            && $this->isInWindow($now, $slots, $until)
+            && $this->isInWindow($now, $slots)
             && $this->areAllDependenciesScheduled($slots)
             && $this->hasUnscheduledDuration($slots));
     }
@@ -177,16 +175,15 @@ class Task {
     /**
      * @param \DateTime $now
      * @param array|Slot[] $slots
-     * @param $until
      * @return bool
      */
-    private function isInWindow(\DateTime $now, $slots, $until) {
+    private function isInWindow(\DateTime $now, $slots) {
         if (empty($this->windows)) {
             return true;
         }
 
         foreach ($this->windows as $window) {
-            if ($window->start > $until) {
+            if ($window->start > $now) {
                 return false;
             }
 
