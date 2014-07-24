@@ -141,41 +141,34 @@ class Task {
 
     /**
      * @param \DateTime $now
-     * @internal param array|\rtens\xkdl\lib\Slot[] $slots
      * @return array|Task[]
      */
-    public function getSchedulableTasks(\DateTime $now) {
+    public function getSchedulableChildren(\DateTime $now) {
         if ($this->done || !$this->isInWindow($now)) {
             return array();
         }
 
-        $tasks = array();
+        $children = array();
         foreach ($this->getChildren() as $child) {
-            foreach ($child->getSchedulableTasks($now) as $task) {
-                $tasks[] = $task;
-            }
             if ($child->isSchedulable($now)) {
-                $tasks[] = $child;
+                $children[] = $child;
             }
         }
-        return $tasks;
+        return $children;
     }
 
     /**
      * @param DateTime $now
-     * @internal param array|\rtens\xkdl\lib\Slot[] $slots
      * @return bool
      */
     protected function isSchedulable(\DateTime $now) {
         return (!$this->done
             && $this->duration->seconds()
-            && count($this->getOpenChildren()) == 0
             && $this->isInWindow($now));
     }
 
     /**
      * @param \DateTime $now
-     * @internal param array|\rtens\xkdl\lib\Slot[] $slots
      * @return bool
      */
     private function isInWindow(\DateTime $now) {
@@ -228,6 +221,10 @@ class Task {
             }
         }
         return $openChildren;
+    }
+
+    public function hasOpenChildren() {
+        return count($this->getOpenChildren()) != 0;
     }
 
     public function hasHigherPriorityThen(Task $task) {

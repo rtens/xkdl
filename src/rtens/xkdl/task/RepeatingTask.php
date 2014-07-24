@@ -24,10 +24,10 @@ class RepeatingTask extends Task {
     }
 
     protected function isSchedulable(\DateTime $now) {
-        return false;
+        return true;
     }
 
-    public function getSchedulableTasks(\DateTime $now) {
+    public function getSchedulableChildren(\DateTime $now) {
         for ($i = 0; true; $i++) {
             $task = $this->generateRepetition($i);
             if (!$this->hasWindowBefore($task, $now)) {
@@ -38,6 +38,10 @@ class RepeatingTask extends Task {
             }
         }
         return array();
+    }
+
+    public function hasOpenChildren() {
+        return true;
     }
 
     /**

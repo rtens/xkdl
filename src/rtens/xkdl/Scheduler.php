@@ -26,8 +26,7 @@ class Scheduler {
 
         $schedule = new Schedule($from, $until);
         while ($now < $until) {
-            $tasks = $this->root->getSchedulableTasks($now);
-
+            $tasks = $this->getSchedulableTasks($this->root, $now);
             $tasks = $this->filterTasks($tasks, $now, $schedule->slots);
 
             usort($tasks, function (Task $a, Task $b) {
@@ -57,6 +56,17 @@ class Scheduler {
         return $schedule;
     }
 
+    private function getSchedulableTasks(Task $root, $now) {
+        $tasks = array();
+        foreach ($root->getSchedulableChildren($now) as $child) {
+            foreach ($this->getSchedulableTasks($child, $now) as $task) {
+                $tasks[] = $task;
+            }
+            $tasks[] = $child;
+        }
+        return $tasks;
+    }
+
     /**
      * @param Task[] $tasks
      * @param \DateTime $now
@@ -69,6 +79,7 @@ class Scheduler {
             if ($this->hasWindowWithFreeQuota($task, $now, $slots)
                 && $this->areAllDependenciesScheduled($task, $slots)
                 && $this->hasUnscheduledDuration($task, $slots)
+                && !$task->hasOpenChildren()
             ) {
                 $filtered[] = $task;
             }
