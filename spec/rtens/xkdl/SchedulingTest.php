@@ -131,6 +131,8 @@ class SchedulingTest extends Specification {
         $this->task->givenTheTask_In('leaf_two', 'one_one');
         $this->task->givenTheTask_In('leaf_three', 'two');
 
+        $this->task->given_Takes_Minutes('one', 0);
+
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(3);

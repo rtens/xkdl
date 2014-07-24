@@ -101,7 +101,7 @@ class ShowScheduleTest extends Specification {
         $this->file->givenTheFile_WithContent('root/a/__ab/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:03");
         $this->file->givenTheFolder('root/b/ab/__abc');
 
-        $this->config->givenNowIs('20010101 10:10:10');
+        $this->config->givenNowIs('2001-01-01 10:10:10');
 
         $this->whenICreateANewScheduleFrom_Until("2001-01-01 12:00", "2001-01-01 12:10");
 

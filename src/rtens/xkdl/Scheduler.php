@@ -76,7 +76,8 @@ class Scheduler {
     private function filterTasks($tasks, DateTime $now, $slots) {
         $filtered = array();
         foreach ($tasks as $task) {
-            if ($this->hasWindowWithFreeQuota($task, $now, $slots)
+            if ($task->getDuration()->seconds() > 0
+                && $this->hasWindowWithFreeQuota($task, $now, $slots)
                 && $this->areAllDependenciesScheduled($task, $slots)
                 && $this->hasUnscheduledDuration($task, $slots)
                 && !$task->hasOpenChildren()

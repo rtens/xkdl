@@ -163,7 +163,6 @@ class Task {
      */
     protected function isSchedulable(\DateTime $now) {
         return (!$this->done
-            && $this->duration->seconds()
             && $this->isInWindow($now));
     }
 
