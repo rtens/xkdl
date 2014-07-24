@@ -1,9 +1,9 @@
 <?php
-namespace spec\rtens\xkdl;
+namespace spec\rtens\xkdl\scheduling;
 
 use PHPUnit_Framework_TestCase;
 use rtens\xkdl\lib\Schedule;
-use rtens\xkdl\Scheduler;
+use rtens\xkdl\scheduler\EdfScheduler;
 use spec\rtens\xkdl\fixtures\TaskFixture;
 use watoki\scrut\Specification;
 
@@ -13,7 +13,7 @@ use watoki\scrut\Specification;
  *
  * @property TaskFixture task <-
  */
-class SchedulingTest extends Specification {
+class EdfSchedulingTest extends Specification {
 
     public function background() {
         $this->task->givenTheRootTask('root');
@@ -337,7 +337,7 @@ class SchedulingTest extends Specification {
     }
 
     private function whenICreateTheSchedule() {
-        $scheduler = new Scheduler($this->task->root);
+        $scheduler = new EdfScheduler($this->task->root);
         $this->schedule = $scheduler->createSchedule(new \DateTime(), $this->aligned('2 hours'));
     }
 

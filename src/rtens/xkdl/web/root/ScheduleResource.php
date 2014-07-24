@@ -3,7 +3,7 @@ namespace rtens\xkdl\web\root;
 
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
-use rtens\xkdl\Scheduler;
+use rtens\xkdl\scheduler\EdfScheduler;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
@@ -45,7 +45,7 @@ class ScheduleResource extends DynamicResource {
     public function doPost(\DateTime $from, \DateTime $until) {
         $root = $this->store->getRoot();
 
-        $scheduler = new Scheduler($root);
+        $scheduler = new EdfScheduler($root);
         $schedule = $scheduler->createSchedule($from, $until);
 
         $this->writer->saveSchedule($schedule);
