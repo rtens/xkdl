@@ -4,7 +4,6 @@ namespace rtens\xkdl;
 use DateTime;
 use rtens\xkdl\lib\ExecutionWindow;
 use rtens\xkdl\lib\RepeatedExecutionWindows;
-use rtens\xkdl\lib\Slot;
 use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 
@@ -136,22 +135,26 @@ class Task {
         $this->dependencies[] = $dependency;
     }
 
+    public function getDependencies() {
+        return $this->dependencies;
+    }
+
     /**
      * @param \DateTime $now
-     * @param array|Slot[] $slots
+     * @internal param array|\rtens\xkdl\lib\Slot[] $slots
      * @return array|Task[]
      */
-    public function getSchedulableTasks(\DateTime $now, array $slots) {
-        if ($this->done || !$this->isInWindow($now, $slots)) {
+    public function getSchedulableTasks(\DateTime $now) {
+        if ($this->done || !$this->isInWindow($now)) {
             return array();
         }
 
         $tasks = array();
         foreach ($this->getChildren() as $child) {
-            foreach ($child->getSchedulableTasks($now, $slots) as $task) {
+            foreach ($child->getSchedulableTasks($now) as $task) {
                 $tasks[] = $task;
             }
-            if ($child->isSchedulable($now, $slots)) {
+            if ($child->isSchedulable($now)) {
                 $tasks[] = $child;
             }
         }
@@ -160,24 +163,22 @@ class Task {
 
     /**
      * @param DateTime $now
-     * @param array|Slot[] $slots
+     * @internal param array|\rtens\xkdl\lib\Slot[] $slots
      * @return bool
      */
-    protected function isSchedulable(\DateTime $now, array $slots) {
+    protected function isSchedulable(\DateTime $now) {
         return (!$this->done
             && $this->duration->seconds()
             && count($this->getOpenChildren()) == 0
-            && $this->isInWindow($now, $slots)
-            && $this->areAllDependenciesScheduled($slots)
-            && $this->hasUnscheduledDuration($slots));
+            && $this->isInWindow($now));
     }
 
     /**
      * @param \DateTime $now
-     * @param array|Slot[] $slots
+     * @internal param array|\rtens\xkdl\lib\Slot[] $slots
      * @return bool
      */
-    private function isInWindow(\DateTime $now, $slots) {
+    private function isInWindow(\DateTime $now) {
         if (empty($this->windows)) {
             return true;
         }
@@ -187,62 +188,11 @@ class Task {
                 return false;
             }
 
-            if ($window->start <= $now && $now < $window->end
-                && $this->isScheduledTimeSmallerThanQuota($window, $slots)
-            ) {
+            if ($now < $window->end) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * @param \rtens\xkdl\lib\ExecutionWindow $window
-     * @param array|Slot[] $slots
-     * @return bool
-     */
-    private function isScheduledTimeSmallerThanQuota(ExecutionWindow $window, $slots) {
-        if (!$window->quota) {
-            return true;
-        }
-
-        $secondsScheduledInWindow = 0;
-        foreach ($slots as $slot) {
-            if ($slot->task == $this && $window->start <= $slot->window->start && $slot->window->end <= $window->end) {
-                $secondsScheduledInWindow += $slot->window->getSeconds();
-            }
-        }
-        return $secondsScheduledInWindow < $window->quota * 3600;
-    }
-
-    /**
-     * @param array|Slot[] $slots
-     * @return bool
-     */
-    private function areAllDependenciesScheduled($slots) {
-        foreach ($this->dependencies as $task) {
-            if ($task->hasUnscheduledDuration($slots)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @param array|Slot[] $slots
-     * @return float
-     */
-    private function hasUnscheduledDuration(array $slots) {
-        $unscheduledSeconds = $this->duration->seconds() - $this->getLoggedDuration()->seconds();
-        foreach ($slots as $slot) {
-            if ($slot->task == $this) {
-                $unscheduledSeconds -= $slot->window->getSeconds();
-                if ($unscheduledSeconds <= 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public function getLoggedDuration() {

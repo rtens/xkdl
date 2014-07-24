@@ -23,17 +23,17 @@ class RepeatingTask extends Task {
         return $this->repetition;
     }
 
-    protected function isSchedulable(\DateTime $now, array $slots) {
+    protected function isSchedulable(\DateTime $now) {
         return false;
     }
 
-    public function getSchedulableTasks(\DateTime $now, array $slots) {
+    public function getSchedulableTasks(\DateTime $now) {
         for ($i = 0; true; $i++) {
             $task = $this->generateRepetition($i);
             if (!$this->hasWindowBefore($task, $now)) {
                 return array();
             }
-            if ($task->isSchedulable($now, $slots)) {
+            if ($task->isSchedulable($now)) {
                 return array($task);
             }
         }
