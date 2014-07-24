@@ -2,18 +2,10 @@
 namespace spec\rtens\xkdl\scheduling;
 
 use PHPUnit_Framework_TestCase;
-use rtens\xkdl\lib\Schedule;
 use rtens\xkdl\scheduler\EdfScheduler;
-use spec\rtens\xkdl\fixtures\TaskFixture;
-use watoki\scrut\Specification;
+use rtens\xkdl\Task;
 
-/**
- * @property Schedule schedule
- * @property \Exception|null caught
- *
- * @property TaskFixture task <-
- */
-class EdfSchedulingTest extends Specification {
+class EdfSchedulingTest extends SchedulingTest {
 
     public function background() {
         $this->task->givenTheRootTask('root');
@@ -331,46 +323,8 @@ class EdfSchedulingTest extends Specification {
 
     ######################### SETUP ############################
 
-    protected function setUp() {
-        parent::setUp();
-        $this->background();
-    }
-
-    private function whenICreateTheSchedule() {
-        $scheduler = new EdfScheduler($this->task->root);
-        $this->schedule = $scheduler->createSchedule(new \DateTime(), $this->aligned('2 hours'));
-    }
-
-    private function thenThereShouldBe_SlotsInTheSchedule($count) {
-        $this->assertCount($count, $this->schedule->slots);
-    }
-
-    private function thenSlot_ShouldBeTask($index, $name) {
-        $this->assertEquals($name, $this->schedule->slots[$index - 1]->task->getName());
-    }
-
-    private function thenSlot_ShouldBe_Minutes($index, $minutes) {
-        $this->assertEquals($minutes, $this->schedule->slots[$index - 1]->window->getSeconds() / 60);
-    }
-
-    private function thenSlot_ShouldStart($index, $when) {
-        $this->assertEquals($this->aligned($when), $this->schedule->slots[$index - 1]->window->start);
-    }
-
-    private function aligned($from) {
-        return new \DateTime(date('Y-m-d H:i:0', strtotime($from)));
-    }
-
-    private function whenITryToRepeatTheWindowsOf($task) {
-        try {
-            $this->task->givenTheWindowsOf_AreRepeatedEvery_Minutes($task, 1);
-        } catch (\Exception $e) {
-            $this->caught = $e;
-        }
-    }
-
-    private function thenAnExceptionShouldBeThrown() {
-        $this->assertNotNull($this->caught);
+    protected function createSchedulerInstance(Task $root) {
+        return new EdfScheduler($root);
     }
 
 }
