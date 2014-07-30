@@ -10,6 +10,7 @@
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 </head>
 <body>
@@ -80,17 +81,41 @@
     <div property="schedule">
 
         <div class="refresh item bg-primary clearfix">
-            <form method="post" class="form-inline">
-                <div class="main">
-                    <h4>
-                        <span property="from">2001-01-01 10:10</span>
-                        -
-                        <span property="until">2001-01-01 11:11</span>
-                    </h4>
+            <form method="post">
+                <div class="clearfix">
+                    <div class="main">
+                        <h4>
+                            <span property="from">2001-01-01 10:10</span>
+                            -
+                            <span property="until">2001-01-01 11:11</span>
+                        </h4>
+                    </div>
+                    <div class="logging">
+                        <div class="form-group form-inline">
+                            <input style="width: 39%" class="form-control" type="text" name="from" value="now"/><div style="display: inline-block; text-align: center; width: 5%;">-</div><input style="width: 39%;" class="form-control" type="text" name="until" value="tomorrow"/><input style="width: 16%; margin-left: 1%;" class="btn btn-info" type="submit" value="refresh"/>
+                        </div>
+                    </div>
                 </div>
-                <div class="logging">
-                    <div class="form-group">
-                        <input style="width: 39%" class="form-control" type="text" name="from" value="now"/><div style="display: inline-block; text-align: center; width: 5%;">-</div><input style="width: 39%;" class="form-control" type="text" name="until" value="tomorrow"/><input style="width: 16%; margin-left: 1%;" class="btn btn-info" type="submit" value="refresh"/>
+
+                <div class="extend-toggle">
+                    <a style="color: white; text-decoration: none; opacity: 0.5" data-toggle="collapse" href="#schedule-extended">
+                        <span class="glyphicon glyphicon-cog"></span>
+                        Extended Options
+                    </a>
+                </div>
+                <div class="extended collapse" id="schedule-extended">
+                    <h4>Scheduling algroithm</h4>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="scheduler" value="pedf" checked/>
+                            Prioritized earliest deadline first
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="scheduler" value="edf"/>
+                            Earliest deadline first
+                        </label>
                     </div>
                 </div>
             </form>
