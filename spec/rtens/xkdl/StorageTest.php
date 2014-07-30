@@ -4,6 +4,7 @@ namespace spec\rtens\xkdl;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
+use rtens\xkdl\Task;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\TaskFixture;
@@ -72,7 +73,18 @@ class StorageTest extends Specification {
 
         $this->task->then_ShouldHaveThePriority('Some task', 1);
         $this->task->then_ShouldHaveThePriority('other task', 3);
-        $this->task->then_ShouldHaveThePriority('this task', 9999);
+        $this->task->then_ShouldHaveThePriority('this task', Task::DEFAULT_PRIORITY);
+    }
+
+    function testReadPriorityFromFile() {
+        $this->file->givenTheFolder('root/one');
+        $this->file->givenTheFolder('root/two');
+        $this->file->givenTheFile_WithContent('root/one/__.txt', 'priority: 73');
+
+        $this->whenIReadTheTasks();
+
+        $this->task->then_ShouldHaveThePriority('one', 73);
+        $this->task->then_ShouldHaveThePriority('two', Task::DEFAULT_PRIORITY);
     }
 
     function testReadDuration() {

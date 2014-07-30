@@ -11,6 +11,8 @@ class Task {
 
     public static $CLASS = __CLASS__;
 
+    const DEFAULT_PRIORITY = PHP_INT_MAX;
+
     /** @var string */
     protected $name;
 
@@ -27,7 +29,7 @@ class Task {
     protected $deadline;
 
     /** @var int Priority relative to siblings */
-    protected $priority = 9999;
+    protected $priority = self::DEFAULT_PRIORITY;
 
     /** @var TimeSpan */
     protected $duration;

@@ -21,28 +21,18 @@ class EdfScheduler extends Scheduler {
 
         $schedule = new Schedule($from, $until);
         while ($now < $until) {
-            $tasks = $this->getSchedulableTasks($this->root, $now);
-            $tasks = $this->filterTasks($tasks, $now, $schedule->slots);
-
-            usort($tasks, function (Task $a, Task $b) {
-                $deadlineA = $a->getDeadline();
-                $deadlineB = $b->getDeadline();
-                if ($deadlineA == $deadlineB) {
-                    return $a->hasHigherPriorityThen($b) ? -1 : 1;
-                }
-                return $deadlineA && !$deadlineB || $deadlineA && $deadlineB && $deadlineA < $deadlineB ? -1 : 1;
-            });
+            $chosen = $this->chooseNextTask($now, $schedule);
 
             $next = clone $now;
             $next->add(new \DateInterval(self::RESOLUTION));
 
-            if (count($tasks) > 0) {
-                if (count($schedule->slots) && $schedule->slots[count($schedule->slots) - 1]->task == $tasks[0]
+            if ($chosen) {
+                if (count($schedule->slots) && $schedule->slots[count($schedule->slots) - 1]->task == $chosen
                     && $schedule->slots[count($schedule->slots) - 1]->window->end == $now
                 ) {
                     $schedule->slots[count($schedule->slots) - 1]->window->end = $next;
                 } else {
-                    $schedule->slots[] = new Slot($tasks[0], new lib\TimeWindow($now, $next));
+                    $schedule->slots[] = new Slot($chosen, new lib\TimeWindow($now, $next));
                 }
             }
 
@@ -51,7 +41,28 @@ class EdfScheduler extends Scheduler {
         return $schedule;
     }
 
-    private function getSchedulableTasks(Task $root, $now) {
+    /**
+     * @param \DateTime $now
+     * @param Schedule $schedule
+     * @return null|Task
+     */
+    protected function chooseNextTask(\DateTime $now, Schedule $schedule) {
+        $tasks = $this->getSchedulableTasks($this->root, $now);
+        $tasks = $this->filterTasks($tasks, $now, $schedule->slots);
+
+        usort($tasks, function (Task $a, Task $b) {
+            $deadlineA = $a->getDeadline();
+            $deadlineB = $b->getDeadline();
+            if ($deadlineA == $deadlineB) {
+                return $a->hasHigherPriorityThen($b) ? -1 : 1;
+            }
+            return $deadlineA && !$deadlineB || $deadlineA && $deadlineB && $deadlineA < $deadlineB ? -1 : 1;
+        });
+
+        return count($tasks) ? $tasks[0] : null;
+    }
+
+    protected function getSchedulableTasks(Task $root, $now) {
         $tasks = array();
         foreach ($root->getSchedulableChildren($now) as $child) {
             foreach ($this->getSchedulableTasks($child, $now) as $task) {
@@ -68,7 +79,7 @@ class EdfScheduler extends Scheduler {
      * @param Slot[] $slots
      * @return Task[] array
      */
-    private function filterTasks($tasks, DateTime $now, $slots) {
+    protected function filterTasks($tasks, DateTime $now, $slots) {
         $filtered = array();
         foreach ($tasks as $task) {
             if ($task->getDuration()->seconds() > 0
