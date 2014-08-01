@@ -15,7 +15,7 @@ class TaskStorageFixture extends Fixture {
     /** @var Task[] */
     private $tasks = array();
 
-    protected function setUp() {
+    public function setUp() {
         parent::setUp();
         $this->root = new Task('root');
         $this->tasks['.'] = $this->root;

@@ -2,8 +2,8 @@
 namespace rtens\xkdl\web;
 
 use rtens\xkdl\exception\AuthenticationException;
+use rtens\xkdl\lib\OpenIdAuthenticator;
 use watoki\curir\http\Request;
-use watoki\curir\http\Response;
 use watoki\curir\http\Url;
 use watoki\curir\resource\Container;
 use watoki\curir\responder\Redirecter;
@@ -18,7 +18,15 @@ class RootResource extends Container {
     /** @var Session <- */
     public $session;
 
+    /** @var OpenIdAuthenticator <- */
+    public $authenticator;
+
     public function respond(Request $request) {
+        if (!$this->session->isLoggedIn()) {
+            return (new Redirecter($this->authenticator->getAuthenticationUrl()))
+                ->createResponse($request);
+        }
+
         if ($this->session->has('token')) {
             $this->client->setAccessToken($this->session->get('token'));
         }
@@ -26,7 +34,7 @@ class RootResource extends Container {
         try {
             return parent::respond($request);
         } catch (AuthenticationException $ae) {
-            return (new Redirecter(Url::parse($ae->getAuthenticationUrl()), Response::STATUS_UNAUTHORIZED))
+            return (new Redirecter(Url::parse($ae->getAuthenticationUrl())))
                 ->createResponse($request);
         }
     }

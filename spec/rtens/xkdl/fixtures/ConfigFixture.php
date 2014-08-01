@@ -13,21 +13,35 @@ class ConfigFixture extends Fixture {
     /** @var Mock */
     private $config;
 
-    protected function setUp() {
+    private $rootDir;
+
+    public function setUp() {
         parent::setUp();
 
-        $root = $this->tmpDir();
+        $this->rootDir = sys_get_temp_dir() . '/xkdl';
+        @mkdir($this->rootDir);
+        $this->clear($this->rootDir);
 
         $mf = new MockFactory();
-        $this->config = $mf->getInstance(Configuration::$CLASS, [$root]);
+        $this->config = $mf->getInstance(Configuration::$CLASS, [$this->rootDir]);
         $this->config->__mock()->mockMethods(Mockster::F_NONE);
 
         $this->spec->factory->setSingleton(Configuration::$CLASS, $this->config);
+    }
 
-        @mkdir($root);
-        $this->spec->undos[] = function () use ($root) {
-            @rmdir($root);
-        };
+    public function tearDown() {
+        $this->clear($this->rootDir);
+    }
+
+    private function clear($dir) {
+        foreach (glob($dir . '/*') as $file) {
+            if (is_file($file)) {
+                @unlink($file);
+            } else {
+                $this->clear($file);
+                @rmdir($file);
+            }
+        }
     }
 
     /**
@@ -46,7 +60,7 @@ class ConfigFixture extends Fixture {
         $this->config->__mock()->method('now')->willReturn(new \DateTime($when));
     }
 
-    public function tmpDir() {
-        return __DIR__ . '/tmp';
+    public function givenTheUsersHasTheOpenId($string) {
+        $this->config->__mock()->method('getOpenIds')->willReturn(array($string));
     }
 }

@@ -7,4 +7,8 @@ class Session extends Map {
 
     public static $CLASS = __CLASS__;
 
+    public function isLoggedIn() {
+        return false;
+    }
+
 } 

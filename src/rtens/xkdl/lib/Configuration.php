@@ -1,7 +1,7 @@
 <?php
 namespace rtens\xkdl\lib;
 
-class Configuration {
+abstract class Configuration {
 
     public static $CLASS = __CLASS__;
 
@@ -34,5 +34,15 @@ class Configuration {
     public function now() {
         return new \DateTime();
     }
+
+    /**
+     * @return string
+     */
+    abstract public function getHost();
+
+    /**
+     * @return array|string[] Array of accepted openID identifiers
+     */
+    abstract public function getOpenIds();
 
 } 

@@ -179,11 +179,6 @@ class StorageTest extends Specification {
 
     ###################### SETUP ########################
 
-    protected function setUp() {
-        parent::setUp();
-        $this->file->cleanUp();
-    }
-
     private function whenIReadTheTasks() {
         /** @var TaskStore $store */
         $store = $this->factory->getInstance(TaskStore::$CLASS);

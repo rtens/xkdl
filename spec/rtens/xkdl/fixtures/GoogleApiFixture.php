@@ -12,7 +12,7 @@ class GoogleApiFixture extends Fixture {
 
     private $token;
 
-    protected function setUp() {
+    public function setUp() {
         parent::setUp();
 
         $mf = new MockFactory();
