@@ -30,8 +30,6 @@ class AuthenticationTest extends Specification {
     }
 
     function testLoggedInUser() {
-        $this->markTestIncomplete();
-
         $this->web->givenIAmLoggedIn();
         $this->web->whenIGetTheResource('schedule');
         $this->web->thenIShouldNotBeRedirected();

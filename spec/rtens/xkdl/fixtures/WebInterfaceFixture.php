@@ -36,7 +36,7 @@ class WebInterfaceFixture extends Fixture {
         parent::setUp();
 
         $mf = new MockFactory();
-        $this->session = $mf->getInstance(Session::$CLASS);
+        $this->session = $mf->getInstance(Session::$CLASS, []);
         $this->spec->factory->setSingleton(Session::$CLASS, $this->session);
 
         $this->session->__mock()->mockMethods(Mockster::F_NONE);
@@ -63,8 +63,9 @@ class WebInterfaceFixture extends Fixture {
     }
 
     public function thenIShouldNotBeRedirected() {
-        $this->spec->assertFalse($this->response->getHeaders()->has('Location'),
-            'Was redirected to ' . $this->response->getHeaders()->get('Location'));
+        $has = $this->response->getHeaders()->has('Location');
+        $this->spec->assertFalse($has,
+            $has ? 'Was redirected to ' . $this->response->getHeaders()->get('Location') : '');
     }
 
     public function thenIShouldBeRedirectedTo($url) {
