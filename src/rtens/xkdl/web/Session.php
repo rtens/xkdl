@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\web;
 
+use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\lib\Configuration;
 
 class Session {
@@ -39,6 +40,12 @@ class Session {
             $this->set('session_token', $token);
         } else {
             @unlink($this->config->sessionFile());
+        }
+    }
+
+    public function requireLoggedIn() {
+        if (!$this->isLoggedIn()) {
+            throw new NotLoggedInException();
         }
     }
 

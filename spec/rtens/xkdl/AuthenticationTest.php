@@ -6,7 +6,6 @@ use rtens\mockster\MockFactory;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Response;
-use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 
 /**
@@ -38,6 +37,7 @@ class AuthenticationTest extends Specification {
         $this->web->givenIAmNotLoggedIn();
         $this->whenILogInWithTheIdentity('http://some.open.id/foo');
         $this->web->thenIShouldBeLoggedIn();
+        $this->web->thenIShouldBeRedirectedTo('http://xkdl/schedule');
     }
 
     function testFailedLogIn() {
@@ -68,7 +68,7 @@ class AuthenticationTest extends Specification {
     }
 
     private function givenTheAuthUrlIs($url) {
-        $this->openId->__mock()->method('authUrl')->willReturn(Url::parse($url));
+        $this->openId->__mock()->method('authUrl')->willReturn($url);
     }
 
     private function whenILogInWithTheIdentity($string) {

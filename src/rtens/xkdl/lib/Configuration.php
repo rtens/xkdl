@@ -1,6 +1,8 @@
 <?php
 namespace rtens\xkdl\lib;
 
+use watoki\curir\http\Url;
+
 abstract class Configuration {
 
     public static $CLASS = __CLASS__;
@@ -39,11 +41,12 @@ abstract class Configuration {
         return new \DateTime();
     }
 
-    /**
-     * @return string
-     */
+    public function getRootUrl() {
+        return 'http://localhost';
+    }
+
     public function getHost() {
-        return 'localhost';
+        return Url::parse($this->getRootUrl())->getHost();
     }
 
     /**

@@ -4,7 +4,9 @@ namespace rtens\xkdl\web\root;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\Task;
 use rtens\xkdl\web\Presenter;
+use rtens\xkdl\web\Session;
 use watoki\curir\resource\DynamicResource;
+use watoki\curir\Responder;
 
 class LogsResource extends DynamicResource {
 
@@ -12,6 +14,9 @@ class LogsResource extends DynamicResource {
 
     /** @var TaskStore <- */
     public $store;
+
+    /** @var Session <- */
+    public $session;
 
     /**
      * @param string $task
@@ -21,6 +26,8 @@ class LogsResource extends DynamicResource {
      * @return Presenter
      */
     public function doGet($task = '', $from = null, $until = null, $sortByTime = false) {
+        $this->session->requireLoggedIn();
+
         $from = $from ? new \DateTime($from) : null;
         $until = $until ? new \DateTime($until) : null;
 

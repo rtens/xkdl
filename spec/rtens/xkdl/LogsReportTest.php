@@ -1,20 +1,29 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\LogsResource;
 use spec\rtens\xkdl\fixtures\TaskFixture;
+use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Url;
 use watoki\curir\Responder;
 use watoki\scrut\Specification;
 
 /**
  * @property TaskFixture task <-
+ * @property WebInterfaceFixture web <-
  */
 class LogsReportTest extends Specification {
 
     protected function background() {
         $this->task->givenTheRootTask('root');
+    }
+
+    public function testRequiresLogIn() {
+        $this->web->givenIAmNotLoggedIn();
+        $this->whenITryToRequestAReportOfLogs();
+        $this->then_ShouldBeThrown(NotLoggedInException::$CLASS);
     }
 
     public function testNoLogs() {
@@ -102,6 +111,9 @@ class LogsReportTest extends Specification {
     /** @var Presenter */
     private $responder;
 
+    /** @var null|\Exception */
+    private $caught;
+
     private function whenIRequestAReportOfLogs() {
         $this->whenIRequestAReportOfLogsBetween_And(null, null);
     }
@@ -138,6 +150,19 @@ class LogsReportTest extends Specification {
 
     private function thenTheTotalShouldBe($string) {
         $this->assertEquals($string, $this->responder->getModel()['total']);
+    }
+
+    private function whenITryToRequestAReportOfLogs() {
+        try {
+            $this->whenIRequestAReportOfLogs();
+        } catch (\Exception $e) {
+            $this->caught = $e;
+        }
+    }
+
+    private function then_ShouldBeThrown($exceptionClass) {
+        $this->assertNotNull($this->caught, 'No Exception was thrown.');
+        $this->assertInstanceOf($exceptionClass, $this->caught);
     }
 
 } 

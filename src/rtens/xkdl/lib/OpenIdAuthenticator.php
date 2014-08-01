@@ -15,13 +15,16 @@ class OpenIdAuthenticator {
     public function __construct(Factory $factory, Configuration $config) {
         $this->config = $config;
 
-        $this->openId = $factory->getInstance('LightOpenID', [$this->config->getHost()]);
+        /** @var \LightOpenID $openId */
+        $openId = $factory->getInstance('LightOpenID', [$this->config->getHost()]);
+        $this->openId = $openId;
         $openIds = $this->config->getOpenIds();
 
         if (!is_array($openIds) || empty($openIds)) {
             throw new \Exception('Configuration error: No openIDs provided');
         }
 
+        $this->openId->returnUrl = $this->config->getRootUrl() . '/user?method=login';
         $this->openId->__set('identity', $openIds[0]);
     }
 
@@ -33,6 +36,12 @@ class OpenIdAuthenticator {
      * @return Url
      */
     public function getAuthenticationUrl() {
-        return $this->openId->authUrl();
+        $in = $this->openId->authUrl();
+        $url = Url::parse($in);
+        if ($url->toString() != $in) {
+            var_dump($url->toString(), $in);
+            die('WRONG');
+        }
+        return $url;
     }
 }

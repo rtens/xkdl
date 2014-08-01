@@ -1,7 +1,6 @@
 <?php
 namespace rtens\xkdl\web\root;
 
-use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\scheduler\EdfScheduler;
@@ -34,7 +33,7 @@ class ScheduleResource extends DynamicResource {
     public $session;
 
     public function respond(Request $request) {
-        $this->requireLoggedIn();
+        $this->session->requireLoggedIn();
         return parent::respond($request);
     }
 
@@ -185,12 +184,6 @@ class ScheduleResource extends DynamicResource {
             'number' => round($logged / 3600, 2) . ' / ' . round($duration / 3600, 2),
             'logged' => array('style' => 'width: ' . min($percentage, 100) . '%')
         );
-    }
-
-    private function requireLoggedIn() {
-        if (!$this->session->isLoggedIn()) {
-            throw new NotLoggedInException();
-        }
     }
 
 } 
