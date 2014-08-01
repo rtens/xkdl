@@ -28,19 +28,11 @@ class Session {
     }
 
     public function isLoggedIn() {
-        return file_exists($this->config->sessionFile())
-        && $this->has('session_token')
-        && file_get_contents($this->config->sessionFile()) == $this->get('session_token');
+        return $_SESSION['loggedIn'];
     }
 
     public function setLoggedIn($to = true) {
-        if ($to) {
-            $token = md5(mt_rand());
-            file_put_contents($this->config->sessionFile(), $token);
-            $this->set('session_token', $token);
-        } else {
-            @unlink($this->config->sessionFile());
-        }
+        $_SESSION['loggedIn'] = $to;
     }
 
     public function requireLoggedIn() {
