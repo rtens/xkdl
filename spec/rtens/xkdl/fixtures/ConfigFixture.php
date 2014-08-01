@@ -18,19 +18,21 @@ class ConfigFixture extends Fixture {
     public function setUp() {
         parent::setUp();
 
-        $this->rootDir = sys_get_temp_dir() . '/xkdl';
+        $this->rootDir = __DIR__ . '/tmp';
         @mkdir($this->rootDir);
         $this->clear($this->rootDir);
 
         $mf = new MockFactory();
         $this->config = $mf->getInstance(Configuration::$CLASS, [$this->rootDir]);
         $this->config->__mock()->mockMethods(Mockster::F_NONE);
+        $this->givenTheUsersHasTheOpenId('dummy');
 
         $this->spec->factory->setSingleton(Configuration::$CLASS, $this->config);
     }
 
     public function tearDown() {
         $this->clear($this->rootDir);
+        @rmdir($this->rootDir);
     }
 
     private function clear($dir) {

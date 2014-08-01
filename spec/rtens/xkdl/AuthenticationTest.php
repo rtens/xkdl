@@ -3,7 +3,6 @@ namespace spec\rtens\xkdl;
 
 use rtens\mockster\Mock;
 use rtens\mockster\MockFactory;
-use rtens\xkdl\lib\OpenIdAuthenticator;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Response;
@@ -36,42 +35,57 @@ class AuthenticationTest extends Specification {
     }
 
     function testLogIn() {
-        $this->markTestIncomplete();
-
         $this->web->givenIAmNotLoggedIn();
         $this->whenILogInWithTheIdentity('http://some.open.id/foo');
-        $this->thenIShouldBeLoggedIn();
+        $this->web->thenIShouldBeLoggedIn();
     }
 
     function testFailedLogIn() {
-        $this->markTestIncomplete();
-
         $this->web->givenIAmNotLoggedIn();
-        $this->whenILogInWithTheIdentity('http://wrong.open.id/foo');
-        $this->web->thenTheResponseStatusShouldBe(Response::STATUS_UNAUTHORIZED);
+        $this->whenICancelTheLogIn();
+        $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
+        $this->web->thenIShouldNotBeLoggedIn();
+    }
+
+    function testLogInWithWrongId() {
+        $this->web->givenIAmNotLoggedIn();
+        $this->whenITryToLogInWithTheIdentity('http://wrong.open.id/foo');
+        $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
+        $this->web->thenIShouldNotBeLoggedIn();
     }
 
     /***************************** STEPS *******************************/
 
     /** @var Mock */
-    private $authenticator;
+    private $openId;
 
     protected function setUp() {
         parent::setUp();
 
         $mf = new MockFactory();
-        $this->authenticator = $mf->getInstance(OpenIdAuthenticator::$CLASS);
-        $this->factory->setSingleton(OpenIdAuthenticator::$CLASS, $this->authenticator);
+        $this->openId = $mf->getInstance('LightOpenID');
+        $this->factory->setSingleton('LightOpenID', $this->openId);
     }
 
     private function givenTheAuthUrlIs($url) {
-        $this->authenticator->__mock()->method('getAuthenticationUrl')->willReturn(Url::parse($url));
+        $this->openId->__mock()->method('authUrl')->willReturn(Url::parse($url));
     }
 
     private function whenILogInWithTheIdentity($string) {
+        $this->openId->__mock()->method('validate')->willReturn(true);
+        $this->openId->__mock()->method('__get')->willReturn($string)->withArguments('identity');
+        $this->web->whenICallTheResource_WithTheMethod('user', 'login');
     }
 
-    private function thenIShouldBeLoggedIn() {
+    private function whenICancelTheLogIn() {
+        $this->openId->__mock()->method('validate')->willReturn(false);
+        $this->web->whenITryToCallTheResource_WithTheMethod('user', 'login');
+    }
+
+    private function whenITryToLogInWithTheIdentity($string) {
+        $this->openId->__mock()->method('validate')->willReturn(true);
+        $this->openId->__mock()->method('__get')->willReturn($string)->withArguments('identity');
+        $this->web->whenITryToCallTheResource_WithTheMethod('user', 'login');
     }
 
 } 

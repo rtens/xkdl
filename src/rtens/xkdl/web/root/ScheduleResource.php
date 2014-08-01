@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\web\root;
 
+use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\scheduler\EdfScheduler;
@@ -9,8 +10,11 @@ use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
 use rtens\xkdl\web\Presenter;
+use rtens\xkdl\web\Session;
+use watoki\curir\http\Request;
 use watoki\curir\resource\DynamicResource;
 use watoki\curir\responder\Redirecter;
+use watoki\curir\Responder;
 use watoki\dom\Element;
 
 class ScheduleResource extends DynamicResource {
@@ -25,6 +29,14 @@ class ScheduleResource extends DynamicResource {
 
     /** @var Configuration <- */
     public $config;
+
+    /** @var Session <- */
+    public $session;
+
+    public function respond(Request $request) {
+        $this->requireLoggedIn();
+        return parent::respond($request);
+    }
 
     public function doGet($task = '') {
         $root = $this->store->getRoot();
@@ -173,6 +185,12 @@ class ScheduleResource extends DynamicResource {
             'number' => round($logged / 3600, 2) . ' / ' . round($duration / 3600, 2),
             'logged' => array('style' => 'width: ' . min($percentage, 100) . '%')
         );
+    }
+
+    private function requireLoggedIn() {
+        if (!$this->session->isLoggedIn()) {
+            throw new NotLoggedInException();
+        }
     }
 
 } 

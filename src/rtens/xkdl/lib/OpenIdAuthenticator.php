@@ -2,19 +2,20 @@
 namespace rtens\xkdl\lib;
 
 use watoki\curir\http\Url;
+use watoki\factory\Factory;
 
 class OpenIdAuthenticator {
 
-    public static $CLASS = __CLASS__;
-
-    /** @var Configuration <- */
+    /** @var Configuration */
     public $config;
 
     /** @var \LightOpenID */
     private $openId;
 
-    public function __construct() {
-        $this->openId = new \LightOpenID($this->config->getHost());
+    public function __construct(Factory $factory, Configuration $config) {
+        $this->config = $config;
+
+        $this->openId = $factory->getInstance('LightOpenID', [$this->config->getHost()]);
         $openIds = $this->config->getOpenIds();
 
         if (!is_array($openIds) || empty($openIds)) {
@@ -22,6 +23,10 @@ class OpenIdAuthenticator {
         }
 
         $this->openId->__set('identity', $openIds[0]);
+    }
+
+    public function isAuthenticated() {
+        return $this->openId->validate() && in_array($this->openId->__get('identity'), $this->config->getOpenIds());
     }
 
     /**

@@ -8,6 +8,11 @@ use watoki\scrut\Fixture;
  */
 class FileFixture extends Fixture {
 
+    public function setUp() {
+        parent::setUp();
+        @mkdir($this->getUserFolder(), 0777, true);
+    }
+
     private function getUserFolder() {
         return $this->config->getConfig()->userFolder();
     }
@@ -19,6 +24,7 @@ class FileFixture extends Fixture {
 
     public function givenTheFile_WithContent($path, $content) {
         $file = $this->getUserFolder() . '/' . $path;
+        @mkdir(dirname($file), 0777, true);
         file_put_contents($file, $content);
     }
 

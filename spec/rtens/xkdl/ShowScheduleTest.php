@@ -6,6 +6,7 @@ use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\TimeFixture;
+use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 
@@ -16,6 +17,7 @@ use watoki\scrut\Specification;
  * @property ConfigFixture config <-
  * @property FileFixture file <-
  * @property TimeFixture time <-
+ * @property WebInterfaceFixture w <-
  */
 class ShowScheduleTest extends Specification {
 

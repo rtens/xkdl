@@ -27,6 +27,10 @@ abstract class Configuration {
         return $this->root . '/user';
     }
 
+    public function sessionFile() {
+        return $this->userFolder() . '/session';
+    }
+
     public function scheduleArchiveFileName() {
         return $this->now()->format('Ymd\THis') . '.txt';
     }
@@ -38,7 +42,9 @@ abstract class Configuration {
     /**
      * @return string
      */
-    abstract public function getHost();
+    public function getHost() {
+        return 'localhost';
+    }
 
     /**
      * @return array|string[] Array of accepted openID identifiers

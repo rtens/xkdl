@@ -4,10 +4,10 @@ namespace spec\rtens\xkdl\fixtures;
 use rtens\mockster\Mock;
 use rtens\mockster\MockFactory;
 use rtens\mockster\Mockster;
-use rtens\xkdl\lib\OpenIdAuthenticator;
 use rtens\xkdl\web\RootResource;
 use rtens\xkdl\web\Session;
 use watoki\collections\Map;
+use watoki\curir\http\error\HttpError;
 use watoki\curir\http\Path;
 use watoki\curir\http\Request;
 use watoki\curir\http\Response;
@@ -17,6 +17,7 @@ use watoki\scrut\Fixture;
 
 /**
  * @property ConfigFixture config <-
+ * @property FileFixture file <-
  */
 class WebInterfaceFixture extends Fixture {
 
@@ -29,33 +30,34 @@ class WebInterfaceFixture extends Fixture {
     /** @var array */
     private $accept = array('html');
 
-    /** @var Mock|Session */
+    /** @var Session|Mock */
     private $session;
+
+    /** @var null|\Exception */
+    private $caught;
 
     public function setUp() {
         parent::setUp();
 
         $mf = new MockFactory();
-        $this->session = $mf->getInstance(Session::$CLASS, []);
+        $this->session = $mf->getInstance(Session::$CLASS);
         $this->spec->factory->setSingleton(Session::$CLASS, $this->session);
-
         $this->session->__mock()->mockMethods(Mockster::F_NONE);
-        $this->session->__mock()->method('isLoggedIn')->willReturn(true);
 
-        $this->spec->factory->setSingleton(OpenIdAuthenticator::$CLASS,
-            $mf->getInstance(OpenIdAuthenticator::$CLASS));
+        /** @var Session $session */
+        $session = $this->session;
+        $session->config = $this->config->getConfig();
+        $session->setLoggedIn();
+
+        $this->spec->factory->setSingleton('LightOpenID', $mf->getInstance('LightOpenID'));
     }
 
     public function givenIAmNotLoggedIn() {
-        /** @var Mockster $sessionMock */
-        $sessionMock = $this->session->__mock();
-        $sessionMock->method('isLoggedIn')->willReturn(false);
+        $this->session->setLoggedIn(false);
     }
 
     public function givenIAmLoggedIn() {
-        /** @var Mockster $sessionMock */
-        $sessionMock = $this->session->__mock();
-        $sessionMock->method('isLoggedIn')->willReturn(true);
+        $this->session->setLoggedIn();
     }
 
     public function givenTheSessionContains_WithTheValue($key, $value) {
@@ -85,6 +87,14 @@ class WebInterfaceFixture extends Fixture {
         $this->whenICallTheResource_WithTheMethod($path, Request::METHOD_GET);
     }
 
+    public function whenITryToCallTheResource_WithTheMethod($path, $method) {
+        try {
+            $this->whenICallTheResource_WithTheMethod($path, $method);
+        } catch (\Exception $e) {
+            $this->caught = $e;
+        }
+    }
+
     public function whenICallTheResource_WithTheMethod($path, $method) {
         /** @var RootResource $root */
         $root = $this->spec->factory->getInstance(RootResource::$CLASS, [Url::parse('http://xkdl')]);
@@ -95,5 +105,22 @@ class WebInterfaceFixture extends Fixture {
 
     public function thenTheSessionShouldContain_WithTheValue($key, $value) {
         $this->spec->assertEquals($value, $this->session->get($key));
+    }
+
+    public function thenIShouldBeLoggedIn() {
+        $this->spec->assertTrue($this->session->isLoggedIn(), 'Not logged in');
+    }
+
+    public function thenIShouldNotBeLoggedIn() {
+        $this->spec->assertFalse($this->session->isLoggedIn(), 'Logged in');
+    }
+
+    public function thenAnErrorWithTheStatus_ShouldOccur($status) {
+        $this->spec->assertNotNull($this->caught, 'No Exception was thrown.');
+        if ($this->caught instanceof HttpError) {
+            $this->spec->assertEquals($status, $this->caught->getStatus());
+        } else {
+            $this->spec->fail('Not an HttpError: ' . $this->caught->getMessage());
+        }
     }
 }

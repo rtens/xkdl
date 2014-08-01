@@ -2,6 +2,7 @@
 namespace spec\rtens\xkdl;
 
 use spec\rtens\xkdl\fixtures\TimeFixture;
+use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 use rtens\xkdl\web\Presenter;
@@ -21,6 +22,7 @@ use watoki\curir\responder\Redirecter;
  * @property ConfigFixture config <-
  * @property FileFixture file <-
  * @property TimeFixture time <-
+ * @property WebInterfaceFixture w <-
  */
 class LogTasksTest extends Specification {
 
