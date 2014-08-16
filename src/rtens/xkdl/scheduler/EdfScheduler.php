@@ -54,7 +54,17 @@ class EdfScheduler extends Scheduler {
             $deadlineA = $a->getDeadline();
             $deadlineB = $b->getDeadline();
             if ($deadlineA == $deadlineB) {
-                return $a->hasHigherPriorityThen($b) ? -1 : 1;
+                $fullNameWithPriorities = function (Task $a) use (&$fullNameWithPriorities) {
+                    $maxLength = strlen((string)Task::DEFAULT_PRIORITY);
+                    $name = sprintf("%0{$maxLength}d", $a->getPriority()) . $a->getName();
+                    if ($a->getParent()) {
+                        return $fullNameWithPriorities($a->getParent()) . $name;
+                    }
+                    return $name;
+                };
+                $fullA = $fullNameWithPriorities($a);
+                $fullB = $fullNameWithPriorities($b);
+                return strcmp($fullA, $fullB);
             }
             return $deadlineA && !$deadlineB || $deadlineA && $deadlineB && $deadlineA < $deadlineB ? -1 : 1;
         });

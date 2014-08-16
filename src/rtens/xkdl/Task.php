@@ -60,11 +60,6 @@ class Task {
         return ($this->parent ? ($this->parent->getFullName() . '/' . $this->getName()) : '');
     }
 
-    private function getFullNameWithPriorities() {
-        return ($this->parent ? ($this->parent->getFullNameWithPriorities() . '/'
-            . sprintf('%04d', $this->priority) . $this->getName()) : '');
-    }
-
     public function setDone($done = true) {
         $this->done = $done;
     }
@@ -93,7 +88,7 @@ class Task {
     }
 
     public function hasPriority() {
-        return $this->priority != null;
+        return $this->priority != self::DEFAULT_PRIORITY;
     }
 
     public function setDuration(TimeSpan $duration = null) {
@@ -228,7 +223,4 @@ class Task {
         return count($this->getOpenChildren()) != 0;
     }
 
-    public function hasHigherPriorityThen(Task $task) {
-        return $this->getFullNameWithPriorities() < $task->getFullNameWithPriorities();
-    }
 }

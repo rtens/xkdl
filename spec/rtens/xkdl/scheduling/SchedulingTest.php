@@ -34,6 +34,15 @@ abstract class SchedulingTest extends Specification {
         $this->assertEquals($name, $this->schedule->slots[$index - 1]->task->getName());
     }
 
+    protected function thenScheduleShouldContain($name) {
+        foreach ($this->schedule->slots as $slot) {
+            if ($slot->task->getName() == $name) {
+                return;
+            }
+        }
+        $this->fail("Task $name not found in schedule");
+    }
+
     protected function thenSlot_ShouldBe_Minutes($index, $minutes) {
         $this->assertEquals($minutes, $this->schedule->slots[$index - 1]->window->getSeconds() / 60);
     }

@@ -54,7 +54,7 @@ class EdfSchedulingTest extends SchedulingTest {
         $this->thenSlot_ShouldBeTask(3, 'two');
     }
 
-    function testSameDeadlinesWithPriorities() {
+    function testSameDeadlinesSortsByPriorities() {
         $this->task->givenTheTask_In('a', 'root');
         $this->task->givenTheTask_In('b', 'root');
         $this->task->givenTheTask_In('aa', 'a');
@@ -64,18 +64,21 @@ class EdfSchedulingTest extends SchedulingTest {
 
         $this->task->given_HasThePriority('b', 1);
         $this->task->given_HasThePriority('a', 2);
-        $this->task->given_HasThePriority('ab', 5);
+
+        $this->task->given_HasThePriority('ab', 3);
+        $this->task->given_HasThePriority('bb', 4);
+        $this->task->given_HasThePriority('aa', 5);
 
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(4);
-        $this->thenSlot_ShouldBeTask(1, 'ba');
-        $this->thenSlot_ShouldBeTask(2, 'bb');
+        $this->thenSlot_ShouldBeTask(1, 'bb');
+        $this->thenSlot_ShouldBeTask(2, 'ba');
         $this->thenSlot_ShouldBeTask(3, 'ab');
         $this->thenSlot_ShouldBeTask(4, 'aa');
     }
 
-    function testSameDeadlinesNoPriorities() {
+    function testSameDeadlinesNoPrioritiesSortsByName() {
         $this->task->givenTheTask_In('a', 'root');
         $this->task->givenTheTask_In('b', 'root');
         $this->task->givenTheTask_In('one', 'a');
@@ -128,9 +131,9 @@ class EdfSchedulingTest extends SchedulingTest {
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(3);
-        $this->thenSlot_ShouldBeTask(1, 'leaf_one');
-        $this->thenSlot_ShouldBeTask(2, 'leaf_two');
-        $this->thenSlot_ShouldBeTask(3, 'leaf_three');
+        $this->thenScheduleShouldContain('leaf_one');
+        $this->thenScheduleShouldContain('leaf_two');
+        $this->thenScheduleShouldContain('leaf_three');
     }
 
     function testTreeWithDoneTasks() {
@@ -146,9 +149,9 @@ class EdfSchedulingTest extends SchedulingTest {
         $this->whenICreateTheSchedule();
 
         $this->thenThereShouldBe_SlotsInTheSchedule(3);
-        $this->thenSlot_ShouldBeTask(1, 'leaf_one');
-        $this->thenSlot_ShouldBeTask(2, 'one_one');
-        $this->thenSlot_ShouldBeTask(3, 'leaf_three');
+        $this->thenScheduleShouldContain('leaf_one');
+        $this->thenScheduleShouldContain('one_one');
+        $this->thenScheduleShouldContain('leaf_three');
     }
 
     function testTaskWithoutDuration() {
