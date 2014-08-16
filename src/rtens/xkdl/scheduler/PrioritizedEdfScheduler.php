@@ -9,23 +9,40 @@ use rtens\xkdl\Task;
 class PrioritizedEdfScheduler extends EdfScheduler {
 
     protected function chooseNextTask(\DateTime $now, Schedule $schedule) {
-        return $this->chooseFrom($this->root, $now, $schedule);
+        return $this->chooseFrom([$this->root], $now, $schedule);
     }
 
     /**
-     * @param Task $task
+     * @param Task[] $tasks
      * @param DateTime $now
      * @param Schedule $schedule
      * @return null|Task
      */
-    protected function chooseFrom(Task $task, \DateTime $now, Schedule $schedule) {
-        $children = $task->getSchedulableChildren($now);
-
-        if (!$children) {
-            return null;
+    protected function chooseFrom(array $tasks, \DateTime $now, Schedule $schedule) {
+        /** @var Task[] $children */
+        $children = [];
+        foreach ($tasks as $task) {
+            $children = array_merge($children, $task->getSchedulableChildren($now));
         }
 
         $candidates = $this->filterTasks($children, $now, $schedule->slots);
+
+        if (!$candidates) {
+            $buckets = [];
+            foreach ($children as $child) {
+                $buckets[$child->getPriority()][] = $child;
+            }
+            ksort($buckets);
+
+            foreach ($buckets as $bucket) {
+                $chosen = $this->chooseFrom($bucket, $now, $schedule);
+                if ($chosen) {
+                    return $chosen;
+                }
+            }
+
+            return null;
+        }
 
         $sort = function (Task $a, Task $b) {
             $priorityA = $a->getPriority();
@@ -44,18 +61,6 @@ class PrioritizedEdfScheduler extends EdfScheduler {
 
             return $priorityA - $priorityB;
         };
-
-        if (!$candidates) {
-            usort($children, $sort);
-            foreach ($children as $child) {
-                $chosen = $this->chooseFrom($child, $now, $schedule);
-                if ($chosen) {
-                    return $chosen;
-                }
-            }
-
-            return null;
-        }
 
         usort($candidates, $sort);
         return $candidates[0];

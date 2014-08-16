@@ -102,6 +102,30 @@ class PrioritizedEdfSchedulingTest extends SchedulingTest {
         $this->thenSlot_ShouldBeTask(4, 'aa');
     }
 
+    public function testEarliestDeadlineOfChildren() {
+        $this->task->givenTheTask_In('a', 'root');
+        $this->task->givenTheTask_In('b', 'root');
+        $this->task->givenTheTask_In('c', 'root');
+        $this->task->givenTheTask_In('aa', 'a');
+        $this->task->givenTheTask_In('bb', 'b');
+        $this->task->givenTheTask_In('cc', 'c');
+
+        $this->task->given_HasThePriority('a', 1);
+        $this->task->given_HasThePriority('b', 2);
+        $this->task->given_HasThePriority('c', 1);
+
+        $this->task->given_HasTheDeadline('aa', 'tomorrow');
+        $this->task->given_HasTheDeadline('bb', 'now');
+        $this->task->given_HasTheDeadline('cc', 'now');
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(3);
+        $this->thenSlot_ShouldBeTask(1, 'cc');
+        $this->thenSlot_ShouldBeTask(2, 'aa');
+        $this->thenSlot_ShouldBeTask(3, 'bb');
+    }
+
     public function testMultipleCascades() {
         $this->task->givenTheTask_In('a', 'root');
         $this->task->givenTheTask_In('b', 'root');
@@ -137,6 +161,20 @@ class PrioritizedEdfSchedulingTest extends SchedulingTest {
         $this->thenSlot_ShouldBeTask(5, 'aba');
         $this->thenSlot_ShouldBeTask(6, 'aca');
         $this->thenSlot_ShouldBeTask(7, 'acb');
+    }
+
+    public function testUnschedulableTask() {
+        $this->task->givenTheTask_In('a', 'root');
+        $this->task->givenTheTask_In('b', 'root');
+        $this->task->given_HasThePriority('a', 1);
+        $this->task->given_HasThePriority('a', 2);
+        $this->task->given_DependsOn('a', 'b');
+
+        $this->whenICreateTheSchedule();
+
+        $this->thenThereShouldBe_SlotsInTheSchedule(2);
+        $this->thenSlot_ShouldBeTask(1, 'b');
+        $this->thenSlot_ShouldBeTask(2, 'a');
     }
 
     protected function createSchedulerInstance(Task $root) {
