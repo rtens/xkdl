@@ -60,4 +60,8 @@ class ConfigFixture extends Fixture {
     public function givenNowIs($when) {
         $this->config->__mock()->method('now')->willReturn(new \DateTime($when));
     }
+
+    public function givenTheDefaultSchedulerIs($key) {
+        $this->config->__mock()->method('defaultSchedulerKey')->willReturn($key);
+    }
 }

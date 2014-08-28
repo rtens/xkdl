@@ -8,6 +8,8 @@ use rtens\xkdl\Task;
 
 class PriorityScheduler extends EdfScheduler {
 
+    public static $CLASS = __CLASS__;
+
     protected function chooseNextTask(\DateTime $now, Schedule $schedule) {
         return $this->chooseFrom([$this->root], $now, $schedule);
     }

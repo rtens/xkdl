@@ -104,17 +104,13 @@
                     </a>
                 </div>
                 <div class="extended collapse" id="schedule-extended">
-                    <h4>Scheduling algroithm</h4>
-                    <div class="radio">
+                    <h4>Scheduling algorithm</h4>
+                    <div property="algorithm" class="radio">
                         <label>
-                            <input type="radio" name="scheduler" value="pedf" checked/>
-                            Prioritized earliest deadline first
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="scheduler" value="edf"/>
-                            Earliest deadline first
+                            <input property="priority" type="radio" name="scheduler" value="foo" checked="checked"/>
+                            <span property="name">Some cool Scheduler</span>
+                            -
+                            <small property="description">description of how it works</small>
                         </label>
                     </div>
                 </div>

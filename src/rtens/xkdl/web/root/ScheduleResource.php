@@ -3,8 +3,7 @@ namespace rtens\xkdl\web\root;
 
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
-use rtens\xkdl\scheduler\EdfScheduler;
-use rtens\xkdl\scheduler\PriorityScheduler;
+use rtens\xkdl\scheduler\SchedulerFactory;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
@@ -32,6 +31,9 @@ class ScheduleResource extends DynamicResource {
     /** @var Session <- */
     public $session;
 
+    /** @var SchedulerFactory <- */
+    public $schedulerFactory;
+
     public function respond(Request $request) {
         $this->session->requireLoggedIn($this);
         return parent::respond($request);
@@ -50,20 +52,15 @@ class ScheduleResource extends DynamicResource {
                     'task' => array('value' => $logging['task']),
                     'start' => array('value' => $logging['start']->format('Y-m-d H:i'))
                 ) : null,
-            'schedule' => $this->assembleSchedule($root)
+            'schedule' => $this->assembleSchedule($root),
+            'algorithm' => $this->assembleSchedulers()
         ));
     }
 
-    public function doPost(\DateTime $from, \DateTime $until, $scheduler = 'pedf') {
+    public function doPost(\DateTime $from, \DateTime $until, $scheduler = null) {
         $root = $this->store->getRoot();
 
-        if ($scheduler == 'edf') {
-            $scheduler = new EdfScheduler($root);
-        } else {
-            $scheduler = new PriorityScheduler($root);
-        }
-
-        $schedule = $scheduler->createSchedule($from, $until);
+        $schedule = $this->schedulerFactory->create($scheduler, $root)->createSchedule($from, $until);
 
         $this->writer->saveSchedule($schedule);
         return new Redirecter($this->getUrl());
@@ -184,6 +181,19 @@ class ScheduleResource extends DynamicResource {
             'number' => round($logged / 3600, 2) . ' / ' . round($duration / 3600, 2),
             'logged' => array('style' => 'width: ' . min($percentage, 100) . '%')
         );
+    }
+
+    private function assembleSchedulers() {
+        $schedulers = array();
+        foreach ($this->schedulerFactory->all() as $key => $info) {
+            $schedulers[] = [
+                'key' => $key,
+                'name' => $info['name'],
+                'description' => $info['description'],
+                'checked' => ($this->config->defaultSchedulerKey() == $key ? 'checked' : false)
+            ];
+        }
+        return $schedulers;
     }
 
 } 

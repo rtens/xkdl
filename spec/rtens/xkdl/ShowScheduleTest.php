@@ -1,11 +1,16 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use rtens\mockster\MockFactory;
 use rtens\xkdl\exception\NotLoggedInException;
+use rtens\xkdl\scheduler\EdfScheduler;
+use rtens\xkdl\scheduler\SchedulerFactory;
+use rtens\xkdl\Task;
 use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
+use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TimeFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Path;
@@ -21,6 +26,7 @@ use watoki\scrut\Specification;
  * @property FileFixture file <-
  * @property TimeFixture time <-
  * @property WebInterfaceFixture $web <-
+ * @property SessionFixture session <-
  */
 class ShowScheduleTest extends Specification {
 
@@ -29,7 +35,7 @@ class ShowScheduleTest extends Specification {
     }
 
     public function testRequiresLogIn() {
-        $this->web->givenIAmNotLoggedIn();
+        $this->session->givenIAmNotLoggedIn();
         $this->whenITryToAccessTheSchedule();
         $this->then_ShouldBeThrown(NotLoggedInException::$CLASS);
     }
@@ -177,6 +183,16 @@ class ShowScheduleTest extends Specification {
 
     protected function setUp() {
         parent::setUp();
+
+        $mf = new MockFactory();
+        $scheduleFactory = $mf->getInstance(SchedulerFactory::$CLASS);
+        /** @noinspection PhpUnusedParameterInspection */
+        $scheduleFactory->__mock()->method('create')->willCall(function ($key, Task $root) {
+            return new EdfScheduler($root);
+        });
+        $scheduleFactory->__mock()->method('all')->willReturn([]);
+        $this->factory->setSingleton(SchedulerFactory::$CLASS, $scheduleFactory);
+
         $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS, [Url::parse('schedule')]);
 
         $this->file->givenTheFolder('root');

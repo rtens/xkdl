@@ -1,11 +1,7 @@
 <?php
 namespace spec\rtens\xkdl\fixtures;
 
-use rtens\mockster\Mock;
-use rtens\mockster\MockFactory;
-use rtens\mockster\Mockster;
 use rtens\xkdl\web\RootResource;
-use rtens\xkdl\web\Session;
 use watoki\collections\Map;
 use watoki\curir\http\error\HttpError;
 use watoki\curir\http\Path;
@@ -18,6 +14,7 @@ use watoki\scrut\Fixture;
 /**
  * @property ConfigFixture config <-
  * @property FileFixture file <-
+ * @property SessionFixture s <-
  */
 class WebInterfaceFixture extends Fixture {
 
@@ -30,37 +27,8 @@ class WebInterfaceFixture extends Fixture {
     /** @var array */
     private $accept = array('html');
 
-    /** @var Session|Mock */
-    private $session;
-
     /** @var null|\Exception */
     private $caught;
-
-    public function setUp() {
-        parent::setUp();
-
-        $mf = new MockFactory();
-        $this->session = $mf->getInstance(Session::$CLASS);
-        $this->spec->factory->setSingleton(Session::$CLASS, $this->session);
-        $this->session->__mock()->mockMethods(Mockster::F_NONE);
-
-        /** @var Session $session */
-        $session = $this->session;
-        $session->config = $this->config->getConfig();
-        $session->setLoggedIn();
-    }
-
-    public function givenIAmNotLoggedIn() {
-        $this->session->setLoggedIn(false);
-    }
-
-    public function givenIAmLoggedIn() {
-        $this->session->setLoggedIn();
-    }
-
-    public function givenTheSessionContains_WithTheValue($key, $value) {
-        $this->session->set($key, $value);
-    }
 
     public function thenIShouldNotBeRedirected() {
         $has = $this->response->getHeaders()->has('Location');
@@ -99,18 +67,6 @@ class WebInterfaceFixture extends Fixture {
 
         $request = new Request(Path::parse($path), $this->accept, $method, new Map($this->parameters));
         $this->response = $root->respond($request);
-    }
-
-    public function thenTheSessionShouldContain_WithTheValue($key, $value) {
-        $this->spec->assertEquals($value, $this->session->get($key));
-    }
-
-    public function thenIShouldBeLoggedIn() {
-        $this->spec->assertTrue($this->session->isLoggedIn(), 'Not logged in');
-    }
-
-    public function thenIShouldNotBeLoggedIn() {
-        $this->spec->assertFalse($this->session->isLoggedIn(), 'Logged in');
     }
 
     public function thenAnErrorWithTheStatus_ShouldOccur($status) {

@@ -3,6 +3,7 @@ namespace spec\rtens\xkdl;
 
 use rtens\xkdl\task\GoogleCalendarTask;
 use spec\rtens\xkdl\fixtures\GoogleApiFixture;
+use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TaskStorageFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Response;
@@ -12,6 +13,7 @@ use watoki\scrut\Specification;
  * @property TaskStorageFixture task <-
  * @property GoogleApiFixture api <-
  * @property WebInterfaceFixture web <-
+ * @property SessionFixture session <-
  */
 class ImportGoogleCalendarTest extends Specification {
 
@@ -31,11 +33,11 @@ class ImportGoogleCalendarTest extends Specification {
         $this->web->givenTheParameter_Is('code', 'some-code');
         $this->web->whenICallTheResource_WithTheMethod('', 'authenticate');
         $this->api->thenIShouldBeAuthenticatedWith('some-code');
-        $this->web->thenTheSessionShouldContain_WithTheValue('token', 'some-token');
+        $this->session->thenTheSessionShouldContain_WithTheValue('token', 'some-token');
     }
 
     function testSaveTokenInSession() {
-        $this->web->givenTheSessionContains_WithTheValue('token', 'my-token');
+        $this->session->givenTheSessionContains_WithTheValue('token', 'my-token');
         $this->web->whenICallTheResource_WithTheMethod('', 'get');
         $this->api->thenTheAccesToken_ShouldBeSet('my-token');
     }

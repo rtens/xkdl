@@ -4,6 +4,7 @@ namespace spec\rtens\xkdl;
 use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\LogsResource;
+use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TaskFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Url;
@@ -13,6 +14,7 @@ use watoki\scrut\Specification;
 /**
  * @property TaskFixture task <-
  * @property WebInterfaceFixture web <-
+ * @property SessionFixture session <-
  */
 class LogsReportTest extends Specification {
 
@@ -21,7 +23,7 @@ class LogsReportTest extends Specification {
     }
 
     public function testRequiresLogIn() {
-        $this->web->givenIAmNotLoggedIn();
+        $this->session->givenIAmNotLoggedIn();
         $this->whenITryToRequestAReportOfLogs();
         $this->then_ShouldBeThrown(NotLoggedInException::$CLASS);
     }

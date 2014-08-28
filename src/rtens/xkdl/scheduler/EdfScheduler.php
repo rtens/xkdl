@@ -11,6 +11,8 @@ use rtens\xkdl\Task;
 
 class EdfScheduler extends Scheduler {
 
+    public static $CLASS = __CLASS__;
+
     /**
      * @param DateTime $from
      * @param DateTime $until

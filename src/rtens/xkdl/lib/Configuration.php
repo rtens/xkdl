@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\lib;
 
+use rtens\xkdl\scheduler\SchedulerFactory;
 use watoki\curir\http\Url;
 
 abstract class Configuration {
@@ -19,6 +20,10 @@ abstract class Configuration {
 
     public function defaultDurationString() {
         return 'PT15M';
+    }
+
+    public function defaultSchedulerKey() {
+        return SchedulerFactory::KEY_EDF;
     }
 
     public function rootTaskFolder() {
