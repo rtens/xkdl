@@ -16,8 +16,7 @@
         "watoki/curir": "*",
         "watoki/tempan": "*",
         "watoki/cfg": "*",
-        "google/apiclient": "1.0.*",
-        "lightopenid/lightopenid": "v0.7.0"
+        "google/apiclient": "1.0.*"
     },
     "require-dev": {
         "rtens/mockster": "*",

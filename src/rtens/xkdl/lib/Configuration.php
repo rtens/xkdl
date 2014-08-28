@@ -49,9 +49,4 @@ abstract class Configuration {
         return Url::parse($this->getRootUrl())->getHost();
     }
 
-    /**
-     * @return array|string[] Array of accepted openID identifiers
-     */
-    abstract public function getOpenIds();
-
 } 

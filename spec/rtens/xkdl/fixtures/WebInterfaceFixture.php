@@ -48,8 +48,6 @@ class WebInterfaceFixture extends Fixture {
         $session = $this->session;
         $session->config = $this->config->getConfig();
         $session->setLoggedIn();
-
-        $this->spec->factory->setSingleton('LightOpenID', $mf->getInstance('LightOpenID'));
     }
 
     public function givenIAmNotLoggedIn() {

@@ -1,12 +1,15 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\TimeFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
+use watoki\curir\http\Path;
+use watoki\curir\http\Request;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 
@@ -17,12 +20,18 @@ use watoki\scrut\Specification;
  * @property ConfigFixture config <-
  * @property FileFixture file <-
  * @property TimeFixture time <-
- * @property WebInterfaceFixture w <-
+ * @property WebInterfaceFixture $web <-
  */
 class ShowScheduleTest extends Specification {
 
     protected function background() {
         $this->time->givenTheTimeZoneIs('GMT0');
+    }
+
+    public function testRequiresLogIn() {
+        $this->web->givenIAmNotLoggedIn();
+        $this->whenITryToAccessTheSchedule();
+        $this->then_ShouldBeThrown(NotLoggedInException::$CLASS);
     }
 
     function testShowScheduleWthBunchOfTasks() {
@@ -164,6 +173,8 @@ class ShowScheduleTest extends Specification {
 
     ################ SETUP ####################
 
+    private $caught;
+
     protected function setUp() {
         parent::setUp();
         $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS, [Url::parse('schedule')]);
@@ -239,6 +250,19 @@ class ShowScheduleTest extends Specification {
 
     private function thenSlot_ShouldNotBeLate($int) {
         $this->assertFalse($this->getSlot($int)['isLate']);
+    }
+
+    private function whenITryToAccessTheSchedule() {
+        try {
+            $this->resource->respond(new Request(new Path()));
+        } catch (\Exception $e) {
+            $this->caught = $e;
+        }
+    }
+
+    private function then_ShouldBeThrown($exceptionClass) {
+        $this->assertNotNull($this->caught, 'No Exception was thrown.');
+        $this->assertInstanceOf($exceptionClass, $this->caught);
     }
 
 }

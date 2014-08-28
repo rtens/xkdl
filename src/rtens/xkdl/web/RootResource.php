@@ -3,7 +3,6 @@ namespace rtens\xkdl\web;
 
 use rtens\xkdl\exception\AuthenticationException;
 use rtens\xkdl\exception\NotLoggedInException;
-use rtens\xkdl\lib\OpenIdAuthenticator;
 use watoki\curir\http\Request;
 use watoki\curir\http\Url;
 use watoki\curir\resource\Container;
@@ -19,9 +18,6 @@ class RootResource extends Container {
     /** @var Session <- */
     public $session;
 
-    /** @var OpenIdAuthenticator <- */
-    public $authenticator;
-
     public function respond(Request $request) {
         if ($this->session->has('token')) {
             $this->client->setAccessToken($this->session->get('token'));
@@ -33,8 +29,8 @@ class RootResource extends Container {
             return (new Redirecter(Url::parse($ae->getAuthenticationUrl())))
                 ->createResponse($request);
         } catch (NotLoggedInException $nlie) {
-            return (new Redirecter($this->authenticator->getAuthenticationUrl()))
-                ->createResponse($request);
+            $this->session->setLoggedIn();
+            return (new Redirecter($nlie->getTargetUrl()))->createResponse($request);
         }
     }
 

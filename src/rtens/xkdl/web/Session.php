@@ -3,6 +3,7 @@ namespace rtens\xkdl\web;
 
 use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\lib\Configuration;
+use watoki\curir\Resource;
 
 class Session {
 
@@ -35,9 +36,9 @@ class Session {
         $_SESSION['loggedIn'] = $to;
     }
 
-    public function requireLoggedIn() {
+    public function requireLoggedIn(Resource $resource) {
         if (!$this->isLoggedIn()) {
-            throw new NotLoggedInException();
+            throw new NotLoggedInException($resource->getUrl());
         }
     }
 

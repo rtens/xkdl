@@ -33,7 +33,7 @@ class ScheduleResource extends DynamicResource {
     public $session;
 
     public function respond(Request $request) {
-        $this->session->requireLoggedIn();
+        $this->session->requireLoggedIn($this);
         return parent::respond($request);
     }
 

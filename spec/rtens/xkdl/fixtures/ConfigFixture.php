@@ -25,7 +25,6 @@ class ConfigFixture extends Fixture {
         $mf = new MockFactory();
         $this->config = $mf->getInstance(Configuration::$CLASS, [$this->rootDir]);
         $this->config->__mock()->mockMethods(Mockster::F_NONE);
-        $this->givenTheUsersHasTheOpenId('dummy');
 
         $this->spec->factory->setSingleton(Configuration::$CLASS, $this->config);
     }
@@ -60,9 +59,5 @@ class ConfigFixture extends Fixture {
 
     public function givenNowIs($when) {
         $this->config->__mock()->method('now')->willReturn(new \DateTime($when));
-    }
-
-    public function givenTheUsersHasTheOpenId($string) {
-        $this->config->__mock()->method('getOpenIds')->willReturn(array($string));
     }
 }

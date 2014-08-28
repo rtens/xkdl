@@ -3,26 +3,34 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "43a28a1c1b1881d7202b270c06eea7e3",
+    "hash": "9733b83fa057c475c3a98117392961ab",
     "packages": [
         {
             "name": "google/apiclient",
-            "version": "1.0.4-beta",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client.git",
-                "reference": "eb5934d58761f1a8575e6df6de02fdce89dd89d2"
+                "reference": "fd55df08644e73a754f72579adcd6044cb76767d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/eb5934d58761f1a8575e6df6de02fdce89dd89d2",
-                "reference": "eb5934d58761f1a8575e6df6de02fdce89dd89d2",
+                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/fd55df08644e73a754f72579adcd6044cb76767d",
+                "reference": "fd55df08644e73a754f72579adcd6044cb76767d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.1"
             },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "src/"
@@ -40,62 +48,36 @@
             "keywords": [
                 "google"
             ],
-            "time": "2014-03-07 17:54:19"
-        },
-        {
-            "name": "lightopenid/lightopenid",
-            "version": "v0.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://git.gitorious.org/lightopenid/lightopenid.git",
-                "reference": "9d42dc24e4dd34121c98a6491bc3ef7933a68a19"
-            },
-            "require": {
-                "php": ">=5.2.3"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "./"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "homepage": "http://code.google.com/p/lightopenid/",
-            "keywords": [
-                "OpenId"
-            ],
-            "time": "2013-10-27 16:25:49"
+            "time": "2014-08-28 08:30:46"
         },
         {
             "name": "nikic/php-parser",
-            "version": "v0.9.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "1e5e280ae88a27effa2ae4aa2bd088494ed8594f"
+                "reference": "6d0589d14f540f7e6be0a7f91b2d73f45847cb71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/1e5e280ae88a27effa2ae4aa2bd088494ed8594f",
-                "reference": "1e5e280ae88a27effa2ae4aa2bd088494ed8594f",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/6d0589d14f540f7e6be0a7f91b2d73f45847cb71",
+                "reference": "6d0589d14f540f7e6be0a7f91b2d73f45847cb71",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2"
+                "ext-tokenizer": "*",
+                "php": ">=5.3"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.9-dev"
+                    "dev-master": "1.0-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "PHPParser": "lib/"
-                }
+                "files": [
+                    "lib/bootstrap.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -111,7 +93,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2013-08-25 17:11:40"
+            "time": "2014-08-11 20:04:52"
         },
         {
             "name": "watoki/cfg",
@@ -211,12 +193,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "5213247a754766ef8f56109600c3dfc940fa9598"
+                "reference": "00ac6310d794c4f9e13a439a1c0860301c4be412"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/5213247a754766ef8f56109600c3dfc940fa9598",
-                "reference": "5213247a754766ef8f56109600c3dfc940fa9598",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/00ac6310d794c4f9e13a439a1c0860301c4be412",
+                "reference": "00ac6310d794c4f9e13a439a1c0860301c4be412",
                 "shasum": ""
             },
             "require": {
@@ -253,7 +235,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2014-08-01 10:25:38"
+            "time": "2014-08-16 09:25:48"
         },
         {
             "name": "watoki/dom",
@@ -305,16 +287,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/factory.git",
-                "reference": "796cb26d4c83f3f88a5f898267917b3d4b7d4b98"
+                "reference": "bbab7612b3648ede014c6887a1ed99d75d01a32c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/factory/zipball/796cb26d4c83f3f88a5f898267917b3d4b7d4b98",
-                "reference": "796cb26d4c83f3f88a5f898267917b3d4b7d4b98",
+                "url": "https://api.github.com/repos/watoki/factory/zipball/bbab7612b3648ede014c6887a1ed99d75d01a32c",
+                "reference": "bbab7612b3648ede014c6887a1ed99d75d01a32c",
                 "shasum": ""
             },
             "require": {
-                "nikic/php-parser": "0.9.4",
+                "nikic/php-parser": "1.*",
                 "php": ">=5.3.8"
             },
             "require-dev": {
@@ -344,7 +326,7 @@
                 "dependency injection",
                 "watoki"
             ],
-            "time": "2013-11-14 10:33:10"
+            "time": "2014-05-12 12:10:17"
         },
         {
             "name": "watoki/smokey",
@@ -396,12 +378,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/tempan.git",
-                "reference": "c2a5d8a5a81e5b6a41425db544006fa7e338efc7"
+                "reference": "bac7e329d152e6e4f9a8ce9fc8df2f39ce453523"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/tempan/zipball/c2a5d8a5a81e5b6a41425db544006fa7e338efc7",
-                "reference": "c2a5d8a5a81e5b6a41425db544006fa7e338efc7",
+                "url": "https://api.github.com/repos/watoki/tempan/zipball/bac7e329d152e6e4f9a8ce9fc8df2f39ce453523",
+                "reference": "bac7e329d152e6e4f9a8ce9fc8df2f39ce453523",
                 "shasum": ""
             },
             "require": {
@@ -435,7 +417,7 @@
                 "template animation",
                 "watoki"
             ],
-            "time": "2013-10-31 22:35:07"
+            "time": "2014-05-06 07:45:02"
         }
     ],
     "packages-dev": [
@@ -445,12 +427,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "6ef2bf3a1c47eca07ea95f0d8a902a6340390b34"
+                "reference": "61fed79803b6c75d461b909dfac05bbef5cd4f46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6ef2bf3a1c47eca07ea95f0d8a902a6340390b34",
-                "reference": "6ef2bf3a1c47eca07ea95f0d8a902a6340390b34",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/61fed79803b6c75d461b909dfac05bbef5cd4f46",
+                "reference": "61fed79803b6c75d461b909dfac05bbef5cd4f46",
                 "shasum": ""
             },
             "require": {
@@ -498,7 +480,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-03-28 10:53:45"
+            "time": "2014-05-19 01:58:57"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -639,17 +621,20 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "ad4e1e23ae01b483c16f600ff1bebec184588e32"
+                "reference": "15a719c78af351a7b7cf3e390d28c9f23ae8fbbb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/ad4e1e23ae01b483c16f600ff1bebec184588e32",
-                "reference": "ad4e1e23ae01b483c16f600ff1bebec184588e32",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/15a719c78af351a7b7cf3e390d28c9f23ae8fbbb",
+                "reference": "15a719c78af351a7b7cf3e390d28c9f23ae8fbbb",
                 "shasum": ""
             },
             "require": {
                 "ext-tokenizer": "*",
                 "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.2"
             },
             "type": "library",
             "extra": {
@@ -659,21 +644,17 @@
             },
             "autoload": {
                 "classmap": [
-                    "PHP/"
+                    "src/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                ""
-            ],
             "license": [
                 "BSD-3-Clause"
             ],
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sb@sebastian-bergmann.de",
-                    "role": "lead"
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "Wrapper around PHP's tokenizer extension.",
@@ -681,7 +662,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2014-03-03 05:10:30"
+            "time": "2014-08-27 08:24:49"
         },
         {
             "name": "phpunit/phpunit",
@@ -689,16 +670,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "248d6ce95e6ca7f0e3135252c0b984bbe1f52f19"
+                "reference": "ae6cefd7cc84586a5ef27e04bae11ee940ec63dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/248d6ce95e6ca7f0e3135252c0b984bbe1f52f19",
-                "reference": "248d6ce95e6ca7f0e3135252c0b984bbe1f52f19",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ae6cefd7cc84586a5ef27e04bae11ee940ec63dc",
+                "reference": "ae6cefd7cc84586a5ef27e04bae11ee940ec63dc",
                 "shasum": ""
             },
             "require": {
+                "ext-ctype": "*",
                 "ext-dom": "*",
+                "ext-json": "*",
                 "ext-pcre": "*",
                 "ext-reflection": "*",
                 "ext-spl": "*",
@@ -714,9 +697,6 @@
                 "pear-pear.php.net/pear": "1.9.4"
             },
             "suggest": {
-                "ext-json": "*",
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
                 "phpunit/php-invoker": "~1.1"
             },
             "bin": [
@@ -755,7 +735,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-03-28 11:04:36"
+            "time": "2014-04-30 12:24:19"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -820,16 +800,15 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtens/mockster.git",
-                "reference": "22c706f369cf8ff239fa51d901278cd7e5f776d4"
+                "reference": "a92445439eaded368a22e2f19739fabd7af5025d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtens/mockster/zipball/22c706f369cf8ff239fa51d901278cd7e5f776d4",
-                "reference": "22c706f369cf8ff239fa51d901278cd7e5f776d4",
+                "url": "https://api.github.com/repos/rtens/mockster/zipball/a92445439eaded368a22e2f19739fabd7af5025d",
+                "reference": "a92445439eaded368a22e2f19739fabd7af5025d",
                 "shasum": ""
             },
             "require": {
-                "nikic/php-parser": "0.9.4",
                 "php": ">=5.3.2",
                 "watoki/factory": "*"
             },
@@ -862,7 +841,7 @@
                 "mocking",
                 "unit testing"
             ],
-            "time": "2013-12-18 11:48:17"
+            "time": "2014-07-15 14:03:40"
         },
         {
             "name": "symfony/yaml",
@@ -871,12 +850,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "cee3067d680232674c6505d91db9d3d635a9a8f4"
+                "reference": "d84b97a12046b2c34e8457626b9f2b72dec0c183"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/cee3067d680232674c6505d91db9d3d635a9a8f4",
-                "reference": "cee3067d680232674c6505d91db9d3d635a9a8f4",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/d84b97a12046b2c34e8457626b9f2b72dec0c183",
+                "reference": "d84b97a12046b2c34e8457626b9f2b72dec0c183",
                 "shasum": ""
             },
             "require": {
@@ -885,7 +864,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -899,19 +878,17 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                },
-                {
                     "name": "Symfony Community",
                     "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-03-26 11:51:10"
+            "time": "2014-08-05 09:07:51"
         },
         {
             "name": "watoki/scrut",
@@ -919,12 +896,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/scrut.git",
-                "reference": "d9be0304b7b731a423e3b9aea18519c530fd5dc7"
+                "reference": "e2bda9c849385e1b961c021c16dd2674b3f7437a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/scrut/zipball/d9be0304b7b731a423e3b9aea18519c530fd5dc7",
-                "reference": "d9be0304b7b731a423e3b9aea18519c530fd5dc7",
+                "url": "https://api.github.com/repos/watoki/scrut/zipball/e2bda9c849385e1b961c021c16dd2674b3f7437a",
+                "reference": "e2bda9c849385e1b961c021c16dd2674b3f7437a",
                 "shasum": ""
             },
             "require": {
@@ -958,7 +935,7 @@
                 "test",
                 "watoki"
             ],
-            "time": "2013-11-14 10:33:31"
+            "time": "2014-08-01 10:26:24"
         }
     ],
     "aliases": [

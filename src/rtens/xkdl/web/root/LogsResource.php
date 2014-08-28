@@ -26,7 +26,7 @@ class LogsResource extends DynamicResource {
      * @return Presenter
      */
     public function doGet($task = '', $from = null, $until = null, $sortByTime = false) {
-        $this->session->requireLoggedIn();
+        $this->session->requireLoggedIn($this);
 
         $from = $from ? new \DateTime($from) : null;
         $until = $until ? new \DateTime($until) : null;
