@@ -2,10 +2,10 @@
 namespace spec\rtens\xkdl\scheduling;
 
 use rtens\xkdl\Scheduler;
-use rtens\xkdl\scheduler\PrioritizedEdfScheduler;
+use rtens\xkdl\scheduler\PriorityScheduler;
 use rtens\xkdl\Task;
 
-class PrioritizedEdfSchedulingTest extends SchedulingTest {
+class PrioritySchedulingTest extends SchedulingTest {
 
     protected function background() {
         $this->task->givenTheRootTask('root');
@@ -178,6 +178,6 @@ class PrioritizedEdfSchedulingTest extends SchedulingTest {
     }
 
     protected function createSchedulerInstance(Task $root) {
-        return new PrioritizedEdfScheduler($root);
+        return new PriorityScheduler($root);
     }
 }

@@ -6,7 +6,7 @@ use rtens\xkdl\lib\Schedule;
 use rtens\xkdl\lib;
 use rtens\xkdl\Task;
 
-class PrioritizedEdfScheduler extends EdfScheduler {
+class PriorityScheduler extends EdfScheduler {
 
     protected function chooseNextTask(\DateTime $now, Schedule $schedule) {
         return $this->chooseFrom([$this->root], $now, $schedule);

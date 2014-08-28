@@ -4,7 +4,7 @@ namespace rtens\xkdl\web\root;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\scheduler\EdfScheduler;
-use rtens\xkdl\scheduler\PrioritizedEdfScheduler;
+use rtens\xkdl\scheduler\PriorityScheduler;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
@@ -60,7 +60,7 @@ class ScheduleResource extends DynamicResource {
         if ($scheduler == 'edf') {
             $scheduler = new EdfScheduler($root);
         } else {
-            $scheduler = new PrioritizedEdfScheduler($root);
+            $scheduler = new PriorityScheduler($root);
         }
 
         $schedule = $scheduler->createSchedule($from, $until);
