@@ -40,9 +40,13 @@ class SchedulerFactory {
     /**
      * @param string $key
      * @param \rtens\xkdl\Task $root
+     * @throws \Exception If the $key does not exist
      * @return Scheduler
      */
     public function create($key, Task $root) {
+        if (!array_key_exists($key, $this->schedulers)) {
+            throw new \Exception('Invalid scheduler key: ' . $key);
+        }
         return $this->factory->getInstance($this->schedulers[$key]['class'], [$root]);
     }
 

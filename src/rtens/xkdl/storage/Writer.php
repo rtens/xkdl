@@ -109,9 +109,9 @@ class Writer {
     }
 
     public function saveSchedule(Schedule $schedule) {
-        $content = $schedule->from->format('c') . ' >> ' . $schedule->until->format('c') . "\n";
+        $content = $schedule->getFrom()->format('c') . ' >> ' . $schedule->getUntil()->format('c') . "\n";
 
-        foreach ($schedule->slots as $slot) {
+        foreach ($schedule->getSlots() as $slot) {
             $content .= $slot->window->start->format('c') . ' >> ' .
                 $slot->window->end->format('c') . ' >> ' .
                 $slot->task->getFullName() . "\n";
@@ -126,12 +126,11 @@ class Writer {
     }
 
     public function readSchedule(Task $root) {
-        $schedule = new Schedule(new \DateTime(), new \DateTime());
-
         if (!file_exists($this->scheduleFile())) {
-            return $schedule;
+            return new Schedule(new \DateTime(), new \DateTime());
         }
 
+        $schedule = null;
         foreach (explode("\n", file_get_contents($this->scheduleFile())) as $i => $line) {
             if (!trim($line)) {
                 continue;
@@ -139,12 +138,11 @@ class Writer {
 
             if ($i == 0) {
                 list($start, $end) = explode(" >> ", trim($line));
-                $schedule->from = new \DateTime($start);
-                $schedule->until = new \DateTime($end);
+                $schedule = new Schedule(new \DateTime($start), new \DateTime($end));
             } else {
                 list($start, $end, $task) = explode(" >> ", trim($line));
-                $schedule->slots[] = new Slot($this->findTask($root, $task),
-                    new TimeWindow(new \DateTime($start), new \DateTime($end)));
+                $schedule->addSlot(new Slot($this->findTask($root, $task),
+                    new TimeWindow(new \DateTime($start), new \DateTime($end))));
             }
         }
         return $schedule;

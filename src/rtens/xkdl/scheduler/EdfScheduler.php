@@ -29,12 +29,12 @@ class EdfScheduler extends Scheduler {
             $next->add(new \DateInterval(self::RESOLUTION));
 
             if ($chosen) {
-                if (count($schedule->slots) && $schedule->slots[count($schedule->slots) - 1]->task == $chosen
-                    && $schedule->slots[count($schedule->slots) - 1]->window->end == $now
+                if (count($schedule->getSlots()) && $schedule->getSlot(count($schedule->getSlots()) - 1)->task == $chosen
+                    && $schedule->getSlot(count($schedule->getSlots()) - 1)->window->end == $now
                 ) {
-                    $schedule->slots[count($schedule->slots) - 1]->window->end = $next;
+                    $schedule->getSlot(count($schedule->getSlots()) - 1)->window->end = $next;
                 } else {
-                    $schedule->slots[] = new Slot($chosen, new lib\TimeWindow($now, $next));
+                    $schedule->addSlot(new Slot($chosen, new lib\TimeWindow($now, $next)));
                 }
             }
 
@@ -50,7 +50,7 @@ class EdfScheduler extends Scheduler {
      */
     protected function chooseNextTask(\DateTime $now, Schedule $schedule) {
         $tasks = $this->getSchedulableTasks($this->root, $now);
-        $tasks = $this->filterTasks($tasks, $now, $schedule->slots);
+        $tasks = $this->filterTasks($tasks, $now, $schedule->getSlots());
 
         usort($tasks, function (Task $a, Task $b) {
             $deadlineA = $a->getDeadline();

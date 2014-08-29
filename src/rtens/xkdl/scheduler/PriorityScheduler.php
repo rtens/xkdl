@@ -27,7 +27,7 @@ class PriorityScheduler extends EdfScheduler {
             $children = array_merge($children, $task->getSchedulableChildren($now));
         }
 
-        $candidates = $this->filterTasks($children, $now, $schedule->slots);
+        $candidates = $this->filterTasks($children, $now, $schedule->getSlots());
 
         if (!$candidates) {
             $buckets = [];

@@ -5,6 +5,8 @@ use rtens\xkdl\lib\Schedule;
 
 abstract class Scheduler {
 
+    public static $CLASS = __CLASS__;
+
     protected $root;
 
     const RESOLUTION = 'PT1M';

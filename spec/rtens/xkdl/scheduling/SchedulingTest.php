@@ -27,15 +27,15 @@ abstract class SchedulingTest extends Specification {
     }
 
     protected function thenThereShouldBe_SlotsInTheSchedule($count) {
-        $this->assertCount($count, $this->schedule->slots);
+        $this->assertCount($count, $this->schedule->getSlots());
     }
 
     protected function thenSlot_ShouldBeTask($index, $name) {
-        $this->assertEquals($name, $this->schedule->slots[$index - 1]->task->getName());
+        $this->assertEquals($name, $this->schedule->getSlot($index - 1)->task->getName());
     }
 
     protected function thenScheduleShouldContain($name) {
-        foreach ($this->schedule->slots as $slot) {
+        foreach ($this->schedule->getSlots() as $slot) {
             if ($slot->task->getName() == $name) {
                 return;
             }
@@ -44,11 +44,11 @@ abstract class SchedulingTest extends Specification {
     }
 
     protected function thenSlot_ShouldBe_Minutes($index, $minutes) {
-        $this->assertEquals($minutes, $this->schedule->slots[$index - 1]->window->getSeconds() / 60);
+        $this->assertEquals($minutes, $this->schedule->getSlot($index - 1)->window->getSeconds() / 60);
     }
 
     protected function thenSlot_ShouldStart($index, $when) {
-        $this->assertEquals($this->aligned($when), $this->schedule->slots[$index - 1]->window->start);
+        $this->assertEquals($this->aligned($when), $this->schedule->getSlot($index - 1)->window->start);
     }
 
     protected function aligned($from) {

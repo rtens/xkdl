@@ -57,7 +57,7 @@ class ScheduleResource extends DynamicResource {
         ));
     }
 
-    public function doPost(\DateTime $from, \DateTime $until, $scheduler = null) {
+    public function doPost(\DateTime $from, \DateTime $until, $scheduler) {
         $root = $this->store->getRoot();
 
         $schedule = $this->schedulerFactory->create($scheduler, $root)->createSchedule($from, $until);
@@ -123,7 +123,7 @@ class ScheduleResource extends DynamicResource {
         }
 
         $slots = array();
-        foreach ($schedule->slots as $slot) {
+        foreach ($schedule->getSlots() as $slot) {
             $isActive = !$slot->task->isDone() && $slot->task->getDeadline();
             $isLate = $isActive && $slot->window->end > $slot->task->getDeadline();
 
@@ -162,8 +162,8 @@ class ScheduleResource extends DynamicResource {
             );
         }
         return array(
-            'from' => $schedule->from->format('Y-m-d H:i'),
-            'until' => $schedule->until->format('Y-m-d H:i'),
+            'from' => $schedule->getFrom()->format('Y-m-d H:i'),
+            'until' => $schedule->getUntil()->format('Y-m-d H:i'),
             'slot' => $slots
         );
     }
@@ -187,10 +187,12 @@ class ScheduleResource extends DynamicResource {
         $schedulers = array();
         foreach ($this->schedulerFactory->all() as $key => $info) {
             $schedulers[] = [
-                'key' => $key,
                 'name' => $info['name'],
                 'description' => $info['description'],
-                'checked' => ($this->config->defaultSchedulerKey() == $key ? 'checked' : false)
+                'meta' => [
+                    'value' => $key,
+                    'checked' => ($this->config->defaultSchedulerKey() == $key ? 'checked' : false)
+                ]
             ];
         }
         return $schedulers;

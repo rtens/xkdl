@@ -253,7 +253,7 @@ class ShowScheduleTest extends Specification {
     }
 
     private function whenICreateANewScheduleFrom_Until($from, $until) {
-        $this->resource->doPost(new \DateTime($from), new \DateTime($until));
+        $this->resource->doPost(new \DateTime($from), new \DateTime($until), SchedulerFactory::KEY_EDF);
     }
 
     private function thenTheActionTargetOfSlot_ShouldBe($int, $string) {

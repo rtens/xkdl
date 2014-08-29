@@ -1,7 +1,10 @@
 <?php
 namespace spec\rtens\xkdl\scheduling;
 
+use rtens\mockster\Mock;
+use rtens\mockster\MockFactory;
 use rtens\xkdl\scheduler\SchedulerFactory;
+use rtens\xkdl\Scheduler;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\ResourceFixture;
@@ -43,26 +46,14 @@ class ChooseSchedulingTest extends Specification {
     }
 
     function testChooseScheduler() {
-        $this->markTestIncomplete();
-
         $this->config->givenTheDefaultSchedulerIs('foo');
         $this->whenICreateAScheduleUsingTheScheduler('baz');
         $this->thenTheScheduler_ShouldBeUsed('baz');
     }
 
-    function testFallBackToDefaultScheduler() {
-        $this->markTestIncomplete();
-
-        $this->config->givenTheDefaultSchedulerIs('foo');
-        $this->whenICreateASchedule();
-        $this->thenTheScheduler_ShouldBeUsed('foo');
-    }
-
     function testInvalidSchedulerChosen() {
-        $this->markTestIncomplete();
-
         $this->whenITryToCreateAScheduleUsingTheScheduler('not');
-        $this->thenTheErrorShouldOccur('Invalid scheduler key: "not"');
+        $this->thenTheErrorShouldOccur('Invalid scheduler key: not');
     }
 
     ###################### SET-UP ##################
@@ -70,10 +61,16 @@ class ChooseSchedulingTest extends Specification {
     /** @var SchedulerFactory */
     private $schedulerFactory;
 
+    /** @var array|Mock[] */
+    private $schedulers = [];
+
+    /** @var null|\Exception */
+    private $caught;
+
     protected function setUp() {
         parent::setUp();
 
-        $this->schedulerFactory = new SchedulerFactory();
+        $this->schedulerFactory = $this->factory->getInstance(SchedulerFactory::$CLASS);
         $this->schedulerFactory->clear();
 
         $this->factory->setSingleton(SchedulerFactory::$CLASS, $this->schedulerFactory);
@@ -82,11 +79,31 @@ class ChooseSchedulingTest extends Specification {
     }
 
     private function givenTheScheduler_WithTheName_AndDescription($key, $name, $description) {
-        $this->schedulerFactory->set($key, 'StdClass', $name, $description);
+        $schedulerClass = 'Scheduler' . $key;
+
+        $mf = new MockFactory();
+        $schedulerMock = $mf->getMock(Scheduler::$CLASS);
+
+        $this->schedulers[$key] = $schedulerMock;
+        $this->factory->setSingleton($schedulerClass, $schedulerMock);
+
+        $this->schedulerFactory->set($key, $schedulerClass, $name, $description);
     }
 
     private function whenIOpenTheSchedule() {
         $this->resource->whenIInvoke('doGet');
+    }
+
+    private function whenICreateAScheduleUsingTheScheduler($key) {
+        $this->resource->whenIInvoke_With('doPost', [new \DateTime(), new \DateTime(), $key]);
+    }
+
+    private function whenITryToCreateAScheduleUsingTheScheduler($key) {
+        try {
+            $this->whenICreateAScheduleUsingTheScheduler($key);
+        } catch (\Exception $e) {
+            $this->caught = $e;
+        }
     }
 
     private function thenThereShouldBe_SchedulerOptions($int) {
@@ -94,7 +111,7 @@ class ChooseSchedulingTest extends Specification {
     }
 
     private function thenSchedulerOption_ShouldHaveTheKey($pos, $string) {
-        $this->thenOption_ShouldHaveTheField_WithValue($pos, 'key', $string);
+        $this->thenOption_ShouldHaveTheField_WithValue($pos, 'meta/value', $string);
     }
 
     private function thenSchedulerOption_ShouldHaveTheName($pos, $string) {
@@ -106,16 +123,25 @@ class ChooseSchedulingTest extends Specification {
     }
 
     private function thenTheSchedulerOption_ShouldBeSelected($pos) {
-        $this->thenOption_ShouldHaveTheField_WithValue($pos, 'checked', 'checked');
+        $this->thenOption_ShouldHaveTheField_WithValue($pos, 'meta/checked', 'checked');
     }
 
     private function thenTheSchedulerOption_ShouldNotBeSelected($pos) {
-        $this->thenOption_ShouldHaveTheField_WithValue($pos, "checked", false);
+        $this->thenOption_ShouldHaveTheField_WithValue($pos, 'meta/checked', false);
     }
 
     private function thenOption_ShouldHaveTheField_WithValue($pos, $field, $value) {
         $pos--;
         $this->resource->then_ShouldBe("algorithm/$pos/$field", $value);
+    }
+
+    private function thenTheScheduler_ShouldBeUsed($key) {
+        $this->assertTrue($this->schedulers[$key]->__mock()->method('createSchedule')->getHistory()->wasCalled());
+    }
+
+    private function thenTheErrorShouldOccur($string) {
+        $this->assertNotNull($this->caught);
+        $this->assertEquals($string, $this->caught->getMessage());
     }
 
 } 
