@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "fd125e6a57ae22ffe46c22fb72ec637e",
+    "hash": "6d3bd63294fcd414cf3074c573a8a29c",
     "packages": [
         {
             "name": "erusev/parsedown",
@@ -50,12 +50,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client.git",
-                "reference": "fd55df08644e73a754f72579adcd6044cb76767d"
+                "reference": "99727b0129b23eaaf916d4a665e751d5732d563c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/fd55df08644e73a754f72579adcd6044cb76767d",
-                "reference": "fd55df08644e73a754f72579adcd6044cb76767d",
+                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/99727b0129b23eaaf916d4a665e751d5732d563c",
+                "reference": "99727b0129b23eaaf916d4a665e751d5732d563c",
                 "shasum": ""
             },
             "require": {
@@ -75,7 +75,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "include-path": [
                 "src/"
             ],
@@ -87,7 +87,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2014-08-28 08:30:46"
+            "time": "2014-08-28 23:03:50"
         },
         {
             "name": "nikic/php-parser",
@@ -232,12 +232,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "00ac6310d794c4f9e13a439a1c0860301c4be412"
+                "reference": "5bdac5d8c47e66f610c2082001356926b3583b1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/00ac6310d794c4f9e13a439a1c0860301c4be412",
-                "reference": "00ac6310d794c4f9e13a439a1c0860301c4be412",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/5bdac5d8c47e66f610c2082001356926b3583b1b",
+                "reference": "5bdac5d8c47e66f610c2082001356926b3583b1b",
                 "shasum": ""
             },
             "require": {
@@ -255,7 +255,7 @@
                     "spec\\watoki\\curir": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -274,7 +274,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2014-08-16 09:25:48"
+            "time": "2014-08-29 12:01:55"
         },
         {
             "name": "watoki/dom",
@@ -282,12 +282,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/dom.git",
-                "reference": "6e7940dbca9e9008c18381eb0aa86ea10e304476"
+                "reference": "ae1c9ce153e1b663b4b76bf9dddcf89b006308f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/dom/zipball/6e7940dbca9e9008c18381eb0aa86ea10e304476",
-                "reference": "6e7940dbca9e9008c18381eb0aa86ea10e304476",
+                "url": "https://api.github.com/repos/watoki/dom/zipball/ae1c9ce153e1b663b4b76bf9dddcf89b006308f6",
+                "reference": "ae1c9ce153e1b663b4b76bf9dddcf89b006308f6",
                 "shasum": ""
             },
             "require": {
@@ -301,7 +301,7 @@
                     "spec\\watoki\\dom": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -318,7 +318,7 @@
                 "parser",
                 "watoki"
             ],
-            "time": "2013-11-09 10:12:08"
+            "time": "2014-08-29 12:35:24"
         },
         {
             "name": "watoki/factory",
@@ -326,12 +326,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/factory.git",
-                "reference": "bbab7612b3648ede014c6887a1ed99d75d01a32c"
+                "reference": "a6f60634f6edf0b22549cb6a95f1ec6363fa0a3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/factory/zipball/bbab7612b3648ede014c6887a1ed99d75d01a32c",
-                "reference": "bbab7612b3648ede014c6887a1ed99d75d01a32c",
+                "url": "https://api.github.com/repos/watoki/factory/zipball/a6f60634f6edf0b22549cb6a95f1ec6363fa0a3b",
+                "reference": "a6f60634f6edf0b22549cb6a95f1ec6363fa0a3b",
                 "shasum": ""
             },
             "require": {
@@ -348,7 +348,7 @@
                     "spec\\watoki\\factory": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -365,7 +365,7 @@
                 "dependency injection",
                 "watoki"
             ],
-            "time": "2014-05-12 12:10:17"
+            "time": "2014-08-29 12:35:23"
         },
         {
             "name": "watoki/smokey",
@@ -417,12 +417,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/tempan.git",
-                "reference": "bac7e329d152e6e4f9a8ce9fc8df2f39ce453523"
+                "reference": "8152b5ae489f8c69b15e4675780d852c75d94658"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/tempan/zipball/bac7e329d152e6e4f9a8ce9fc8df2f39ce453523",
-                "reference": "bac7e329d152e6e4f9a8ce9fc8df2f39ce453523",
+                "url": "https://api.github.com/repos/watoki/tempan/zipball/8152b5ae489f8c69b15e4675780d852c75d94658",
+                "reference": "8152b5ae489f8c69b15e4675780d852c75d94658",
                 "shasum": ""
             },
             "require": {
@@ -437,7 +437,7 @@
                     "spec\\watoki\\tempan": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -456,7 +456,7 @@
                 "template animation",
                 "watoki"
             ],
-            "time": "2014-05-06 07:45:02"
+            "time": "2014-08-29 12:36:52"
         }
     ],
     "packages-dev": [
