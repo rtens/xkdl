@@ -16,7 +16,8 @@
         "watoki/curir": "*",
         "watoki/tempan": "*",
         "watoki/cfg": "*",
-        "google/apiclient": "1.0.*"
+        "google/apiclient": "1.0.*",
+        "erusev/parsedown": "1.0.*"
     },
     "require-dev": {
         "rtens/mockster": "*",

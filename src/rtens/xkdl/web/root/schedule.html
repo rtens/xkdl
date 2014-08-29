@@ -3,6 +3,7 @@
 <head>
     <title>xkdl</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
@@ -98,12 +99,12 @@
                 </div>
 
                 <div class="extend-toggle">
-                    <a style="color: white; text-decoration: none; opacity: 0.5" data-toggle="collapse" href="#schedule-extended">
-                        <span class="glyphicon glyphicon-cog"></span>
+                    <a data-toggle="collapse-next">
+                        <span class="glyphicon glyphicon-plus"></span>
                         Extended Options
                     </a>
                 </div>
-                <div class="extended collapse" id="schedule-extended">
+                <div class="extended collapse">
                     <h4>Scheduling algorithm</h4>
                     <div property="algorithm" class="radio">
                         <label>
@@ -123,7 +124,7 @@
                     <input type="hidden" name="task" property="target" value="/some/task"/>
                     <div class="info">
                         <h4 property="start">14:02</h4>
-                        <input property="done" type="submit" name="method" value="done" class="btn btn-warning"/>
+                        <input property="done" type="submit" name="method" value="done" class="btn btn-info"/>
                         <h4 property="end">15:32</h4>
                     </div>
 
@@ -136,6 +137,52 @@
                         <span property="buffer" style="font-weight: bold">4 days 2 hours</span>
                         (<span property="absolute">2014-02-13 14:00</span>)
                     </p>
+
+                    <div property="duration" class="duration">
+                        <span property="logged" class="logged" style="width: 40%;"></span>
+                        <span property="number" class="number">4.7 / 15</span>
+                    </div>
+
+                    <div property="description" class="description">
+                        <div class="extend-toggle">
+                            <a data-toggle="collapse-next">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                Description
+                            </a>
+                        </div>
+                        <div class="extended collapse">
+                            <div class="description-text" property="text">
+                                <p>Some <em>description</em> text =D</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="logging">
+                    <div class="form-group">
+                        <input value="now" style="width: 47%;" class="form-control" required="true" type="text" name="start"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+                    </div>
+
+                    <div class="actions btn-group">
+                        <input style="width: 100%;" class="btn btn-primary" type="submit" name="method" value="start"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div property="slot" class="slot item clearfix bg-success">
+            <form property="form" method="post">
+                <div property="task" class="main">
+                    <input type="hidden" name="task" property="target" value="/some/task"/>
+                    <div class="info">
+                        <h4 property="start">14:02</h4>
+                        <input property="done" type="submit" name="method" value="done" class="btn btn-success"/>
+                        <h4 property="end">15:32</h4>
+                    </div>
+
+                    <p property="parent" class="text-muted">the/full/name/of/the/parent</p>
+
+                    <h3 property="name">Name of this task</h3>
 
                     <div property="duration" class="duration">
                         <span property="logged" class="logged" style="width: 40%;"></span>
@@ -157,6 +204,13 @@
     </div>
 
 </div>
+
+<script language="JavaScript">
+    $('[data-toggle=collapse-next]').on('click', function () {
+        $(this).find('.glyphicon').toggleClass('glyphicon-plus').toggleClass('glyphicon-minus');
+        $(this).parent().next().collapse('toggle');
+    })
+</script>
 
 </body>
 </html>

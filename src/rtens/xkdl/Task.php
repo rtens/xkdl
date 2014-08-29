@@ -43,6 +43,9 @@ class Task {
     /** @var array|Task[] */
     protected $dependencies = array();
 
+    /** @var null|string */
+    private $description;
+
     function __construct($name, TimeSpan $duration = null) {
         $this->name = $name;
         $this->duration = $duration ?: new TimeSpan('PT0S');
@@ -134,6 +137,20 @@ class Task {
 
     public function getDependencies() {
         return $this->dependencies;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getDescription() {
+        return $this->description;
+    }
+
+    /**
+     * @param null|string $description
+     */
+    public function setDescription($description) {
+        $this->description = $description;
     }
 
     /**

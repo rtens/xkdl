@@ -48,6 +48,7 @@ class ShowScheduleTest extends Specification {
         $this->file->givenTheFile_WithContent('root/a/__ab/__.txt', 'deadline: 2001-01-10 10:00');
         $this->file->givenTheFile_WithContent('root/a/__ab/logs.txt', "2001-01-01 9:00 >> 2001-01-01 9:03");
         $this->file->givenTheFolder('root/b/ab/__abc');
+        $this->file->givenTheFile_WithContent('root/b/ab/__abc/description.txt', 'This is a *description*');
 
         $this->file->givenTheFile_WithContent('schedule.txt',
             "2001-01-01T12:00:00+00:00 >> 2001-01-01T12:10:00+00:00\n" .
@@ -73,8 +74,10 @@ class ShowScheduleTest extends Specification {
         $this->thenTheEndOfSlot_ShouldBe(2, '12:03');
         $this->thenSlot_ShouldHaveNoDeadline(2);
         $this->thenTheDurationOfSlot_ShouldBe_With_Completed(2, '0.02 / 0.05', '33.33%');
+        $this->thenSlot_ShouldHaveNoDescription(2);
 
         $this->thenParentOfSlot_ShouldBe(3, '/b/ab');
+        $this->thenTheDescriptionOfSlot_ShouldBe(3, '<p>This is a <em>description</em></p>');
     }
 
     function testLateTask() {
@@ -229,6 +232,14 @@ class ShowScheduleTest extends Specification {
 
     private function thenTheNameOfSlot_ShouldBe($int, $string) {
         $this->assertEquals($string, $this->getSlot($int)['task']['name']);
+    }
+
+    private function thenTheDescriptionOfSlot_ShouldBe($int, $string) {
+        $this->assertEquals($string, $this->getSlot($int)['task']['description']['text']);
+    }
+
+    private function thenSlot_ShouldHaveNoDescription($int) {
+        $this->assertNull($this->getSlot($int)['task']['description']);
     }
 
     private function thenSlot_ShouldHaveNoDeadline($int) {

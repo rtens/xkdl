@@ -157,7 +157,10 @@ class ScheduleResource extends DynamicResource {
                             'buffer' => $slot->task->getDeadline()->diff($slot->window->end)->format('%ad %hh %im'),
                             'absolute' => $slot->task->getDeadline()->format('Y-m-d H:i')
                         ) : null,
-                    'duration' => $this->assembleDuration($slot->task)
+                    'duration' => $this->assembleDuration($slot->task),
+                    'description' => $slot->task->getDescription()
+                            ? ['text' => \Parsedown::instance()->text($slot->task->getDescription())]
+                            : null
                 )
             );
         }

@@ -22,6 +22,7 @@ class TaskSerializer implements Serializer {
         $this->setProperties($task, $properties);
         $this->setWindows($task, $folder . '/windows.txt');
         $this->setLogs($task, $folder . '/logs.txt');
+        $this->setDescription($task, $folder . '/description.txt');
 
         return $task;
     }
@@ -62,6 +63,12 @@ class TaskSerializer implements Serializer {
     private function setLogs(Task $task, $file) {
         foreach ($this->readWindows($file) as $window) {
             $task->addLog($window);
+        }
+    }
+
+    private function setDescription(Task $task, $file) {
+        if (file_exists($file)) {
+            $task->setDescription(file_get_contents($file));
         }
     }
 

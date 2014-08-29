@@ -77,6 +77,10 @@ class TaskFixture extends Fixture {
         $this->spec->assertCount($count, $this->getTask($path)->getLogs());
     }
 
+    public function then_ShouldHaveTheDescription($path, $string) {
+        $this->spec->assertEquals($string, $this->getTask($path)->getDescription());
+    }
+
     public function then_ShouldHaveNoChildren($path) {
         $this->spec->assertEmpty($this->getTask($path)->getChildren());
     }

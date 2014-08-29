@@ -133,6 +133,14 @@ class StorageTest extends Specification {
         $this->task->then_ShouldHave_Logs('one', 2);
     }
 
+    function testReadDescription() {
+        $this->file->givenTheFolder('root/one');
+        $this->file->givenTheFile_WithContent('root/one/description.txt', 'Some description');
+        $this->whenIReadTheTasks();
+        $this->task->thenThereShouldBeATask('one');
+        $this->task->then_ShouldHaveTheDescription('one', 'Some description');
+    }
+
     function testAddLogToNewTask() {
         $this->task->givenTheRootTask('root');
         $this->task->givenTheTask_In('one', 'root');
