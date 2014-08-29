@@ -24,6 +24,6 @@ difficulty, duration and custom priority could be a factor.
 
 ## Storage ##
 
-Tasks are stored as folders with the naming schema `_[duration_]Name of task` for incomplete and `X_Name of task`
-for completed tasks. Properties are saved in a file names `__.txt`, composed objects are stored in corresponding
+Tasks are stored as folders with the naming schema `__Name of task` for incomplete and `x_Name of task`
+for completed tasks. Properties are saved in a file named `__.txt`, composed objects are stored in corresponding
 files (e.g. `windows.txt` and `logs.txt`).
