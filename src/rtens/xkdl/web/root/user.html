@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>xkdl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="utf-8"/>
+
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="res/style.css"/>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="item bg-primary">
+        <form method="post" class="form-inline">
+            <label for="email">Please login</label>
+            <input class="form-control" required="true" type="text" id="email" name="email"
+                   placeholder="Email address" size="40"/>
+            <input class="btn btn-success" type="submit" name="request" value="send login link"/>
+        </form>
+    </div>
+
+    <div property="sent" class="alert alert-success">
+        The login link was sent to <code property="to">some@email.com</code>
+    </div>
+
+    <div property="email" class="alert alert-warning">
+        An email containing a login link will be sent to the provided email address.
+    </div>
+
+</div>
+
+</body>
+</html>

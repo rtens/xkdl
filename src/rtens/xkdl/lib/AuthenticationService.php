@@ -49,7 +49,7 @@ class AuthenticationService {
         $this->createToken($email, $otp);
         $this->sendEmail($email, $login, $key, $otp);
 
-        $this->logger->log($this, 'sent foo@bar.baz');
+        $this->logger->log($this, 'sent ' . $email);
     }
 
     private function createToken($email, $otp) {
