@@ -2,15 +2,11 @@
 namespace rtens\xkdl\web;
 
 use rtens\xkdl\exception\NotLoggedInException;
-use rtens\xkdl\lib\Configuration;
 use watoki\curir\Resource;
 
 class Session {
 
     public static $CLASS = __CLASS__;
-
-    /** @var Configuration <- */
-    public $config;
 
     public function __construct() {
         session_start();

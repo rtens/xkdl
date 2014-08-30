@@ -10,12 +10,11 @@ abstract class Configuration {
 
     private $root;
 
-    function __construct($root) {
-        $this->root = $root;
+    private $username;
 
-        if (!file_exists($this->homeFolder())) {
-            mkdir($this->homeFolder(), 0777, true);
-        }
+    function __construct($root, $username = 'default') {
+        $this->root = $root;
+        $this->username = $username;
     }
 
     public function defaultDuration() {
@@ -39,11 +38,11 @@ abstract class Configuration {
     }
 
     public function homeFolder() {
-        return $this->userFolder() . '/home/' . $this->homeFolderName();
+        return $this->userFolder() . '/home/' . $this->userName();
     }
 
-    protected function homeFolderName() {
-        return 'default';
+    protected function userName() {
+        return $this->username;
     }
 
     public function scheduleArchiveFileName() {
