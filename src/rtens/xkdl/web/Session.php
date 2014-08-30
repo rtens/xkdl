@@ -33,7 +33,7 @@ class Session {
     }
 
     public function setLoggedIn($as) {
-        $_SESSION['loggedIn'] = $as;
+        $_SESSION['loggedIn'] = strtolower($as);
     }
 
     public function requireLoggedIn(Resource $resource) {

@@ -53,13 +53,13 @@ class AuthenticationTest extends Specification {
     }
 
     function testSuccessfulLogin() {
-        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz');
+        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'Foo@Bar.baz');
         $this->whenILoginWithTheOtp('foobar');
 
         $this->session->thenIShouldBeLoggedInAs('foo@bar.baz');
         $this->thenThereShouldBeNoTokens();
 
-        $this->then_ShouldBeLogged('login foo@bar.baz');
+        $this->then_ShouldBeLogged('login Foo@Bar.baz');
     }
 
     function testWrongOtp() {
