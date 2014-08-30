@@ -29,8 +29,7 @@ class RootResource extends Container {
             return (new Redirecter(Url::parse($ae->getAuthenticationUrl())))
                 ->createResponse($request);
         } catch (NotLoggedInException $nlie) {
-            $this->session->setLoggedIn();
-            return (new Redirecter($nlie->getTargetUrl()))->createResponse($request);
+            return (new Redirecter($this->getUrl('login')))->createResponse($request);
         }
     }
 

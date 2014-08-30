@@ -2,7 +2,10 @@
 namespace spec\rtens\xkdl;
 
 use rtens\xkdl\exception\NotLoggedInException;
+use rtens\xkdl\web\RootResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
+use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
+use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 
 /**
@@ -11,22 +14,20 @@ use watoki\scrut\Specification;
  *
  * The email address is used to identify a user. Thus no registration is necessary.
  *
- * @property ConfigFixture config
+ * @property ConfigFixture config <-
+ * @property WebInterfaceFixture web <-
  */
 class AuthenticationTest extends Specification {
 
     protected function background() {
-        $this->markTestIncomplete();
-
         $this->config->givenNowIs('2001-01-01 12:00');
-        $this->givenMyIpAddressIs('128.12.42.8');
+//        $this->givenMyIpAddressIs('128.12.42.8');
     }
 
     function testRedirectToLoginResource() {
-        $this->markTestIncomplete();
-
-        $this->when_IsThrown(NotLoggedInException::$CLASS);
-        $this->thenIShouldBeRedirectedToTheLoginResource();
+        $this->givenTheRootResourceThrowsA(NotLoggedInException::$CLASS);
+        $this->web->whenIGetTheResource('');
+        $this->web->thenIShouldBeRedirectedTo('http://xkdl/login');
     }
 
     function testSendOtpByMail() {
@@ -86,6 +87,23 @@ class AuthenticationTest extends Specification {
         $this->thenIShouldNotBeLoggedIn();
 
         $this->thenTheLine_ShouldBeLogged('2001-01-01 12:00:00; 128.12.42.8; logout; foo@bar.baz');
+    }
+
+    ########################## SET-UP ###########################
+
+    private function givenTheRootResourceThrowsA($exceptionClass) {
+        $className = "ExceptionThrowingRootResource";
+        if (!class_exists($className)) {
+            $code = "class $className extends \\rtens\\xkdl\\web\\RootResource {
+                public function doGet() {
+                    throw new $exceptionClass(\\watoki\\curir\\http\\Url::parse('http://xkdl/bar'));
+                }
+            }";
+            eval($code);
+        }
+
+        $root = $this->factory->getInstance($className, [Url::parse('http://xkdl')]);
+        $this->factory->setSingleton(RootResource::$CLASS, $root);
     }
 
 } 
