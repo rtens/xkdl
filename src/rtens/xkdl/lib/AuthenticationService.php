@@ -17,6 +17,17 @@ class AuthenticationService {
     /** @var Logger <- */
     public $logger;
 
+    public function authenticate($otp) {
+        $file = $this->tokenFile($otp);
+
+        $email = file_get_contents($file);
+        unlink($file);
+
+        $this->logger->log($this, 'login ' . $email);
+
+        return $email;
+    }
+
     public function request($email, Url $login, $key) {
         $otp = $this->generator->generate();
 
@@ -27,11 +38,11 @@ class AuthenticationService {
     }
 
     private function createToken($email, $otp) {
-        $otpDir = $this->config->userFolder() . '/otp';
-        if (!file_exists($otpDir)) {
-            mkdir($otpDir);
+        $file = $this->tokenFile($otp);
+        if (!file_exists(dirname($file))) {
+            mkdir(dirname($file));
         }
-        file_put_contents($otpDir . '/' . $otp, $email);
+        file_put_contents($file, $email);
     }
 
     /**
@@ -43,5 +54,9 @@ class AuthenticationService {
     private function sendEmail($email, Url $login, $key, $otp) {
         $login->getParameters()->set($key, $otp);
         $this->email->send($email, 'xkdl@rtens.org', 'xkdl login', $login->toString());
+    }
+
+    private function tokenFile($otp) {
+        return $this->config->userFolder() . '/otp/' . $otp;
     }
 }

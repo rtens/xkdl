@@ -48,4 +48,12 @@ class FileFixture extends Fixture {
         $this->spec->assertFileNotExists($this->getUserFolder() . '/' . $path);
     }
 
+    public function then_ShouldBeEmpty($directory) {
+        $files = [];
+        foreach (glob($this->getUserFolder() . '/' . $directory . '/*') as $file) {
+            $files[] = basename($file);
+        }
+        $this->spec->assertEmpty($files, json_encode($files));
+    }
+
 } 

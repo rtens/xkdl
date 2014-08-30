@@ -10,6 +10,7 @@ use rtens\xkdl\lib\RandomStringGenerator;
 use rtens\xkdl\web\RootResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
+use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
@@ -23,6 +24,7 @@ use watoki\scrut\Specification;
  * @property ConfigFixture config <-
  * @property WebInterfaceFixture web <-
  * @property FileFixture file <-
+ * @property SessionFixture session <-
  */
 class AuthenticationTest extends Specification {
 
@@ -45,20 +47,19 @@ class AuthenticationTest extends Specification {
     }
 
     function testSuccessfulLogin() {
-        $this->markTestIncomplete();
-
-        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz', '5 minutes ago');
+        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz');
         $this->whenILoginWithTheOtp('foobar');
-        $this->thenIShouldBeLoggedInAs('foo@bar.baz');
+
+        $this->session->thenIShouldBeLoggedInAs('foo@bar.baz');
         $this->thenThereShouldBeNoTokens();
 
-        $this->then_ShouldBeLogged('2001-01-01 12:00:00; 128.12.42.8; login; foo@bar.baz');
+        $this->then_ShouldBeLogged('login foo@bar.baz');
     }
 
     function testWrongOtp() {
         $this->markTestIncomplete();
 
-        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz', 'now');
+        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz');
         $this->whenILoginWithTheOtp('wrong');
 
         $this->thenTheError_ShouldBeRaised('Invalid login.');
@@ -153,6 +154,19 @@ class AuthenticationTest extends Specification {
 
     private function then_ShouldBeLogged($string) {
         $this->assertTrue($this->logger->__mock()->method('log')->getHistory()->wasCalledWith(['message' => $string]));
+    }
+
+    private function givenATokenWithTheOtp_For_WasCreated($otp, $email) {
+        $this->file->givenTheFile_WithContent('otp/' . $otp, $email);
+    }
+
+    private function whenILoginWithTheOtp($otp) {
+        $this->web->givenTheParameter_Is('otp', $otp);
+        $this->web->whenICallTheResource_WithTheMethod('user', 'login');
+    }
+
+    private function thenThereShouldBeNoTokens() {
+        $this->file->then_ShouldBeEmpty('otp');
     }
 
 } 

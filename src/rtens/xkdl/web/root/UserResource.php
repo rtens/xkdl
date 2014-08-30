@@ -19,6 +19,10 @@ class UserResource extends DynamicResource {
         $this->authentication->request($email, $url, 'otp');
     }
 
+    public function doLogin($otp) {
+        $this->session->setLoggedIn($this->authentication->authenticate($otp));
+    }
+
     public function doLogout() {
         $this->session->requireLoggedIn($this);
         $this->session->setLoggedIn(false);

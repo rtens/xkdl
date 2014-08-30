@@ -29,11 +29,11 @@ class Session {
     }
 
     public function isLoggedIn() {
-        return $_SESSION['loggedIn'];
+        return isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'];
     }
 
-    public function setLoggedIn($to = true) {
-        $_SESSION['loggedIn'] = $to;
+    public function setLoggedIn($as) {
+        $_SESSION['loggedIn'] = $as;
     }
 
     public function requireLoggedIn(Resource $resource) {

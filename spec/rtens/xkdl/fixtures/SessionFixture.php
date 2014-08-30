@@ -26,7 +26,7 @@ class SessionFixture extends Fixture {
         /** @var Session $session */
         $session = $this->session;
         $session->config = $this->config->getConfig();
-        $session->setLoggedIn();
+        $session->setLoggedIn('some@foo.com');
     }
 
     public function givenIAmNotLoggedIn() {
@@ -45,7 +45,7 @@ class SessionFixture extends Fixture {
         $this->spec->assertEquals($value, $this->session->get($key));
     }
 
-    public function thenIShouldBeLoggedIn() {
+    public function thenIShouldBeLoggedInAs($email) {
         $this->spec->assertTrue($this->session->isLoggedIn(), 'Not logged in');
     }
 
