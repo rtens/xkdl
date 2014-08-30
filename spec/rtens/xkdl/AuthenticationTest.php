@@ -31,6 +31,7 @@ class AuthenticationTest extends Specification {
 
     protected function background() {
         $this->session->givenIAmNotLoggedIn();
+        $this->file->givenPathsAreRelativeToTheUserFolder();
     }
 
     function testRedirectToLoginResource() {

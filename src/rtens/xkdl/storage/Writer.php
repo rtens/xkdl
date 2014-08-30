@@ -82,15 +82,15 @@ class Writer {
     }
 
     private function loggingFile() {
-        return $this->config->userFolder() . '/logging';
+        return $this->config->homeFolder() . '/logging';
     }
 
     private function scheduleFile() {
-        return $this->config->userFolder() . '/schedule.txt';
+        return $this->config->homeFolder() . '/schedule.txt';
     }
 
     private function scheduleArchiveFolder() {
-        return $this->config->userFolder() . '/schedules';
+        return $this->config->homeFolder() . '/schedules';
     }
 
     private function scheduleArchiveFile() {

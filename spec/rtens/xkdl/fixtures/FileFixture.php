@@ -8,13 +8,19 @@ use watoki\scrut\Fixture;
  */
 class FileFixture extends Fixture {
 
+    private $useHome = true;
+
     public function setUp() {
         parent::setUp();
         @mkdir($this->getUserFolder(), 0777, true);
     }
 
+    public function givenPathsAreRelativeToTheUserFolder() {
+        $this->useHome = false;
+    }
+
     private function getUserFolder() {
-        return $this->config->getConfig()->userFolder();
+        return $this->useHome ? $this->config->getConfig()->homeFolder() : $this->config->getConfig()->userFolder();
     }
 
     public function givenTheFolder($name) {

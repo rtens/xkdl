@@ -28,6 +28,8 @@ class LogTasksTest extends Specification {
 
     protected function background() {
         $this->time->givenTheTimeZoneIs('GMT0');
+        $this->file->givenTheFolder('root');
+        $this->config->givenTheDefaultDurationIs_Minutes(1);
     }
 
     function testStartLogging() {
@@ -143,9 +145,6 @@ class LogTasksTest extends Specification {
         $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS, [Url::parse('schedule')]);
 
         $this->fieldEnd = null;
-
-        $this->file->givenTheFolder('root');
-        $this->config->givenTheDefaultDurationIs_Minutes(1);
     }
 
 
