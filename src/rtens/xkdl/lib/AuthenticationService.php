@@ -7,6 +7,8 @@ use watoki\curir\http\Url;
 
 class AuthenticationService {
 
+    const TIMEOUT = 'PT5M';
+
     /** @var RandomStringGenerator <- */
     public $generator;
 
@@ -26,8 +28,15 @@ class AuthenticationService {
             $this->error('Invalid login');
         }
 
-        $email = file_get_contents($file);
+        $token = json_decode(file_get_contents($file), true);
         unlink($file);
+
+        $email = $token['email'];
+        $created = new \DateTime($token['created']);
+
+        if ($created->add(new \DateInterval(self::TIMEOUT)) < $this->config->now()) {
+            $this->error('Login timed out', ' for ' . $email);
+        }
 
         $this->logger->log($this, 'login ' . $email);
 
@@ -48,7 +57,12 @@ class AuthenticationService {
         if (!file_exists(dirname($file))) {
             mkdir(dirname($file));
         }
-        file_put_contents($file, $email);
+
+        $token = [
+            'email' => $email,
+            'created' => $this->config->now()->format('c')
+        ];
+        file_put_contents($file, json_encode($token));
     }
 
     /**
@@ -66,8 +80,8 @@ class AuthenticationService {
         return $this->config->userFolder() . '/otp/' . $otp;
     }
 
-    private function error($string) {
-        $this->logger->log($this, $string);
+    private function error($string, $log = '') {
+        $this->logger->log($this, $string . $log);
         throw new HttpError(Response::STATUS_UNAUTHORIZED, $string);
     }
 

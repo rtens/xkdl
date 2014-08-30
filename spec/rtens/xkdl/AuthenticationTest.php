@@ -72,9 +72,7 @@ class AuthenticationTest extends Specification {
         $this->then_ShouldBeLogged('Invalid login');
     }
 
-    function testOtpTimeOut() {
-        $this->markTestIncomplete();
-
+    function testTimeOut() {
         $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz', '5 minutes 1 second ago');
         $this->whenITryToLoginWithTheOtp('foobar');
 
@@ -82,7 +80,7 @@ class AuthenticationTest extends Specification {
         $this->session->thenIShouldNotBeLoggedIn();
         $this->thenThereShouldBeNoTokens();
 
-        $this->then_ShouldBeLogged('timeout');
+        $this->then_ShouldBeLogged('Login timed out for foo@bar.baz');
     }
 
     function testLogout() {
@@ -150,15 +148,16 @@ class AuthenticationTest extends Specification {
     }
 
     private function thenTheShouldBeATokenWithTheOtp_For($otp, $email) {
-        $this->file->thenThereShouldBeAFile_WithTheContent('otp/' . $otp, $email);
+        $this->file->thenThereShouldBeAFile_ThatContains('otp/' . $otp, $email);
     }
 
     private function then_ShouldBeLogged($string) {
         $this->assertTrue($this->logger->__mock()->method('log')->getHistory()->wasCalledWith(['message' => $string]));
     }
 
-    private function givenATokenWithTheOtp_For_WasCreated($otp, $email) {
-        $this->file->givenTheFile_WithContent('otp/' . $otp, $email);
+    private function givenATokenWithTheOtp_For_WasCreated($otp, $email, $when = 'now') {
+        $this->file->givenTheFile_WithContent('otp/' . $otp, json_encode([
+                'email' => $email, 'created' => (new \DateTime($when))->format('c')]));
     }
 
     private function whenILoginWithTheOtp($otp) {

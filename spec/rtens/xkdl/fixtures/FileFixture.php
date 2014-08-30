@@ -34,6 +34,12 @@ class FileFixture extends Fixture {
         $this->spec->assertEquals($content, file_get_contents($fullPath));
     }
 
+    public function thenThereShouldBeAFile_ThatContains($path, $content) {
+        $fullPath = $this->getUserFolder() . '/' . $path;
+        $this->spec->assertFileExists($fullPath);
+        $this->spec->assertContains($content, file_get_contents($fullPath));
+    }
+
     public function thenThereShouldBeAFile($path) {
         $fullPath = $this->getUserFolder() . '/' . $path;
         $this->spec->assertFileExists($fullPath);
