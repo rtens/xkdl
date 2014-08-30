@@ -33,8 +33,8 @@ class SessionFixture extends Fixture {
         $this->session->setLoggedIn(false);
     }
 
-    public function givenIAmLoggedIn() {
-        $this->session->setLoggedIn();
+    public function givenIAmLoggedInAs($email) {
+        $this->session->setLoggedIn($email);
     }
 
     public function givenTheSessionContains_WithTheValue($key, $value) {
@@ -47,6 +47,7 @@ class SessionFixture extends Fixture {
 
     public function thenIShouldBeLoggedInAs($email) {
         $this->spec->assertTrue($this->session->isLoggedIn(), 'Not logged in');
+        $this->spec->assertEquals($email, $this->session->getUserId());
     }
 
     public function thenIShouldNotBeLoggedIn() {

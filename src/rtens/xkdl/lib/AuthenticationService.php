@@ -1,6 +1,8 @@
 <?php
 namespace rtens\xkdl\lib;
 
+use watoki\curir\http\error\HttpError;
+use watoki\curir\http\Response;
 use watoki\curir\http\Url;
 
 class AuthenticationService {
@@ -19,6 +21,10 @@ class AuthenticationService {
 
     public function authenticate($otp) {
         $file = $this->tokenFile($otp);
+
+        if (!file_exists($file)) {
+            $this->error('Invalid login');
+        }
 
         $email = file_get_contents($file);
         unlink($file);
@@ -58,5 +64,14 @@ class AuthenticationService {
 
     private function tokenFile($otp) {
         return $this->config->userFolder() . '/otp/' . $otp;
+    }
+
+    private function error($string) {
+        $this->logger->log($this, $string);
+        throw new HttpError(Response::STATUS_UNAUTHORIZED, $string);
+    }
+
+    public function logout($email) {
+        $this->logger->log($this, 'logout ' . $email);
     }
 }

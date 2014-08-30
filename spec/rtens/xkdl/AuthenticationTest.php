@@ -12,6 +12,7 @@ use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
+use watoki\curir\http\Response;
 use watoki\curir\http\Url;
 use watoki\scrut\Specification;
 
@@ -27,6 +28,10 @@ use watoki\scrut\Specification;
  * @property SessionFixture session <-
  */
 class AuthenticationTest extends Specification {
+
+    protected function background() {
+        $this->session->givenIAmNotLoggedIn();
+    }
 
     function testRedirectToLoginResource() {
         $this->givenTheRootResourceThrowsA(NotLoggedInException::$CLASS);
@@ -57,37 +62,33 @@ class AuthenticationTest extends Specification {
     }
 
     function testWrongOtp() {
-        $this->markTestIncomplete();
-
         $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz');
-        $this->whenILoginWithTheOtp('wrong');
+        $this->whenITryToLoginWithTheOtp('wrong');
 
-        $this->thenTheError_ShouldBeRaised('Invalid login.');
-        $this->thenIShouldNotBeLoggedIn();
+        $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
+        $this->session->thenIShouldNotBeLoggedIn();
         $this->thenTheShouldBeATokenWithTheOtp_For('foobar', 'foo@bar.baz');
 
-        $this->then_ShouldBeLogged('invalid');
+        $this->then_ShouldBeLogged('Invalid login');
     }
 
     function testOtpTimeOut() {
         $this->markTestIncomplete();
 
         $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz', '5 minutes 1 second ago');
-        $this->whenILoginWithTheOtp('foobar');
+        $this->whenITryToLoginWithTheOtp('foobar');
 
-        $this->thenTheError_ShouldBeRaised('Login timed out. Please try again.');
-        $this->thenIShouldNotBeLoggedIn();
+        $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
+        $this->session->thenIShouldNotBeLoggedIn();
         $this->thenThereShouldBeNoTokens();
 
         $this->then_ShouldBeLogged('timeout');
     }
 
     function testLogout() {
-        $this->markTestIncomplete();
-
-        $this->givenIAmLoggedInAs('foo@bar.baz');
+        $this->session->givenIAmLoggedInAs('foo@bar.baz');
         $this->whenILogOut();
-        $this->thenIShouldNotBeLoggedIn();
+        $this->session->thenIShouldNotBeLoggedIn();
 
         $this->then_ShouldBeLogged('logout foo@bar.baz');
     }
@@ -165,8 +166,17 @@ class AuthenticationTest extends Specification {
         $this->web->whenICallTheResource_WithTheMethod('user', 'login');
     }
 
+    private function whenITryToLoginWithTheOtp($otp) {
+        $this->web->givenTheParameter_Is('otp', $otp);
+        $this->web->whenITryToCallTheResource_WithTheMethod('user', 'login');
+    }
+
     private function thenThereShouldBeNoTokens() {
         $this->file->then_ShouldBeEmpty('otp');
+    }
+
+    private function whenILogOut() {
+        $this->web->whenICallTheResource_WithTheMethod('user', 'logout');
     }
 
 } 

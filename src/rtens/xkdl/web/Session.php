@@ -32,6 +32,10 @@ class Session {
         return isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'];
     }
 
+    public function getUserId() {
+        return $_SESSION['loggedIn'];
+    }
+
     public function setLoggedIn($as) {
         $_SESSION['loggedIn'] = $as;
     }

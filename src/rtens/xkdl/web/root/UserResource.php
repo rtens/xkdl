@@ -25,6 +25,7 @@ class UserResource extends DynamicResource {
 
     public function doLogout() {
         $this->session->requireLoggedIn($this);
+        $this->authentication->logout($this->session->getUserId());
         $this->session->setLoggedIn(false);
         return "Logged out";
     }
