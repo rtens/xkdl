@@ -37,45 +37,48 @@ class AuthenticationTest extends Specification {
     function testRedirectToLoginResource() {
         $this->givenTheRootResourceThrowsA(NotLoggedInException::$CLASS);
         $this->web->whenIGetTheResource('');
-        $this->web->thenIShouldBeRedirectedTo('http://xkdl/user');
+        $this->web->thenIShouldBeRedirectedTo('http://xkdl/auth');
     }
 
-    function testSendOtpByMail() {
-        $this->givenTheNextRandomlyGeneratedOtpIs('password');
+    function testSendTokenByMail() {
+        $this->givenTheNextRandomlyGeneratedTokenIs('password');
         $this->givenIHaveEnteredTheEmail('foo@bar.baz');
 
         $this->whenIRequestALoginToken();
 
-        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/user?method=login&otp=password');
-        $this->thenTheShouldBeATokenWithTheOtp_For('password', 'foo@bar.baz');
+        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth?method=login&token=password');
+        $this->thenTheShouldBeATokenWithTheToken_For('password', 'foo@bar.baz');
 
-        $this->then_ShouldBeLogged('sent foo@bar.baz');
+        $this->then_ShouldBeLogged('created foo@bar.baz');
     }
 
     function testSuccessfulLogin() {
-        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'Foo@Bar.baz');
-        $this->whenILoginWithTheOtp('foobar');
+        $this->givenATokenWithTheToken_For_WasCreated('foobar', 'Foo@Bar.baz');
+        $this->givenTheNextRandomlyGeneratedTokenIs('next');
+
+        $this->whenILoginWithTheToken('foobar');
 
         $this->session->thenIShouldBeLoggedInAs('foo@bar.baz');
-        $this->thenThereShouldBeNoTokens();
+        $this->thenTheShouldBeATokenWithTheToken_For('next', 'foo@bar.baz');
+        $this->web->thenACookie_WithTheValue_ShouldBeSet('token', 'next');
 
         $this->then_ShouldBeLogged('login Foo@Bar.baz');
     }
 
-    function testWrongOtp() {
-        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz');
-        $this->whenITryToLoginWithTheOtp('wrong');
+    function testWrongToken() {
+        $this->givenATokenWithTheToken_For_WasCreated('foobar', 'foo@bar.baz');
+        $this->whenITryToLoginWithTheToken('wrong');
 
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
-        $this->thenTheShouldBeATokenWithTheOtp_For('foobar', 'foo@bar.baz');
+        $this->thenTheShouldBeATokenWithTheToken_For('foobar', 'foo@bar.baz');
 
         $this->then_ShouldBeLogged('Invalid login');
     }
 
     function testTimeOut() {
-        $this->givenATokenWithTheOtp_For_WasCreated('foobar', 'foo@bar.baz', '5 minutes 1 second ago');
-        $this->whenITryToLoginWithTheOtp('foobar');
+        $this->givenATokenWithTheToken_For_WasCreated('foobar', 'foo@bar.baz', '5 minutes 1 second ago');
+        $this->whenITryToLoginWithTheToken('foobar');
 
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
@@ -130,7 +133,7 @@ class AuthenticationTest extends Specification {
             $this->factory->getInstance($className, [Url::parse('http://xkdl')]));
     }
 
-    private function givenTheNextRandomlyGeneratedOtpIs($string) {
+    private function givenTheNextRandomlyGeneratedTokenIs($string) {
         $this->generator->__mock()->method('generate')->willReturn($string);
     }
 
@@ -139,7 +142,7 @@ class AuthenticationTest extends Specification {
     }
 
     private function whenIRequestALoginToken() {
-        $this->web->whenICallTheResource_WithTheMethod('user', 'post');
+        $this->web->whenICallTheResource_WithTheMethod('auth', 'post');
     }
 
     private function thenAnEmailShouldBeSentTo_Containing($receiver, $string) {
@@ -148,35 +151,38 @@ class AuthenticationTest extends Specification {
         $this->assertContains($string, $history->getCalledArgumentAt(0, 'body'));
     }
 
-    private function thenTheShouldBeATokenWithTheOtp_For($otp, $email) {
-        $this->file->thenThereShouldBeAFile_ThatContains('otp/' . $otp, $email);
+    private function thenTheShouldBeATokenWithTheToken_For($token, $email) {
+        $this->file->thenThereShouldBeAFile_ThatContains('token/' . $token, $email);
     }
 
     private function then_ShouldBeLogged($string) {
         $this->assertTrue($this->logger->__mock()->method('log')->getHistory()->wasCalledWith(['message' => $string]));
     }
 
-    private function givenATokenWithTheOtp_For_WasCreated($otp, $email, $when = 'now') {
-        $this->file->givenTheFile_WithContent('otp/' . $otp, json_encode([
-                'email' => $email, 'created' => (new \DateTime($when))->format('c')]));
+    private function givenATokenWithTheToken_For_WasCreated($token, $email, $when = 'now') {
+        $this->config->givenNowIs($when);
+        $this->givenTheNextRandomlyGeneratedTokenIs($token);
+        $this->givenIHaveEnteredTheEmail($email);
+        $this->whenIRequestALoginToken();
+        $this->config->givenNowIs('now');
     }
 
-    private function whenILoginWithTheOtp($otp) {
-        $this->web->givenTheParameter_Is('otp', $otp);
-        $this->web->whenICallTheResource_WithTheMethod('user', 'login');
+    private function whenILoginWithTheToken($token) {
+        $this->web->givenTheParameter_Is('token', $token);
+        $this->web->whenICallTheResource_WithTheMethod('auth', 'login');
     }
 
-    private function whenITryToLoginWithTheOtp($otp) {
-        $this->web->givenTheParameter_Is('otp', $otp);
-        $this->web->whenITryToCallTheResource_WithTheMethod('user', 'login');
+    private function whenITryToLoginWithTheToken($token) {
+        $this->web->givenTheParameter_Is('token', $token);
+        $this->web->whenITryToCallTheResource_WithTheMethod('auth', 'login');
     }
 
     private function thenThereShouldBeNoTokens() {
-        $this->file->then_ShouldBeEmpty('otp');
+        $this->file->then_ShouldBeEmpty('token');
     }
 
     private function whenILogOut() {
-        $this->web->whenICallTheResource_WithTheMethod('user', 'logout');
+        $this->web->whenICallTheResource_WithTheMethod('auth', 'logout');
     }
 
 } 

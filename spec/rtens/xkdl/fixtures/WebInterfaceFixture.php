@@ -77,4 +77,10 @@ class WebInterfaceFixture extends Fixture {
             $this->spec->fail('Not an HttpError: ' . $this->caught->getMessage());
         }
     }
+
+    public function thenACookie_WithTheValue_ShouldBeSet($name, $value) {
+        $cookies = $this->response->getCookies();
+        $this->spec->assertArrayHasKey($name, $cookies);
+        $this->spec->assertEquals($value, $cookies[$name]['value']);
+    }
 }
