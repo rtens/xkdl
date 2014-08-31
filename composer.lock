@@ -232,12 +232,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "5bdac5d8c47e66f610c2082001356926b3583b1b"
+                "reference": "c8c8135d0809752427eef95f4a01ac99787a11ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/5bdac5d8c47e66f610c2082001356926b3583b1b",
-                "reference": "5bdac5d8c47e66f610c2082001356926b3583b1b",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/c8c8135d0809752427eef95f4a01ac99787a11ac",
+                "reference": "c8c8135d0809752427eef95f4a01ac99787a11ac",
                 "shasum": ""
             },
             "require": {
