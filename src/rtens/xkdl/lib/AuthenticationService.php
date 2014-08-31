@@ -49,8 +49,10 @@ class AuthenticationService {
      */
     public function createToken($userId, \DateTime $expire = null) {
         $token = $this->generator->generate();
-        $this->storeToken($userId, $token, $expire ? : new \DateTime(self::DEFAULT_EXPIRATION));
-        $this->logger->log($this, 'created ' . $userId);
+        $expire = $expire ? : new \DateTime(self::DEFAULT_EXPIRATION);
+        $this->storeToken($userId, $token, $expire);
+        $this->logger->log($this, 'created ' . $userId .
+            ' valid ' . $this->config->now()->diff($expire)->format('%ad %hh %im %ss'));
         return $token;
     }
 

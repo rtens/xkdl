@@ -49,12 +49,14 @@ abstract class Configuration {
         return $this->now()->format('Ymd\THis') . '.txt';
     }
 
-    /**
-     * @param string $when
-     * @return \DateTime
-     */
-    public function now($when = 'now') {
-        return new \DateTime($when);
+    public function now() {
+        return new \DateTime();
+    }
+
+    public function then($when) {
+        $time = new \DateTime();
+        $time->setTimestamp(strtotime($when, $this->now()->getTimestamp()));
+        return $time;
     }
 
     public function getRootUrl() {

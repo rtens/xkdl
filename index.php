@@ -1,4 +1,5 @@
 <?php
+use rtens\xkdl\lib\AuthenticationService;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\web\RootResource;
 use rtens\xkdl\web\Session;
@@ -17,6 +18,20 @@ $loader->loadConfiguration(Configuration::$CLASS, $userConfigFile, [__DIR__]);
 
 $session = new Session();
 $factory->setSingleton(Session::$CLASS, $session);
+
+if (!$session->isLoggedIn() && isset($_COOKIE['token'])) {
+    /** @var AuthenticationService $authentication */
+    $authentication = $factory->getInstance(AuthenticationService::$CLASS);
+
+    try {
+        $session->setLoggedIn($authentication->validateToken($_COOKIE['token']));
+        $expire = new \DateTime(AuthenticationService::DEFAULT_EXPIRATION);
+        setcookie('token', $authentication->createToken($session->getUserId(), $expire), $expire->getTimestamp());
+    } catch (\Exception $e) {
+        // wrong token
+    }
+}
+
 if ($session->isLoggedIn()) {
     $homeConfigFile = __DIR__ . '/user/home/' . $session->getUserId() . '/HomeConfiguration.php';
     if (!file_exists($homeConfigFile)) {

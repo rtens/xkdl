@@ -32,7 +32,7 @@ class AuthResource extends DynamicResource {
         $response = parent::respond($request);
 
         if ($this->session->isLoggedIn()) {
-            $expire = $this->config->now(AuthenticationService::DEFAULT_EXPIRATION);
+            $expire = $this->config->then(AuthenticationService::DEFAULT_EXPIRATION);
             $response->setCookie('token',
                 $this->authentication->createToken($this->session->getUserId(), $expire),
                 $expire->getTimestamp());
@@ -46,7 +46,7 @@ class AuthResource extends DynamicResource {
     }
 
     public function doPost($email) {
-        $token = $this->authentication->createToken($email, $this->config->now('5 minutes'));
+        $token = $this->authentication->createToken($email, $this->config->then('5 minutes'));
         $this->sendEmail($email, $token);
 
         return new Presenter($this, ['sent' => ['to' => $email], 'email' => false]);

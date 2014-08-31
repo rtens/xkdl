@@ -49,7 +49,7 @@ class AuthenticationTest extends Specification {
         $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth?method=login&token=password');
         $this->thenTheShouldBeATokenWithTheToken_For('password', 'foo@bar.baz');
 
-        $this->then_ShouldBeLogged('created foo@bar.baz');
+        $this->then_ShouldBeLogged('created foo@bar.baz valid 0d 0h 5m 0s');
     }
 
     function testSuccessfulLogin() {
@@ -156,7 +156,8 @@ class AuthenticationTest extends Specification {
     }
 
     private function then_ShouldBeLogged($string) {
-        $this->assertTrue($this->logger->__mock()->method('log')->getHistory()->wasCalledWith(['message' => $string]));
+        $history = $this->logger->__mock()->method('log')->getHistory();
+        $this->assertTrue($history->wasCalledWith(['message' => $string]), $history->toString());
     }
 
     private function givenATokenWithTheToken_For_WasCreated($token, $email, $when = 'now') {
