@@ -42,7 +42,7 @@ class AuthResource extends DynamicResource {
         $token = $this->authentication->createToken($email);
 
         $expire = $this->config->then('5 minutes');
-        $challenge = $this->authentication->createChallenge($email, $token, $expire);
+        list($challenge, $token) = $this->authentication->createChallenge($email, $token, $expire);
 
         $this->sendEmail($email, $token, $challenge);
 
@@ -59,7 +59,7 @@ class AuthResource extends DynamicResource {
             list($userId, $token) = $this->authentication->validateResponse($response);
             $this->session->setLoggedIn($userId);
 
-            $challenge = $this->authentication->createChallenge($userId, $token);
+            list($challenge, ) = $this->authentication->createChallenge($userId, $token);
             return new Presenter($this, [
                 'challenge' => ['value' => $challenge],
                 'sent' => false,

@@ -63,14 +63,13 @@ class AuthenticationService {
         }
 
         $expire = $expire ? : $this->config->then(self::DEFAULT_EXPIRATION);
-        $token = [
+        file_put_contents($file, json_encode([
             'userId' => $userId,
             'token' => $token,
             'expire' => $expire->format('c')
-        ];
-        file_put_contents($file, json_encode($token));
+        ]));
 
-        return $challenge;
+        return [$challenge, $token];
     }
 
     private function error($string, $log = '') {

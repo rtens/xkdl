@@ -49,7 +49,7 @@ class AuthenticationTest extends Specification {
         $this->whenIRequestALoginToken();
 
         $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth?method=login');
-        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', '#password');
+        $this->thenAnEmailShouldBeSentTo_ContainingTheToken_After('foo@bar.baz', 'password', 'myChallenge');
         $this->thenThereShouldBeAResponseFor_WithTheToken_For('myChallenge', 'password', 'foo@bar.baz');
 
         $this->then_ShouldBeLogged('created foo@bar.baz');
@@ -199,6 +199,10 @@ class AuthenticationTest extends Specification {
 
     private function whenILogOut() {
         $this->web->whenICallTheResource_WithTheMethod('auth', 'logout');
+    }
+
+    private function thenAnEmailShouldBeSentTo_ContainingTheToken_After($receiver, $token, $challenge) {
+        $this->thenAnEmailShouldBeSentTo_Containing($receiver, md5($token . $challenge));
     }
 
 } 
