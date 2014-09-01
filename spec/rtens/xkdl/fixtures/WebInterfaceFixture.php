@@ -97,4 +97,8 @@ class WebInterfaceFixture extends Fixture {
         $this->spec->assertTrue($this->response->getHeaders()->has($key));
         $this->spec->assertEquals($value, $this->response->getHeaders()->get($key));
     }
+
+    public function thenTheResponseBodyShouldContain($string) {
+        $this->spec->assertContains($string, $this->response->getBody());
+    }
 }

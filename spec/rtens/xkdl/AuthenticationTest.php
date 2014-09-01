@@ -48,42 +48,41 @@ class AuthenticationTest extends Specification {
 
         $this->whenIRequestALoginToken();
 
-        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth#password');
+        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth?method=login');
+        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', '#password');
         $this->thenThereShouldBeAResponseFor_WithTheToken_For('myChallenge', 'password', 'foo@bar.baz');
 
         $this->then_ShouldBeLogged('created foo@bar.baz');
-        $this->web->thenTheHeader_WithTheValue_ShouldBeSet('X-Challenge', 'myChallenge');
+        $this->web->thenTheResponseBodyShouldContain('myChallenge');
     }
 
-    function testSuccessfulAuthentication() {
+    function testSuccessfulLogin() {
         $this->givenAChallenge_WithTheToken_WasCreatedFor('theChallenge', 'theToken', 'Foo@Bar.baz');
         $this->givenTheNextRandomlyGeneratedStringIs('nextChallenge');
 
-        $this->whenIAuthenticateWithTheResponseOf_AndTheToken('theChallenge', 'theToken');
+        $this->whenILoginWithTheResponseOf_AndTheToken('theChallenge', 'theToken');
 
         $this->session->thenIShouldBeLoggedInAs('foo@bar.baz');
         $this->thenThereShouldBeAResponseFor_WithTheToken_For('nextChallenge', 'theToken', 'Foo@Bar.baz');
 
         $this->then_ShouldBeLogged('login Foo@Bar.baz');
-        $this->web->thenTheHeader_WithTheValue_ShouldBeSet('X-Challenge', 'nextChallenge');
-        $this->web->thenACookie_WithTheValue_ShouldBeSet('response', null);
+        $this->web->thenTheResponseBodyShouldContain('nextChallenge');
     }
 
     function testWrongToken() {
         $this->givenAChallenge_WithTheToken_WasCreatedFor('foobar', 'password', 'foo@bar.baz');
-        $this->whenITryToAuthenticateWithTheResponseOf_AndTheToken('foobar', 'wrong');
+        $this->whenITryToLoginWithTheResponseOf_AndTheToken('foobar', 'wrong');
 
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
         $this->thenThereShouldBeAResponseFor_WithTheToken_For('foobar', 'password', 'foo@bar.baz');
-        $this->web->thenACookie_WithTheValue_ShouldBeSet('response', null);
 
         $this->then_ShouldBeLogged('Invalid login');
     }
 
     function testTimeOut() {
         $this->givenAChallenge_WithTheToken_WasCreatedFor('challenge', 'password', 'foo@bar.baz', '5 minutes 1 second ago');
-        $this->whenITryToAuthenticateWithTheResponseOf_AndTheToken('challenge', 'password');
+        $this->whenITryToLoginWithTheResponseOf_AndTheToken('challenge', 'password');
 
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
@@ -176,14 +175,14 @@ class AuthenticationTest extends Specification {
         $this->config->givenNowIs('now');
     }
 
-    private function whenIAuthenticateWithTheResponseOf_AndTheToken($challenge, $token) {
-        $this->web->givenTheCookie_WithTheValue('response', md5($token . $challenge));
-        $this->web->whenIGetTheResource('schedule');
+    private function whenILoginWithTheResponseOf_AndTheToken($challenge, $token) {
+        $this->web->givenTheParameter_Is('response', md5($token . $challenge));
+        $this->web->whenICallTheResource_WithTheMethod('auth', 'login');
     }
 
-    private function whenITryToAuthenticateWithTheResponseOf_AndTheToken($challenge, $token) {
-        $this->web->givenTheCookie_WithTheValue('response', md5($token . $challenge));
-        $this->web->whenITryToCallTheResource_WithTheMethod('schedule', 'get');
+    private function whenITryToLoginWithTheResponseOf_AndTheToken($challenge, $token) {
+        $this->web->givenTheParameter_Is('response', md5($token . $challenge));
+        $this->web->whenITryToCallTheResource_WithTheMethod('auth', 'login');
     }
 
     private function thenThereShouldBeNoTokens() {
