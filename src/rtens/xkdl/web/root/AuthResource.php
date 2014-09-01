@@ -38,13 +38,13 @@ class AuthResource extends DynamicResource {
         ]);
     }
 
-    public function doPost($email) {
+    public function doPost($email, $tokenOnly = false) {
         $token = $this->authentication->createToken($email);
 
         $expire = $this->config->then('5 minutes');
         list($challenge, $token) = $this->authentication->createChallenge($email, $token, $expire);
 
-        $this->sendEmail($email, $token, $challenge);
+        $this->sendEmail($email, $token, $challenge, $tokenOnly);
 
         return new Presenter($this, [
             'challenge' => ['value' => $challenge],
@@ -59,7 +59,7 @@ class AuthResource extends DynamicResource {
             list($userId, $token) = $this->authentication->validateResponse($response);
             $this->session->setLoggedIn($userId);
 
-            list($challenge, ) = $this->authentication->createChallenge($userId, $token);
+            list($challenge,) = $this->authentication->createChallenge($userId, $token);
             return new Presenter($this, [
                 'challenge' => ['value' => $challenge],
                 'sent' => false,
@@ -71,13 +71,20 @@ class AuthResource extends DynamicResource {
         }
     }
 
-    private function sendEmail($email, $token, $challenge) {
-        $url = $this->getUrl();
-        $url->getParameters()->set('method', 'login');
-        $url->getParameters()->set('response', md5($token . $challenge));
-        $url->setFragment($token);
+    private function sendEmail($email, $token, $challenge, $tokenOnly) {
+        $content = '';
 
-        $this->email->send($email, 'xkdl@rtens.org', 'xkdl login', $url->toString());
+        if (!$tokenOnly) {
+            $url = $this->getUrl();
+            $url->getParameters()->set('method', 'login');
+            $url->getParameters()->set('response', md5($token . $challenge));
+            $url->setFragment($token);
+            $content .= $url->toString() . "\n\n";
+        }
+
+        $content .= "Token: " . $token;
+
+        $this->email->send($email, 'xkdl@rtens.org', 'xkdl login', $content);
     }
 
     public function doLogout() {
