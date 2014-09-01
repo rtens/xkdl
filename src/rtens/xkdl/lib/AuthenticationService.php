@@ -17,60 +17,58 @@ class AuthenticationService {
     public $logger;
 
     /**
-     * @param $token
-     * @return string ID of user authenticated by token
+     * @param $response
+     * @return array with userId and token
      */
-    public function validateToken($token) {
-        $file = $this->tokenFile($token);
+    public function validateResponse($response) {
+        $file = $this->config->userFolder() . '/token/' . $response;
 
         if (!file_exists($file)) {
             $this->error('Invalid login');
         }
 
-        $token = json_decode(file_get_contents($file), true);
+        $response = json_decode(file_get_contents($file), true);
         unlink($file);
 
-        $userId = $token['userId'];
-        $expire = new \DateTime($token['expire']);
+        $userId = $response['userId'];
+        $expire = new \DateTime($response['expire']);
 
-        if ($expire < $this->config->now()) {
+        $now = $this->config->now();
+        if ($expire < $now) {
             $this->error('Login timed out', ' for ' . $userId);
         }
 
         $this->logger->log($this, 'login ' . $userId);
 
-        return $userId;
+        return [$userId, $response['token']];
     }
 
     /**
      * @param $userId
-     * @param \DateTime $expire
      * @return string The token
      */
-    public function createToken($userId, \DateTime $expire = null) {
-        $token = $this->generator->generate();
-        $expire = $expire ? : new \DateTime(self::DEFAULT_EXPIRATION);
-        $this->storeToken($userId, $token, $expire);
-        $this->logger->log($this, 'created ' . $userId .
-            ' valid ' . $this->config->now()->diff($expire)->format('%ad %hh %im %ss'));
-        return $token;
+    public function createToken($userId) {
+        $this->logger->log($this, 'created ' . $userId);
+        return $this->generator->generate();
     }
 
-    private function storeToken($userId, $token, \DateTime $expire) {
-        $file = $this->tokenFile($token);
+    public function createChallenge($userId, $token, \DateTime $expire = null) {
+        $challenge = $this->generator->generate();
+
+        $file = $this->config->userFolder() . '/token/' . md5($token . $challenge);
         if (!file_exists(dirname($file))) {
             mkdir(dirname($file));
         }
 
+        $expire = $expire ? : $this->config->then(self::DEFAULT_EXPIRATION);
         $token = [
             'userId' => $userId,
+            'token' => $token,
             'expire' => $expire->format('c')
         ];
         file_put_contents($file, json_encode($token));
-    }
 
-    private function tokenFile($token) {
-        return $this->config->userFolder() . '/token/' . $token;
+        return $challenge;
     }
 
     private function error($string, $log = '') {

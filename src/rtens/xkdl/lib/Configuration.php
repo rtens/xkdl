@@ -17,6 +17,10 @@ abstract class Configuration {
         $this->username = $username;
     }
 
+    public function getRoot() {
+        return $this->root;
+    }
+
     public function defaultDuration() {
         return new TimeSpan($this->defaultDurationString());
     }

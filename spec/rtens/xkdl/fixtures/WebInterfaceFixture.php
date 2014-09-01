@@ -2,6 +2,7 @@
 namespace spec\rtens\xkdl\fixtures;
 
 use rtens\xkdl\web\RootResource;
+use Symfony\Component\Yaml\Tests\A;
 use watoki\collections\Map;
 use watoki\curir\http\error\HttpError;
 use watoki\curir\http\Path;
@@ -29,6 +30,9 @@ class WebInterfaceFixture extends Fixture {
 
     /** @var null|\Exception */
     private $caught;
+
+    /** @var array */
+    private $cookies = array();
 
     public function thenIShouldNotBeRedirected() {
         $has = $this->response->getHeaders()->has('Location');
@@ -65,7 +69,8 @@ class WebInterfaceFixture extends Fixture {
         /** @var RootResource $root */
         $root = $this->spec->factory->getInstance(RootResource::$CLASS, [Url::parse('http://xkdl')]);
 
-        $request = new Request(Path::parse($path), $this->accept, $method, new Map($this->parameters));
+        $request = new Request(Path::parse($path), $this->accept, $method, new Map($this->parameters),
+            null, '', new Map($this->cookies));
         $this->response = $root->respond($request);
     }
 
@@ -82,5 +87,14 @@ class WebInterfaceFixture extends Fixture {
         $cookies = $this->response->getCookies();
         $this->spec->assertArrayHasKey($name, $cookies);
         $this->spec->assertEquals($value, $cookies[$name]['value']);
+    }
+
+    public function givenTheCookie_WithTheValue($key, $value) {
+        $this->cookies[$key] = $value;
+    }
+
+    public function thenTheHeader_WithTheValue_ShouldBeSet($key, $value) {
+        $this->spec->assertTrue($this->response->getHeaders()->has($key));
+        $this->spec->assertEquals($value, $this->response->getHeaders()->get($key));
     }
 }

@@ -27,6 +27,7 @@ class ConfigFixture extends Fixture {
         $this->config->__mock()->mockMethods(Mockster::F_NONE);
 
         $this->spec->factory->setSingleton(Configuration::$CLASS, $this->config);
+        $this->spec->factory->setSingleton('watoki\cfg\Loader', $mf->getInstance('watoki\cfg\Loader'));
     }
 
     public function tearDown() {

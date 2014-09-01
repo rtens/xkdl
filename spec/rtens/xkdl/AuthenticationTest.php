@@ -41,44 +41,47 @@ class AuthenticationTest extends Specification {
     }
 
     function testSendTokenByMail() {
-        $this->givenTheNextRandomlyGeneratedTokenIs('password');
+        $this->givenTheNextRandomlyGeneratedStringIs('myChallenge');
+        $this->givenTheNextRandomlyGeneratedStringIs('password');
+
         $this->givenIHaveEnteredTheEmail('foo@bar.baz');
 
         $this->whenIRequestALoginToken();
 
-        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth?method=login&token=password');
-        $this->thenTheShouldBeATokenWithTheToken_For('password', 'foo@bar.baz');
+        $this->thenAnEmailShouldBeSentTo_Containing('foo@bar.baz', 'http://xkdl/auth#password');
+        $this->thenThereShouldBeAResponseFor_WithTheToken_For('myChallenge', 'password', 'foo@bar.baz');
 
-        $this->then_ShouldBeLogged('created foo@bar.baz valid 0d 0h 5m 0s');
+        $this->then_ShouldBeLogged('created foo@bar.baz');
+        $this->web->thenTheHeader_WithTheValue_ShouldBeSet('X-Challenge', 'myChallenge');
     }
 
-    function testSuccessfulLogin() {
-        $this->givenATokenWithTheToken_For_WasCreated('foobar', 'Foo@Bar.baz');
-        $this->givenTheNextRandomlyGeneratedTokenIs('next');
+    function testSuccessfulAuthentication() {
+        $this->givenAChallenge_WithTheToken_WasCreatedFor('theChallenge', 'theToken', 'Foo@Bar.baz');
+        $this->givenTheNextRandomlyGeneratedStringIs('nextChallenge');
 
-        $this->whenILoginWithTheToken('foobar');
+        $this->whenIAuthenticateWithTheResponseOf_AndTheToken('theChallenge', 'theToken');
 
         $this->session->thenIShouldBeLoggedInAs('foo@bar.baz');
-        $this->thenTheShouldBeATokenWithTheToken_For('next', 'foo@bar.baz');
-        $this->web->thenACookie_WithTheValue_ShouldBeSet('token', 'next');
+        $this->thenThereShouldBeAResponseFor_WithTheToken_For('nextChallenge', 'theToken', 'Foo@Bar.baz');
 
         $this->then_ShouldBeLogged('login Foo@Bar.baz');
+        $this->web->thenTheHeader_WithTheValue_ShouldBeSet('X-Challenge', 'nextChallenge');
     }
 
     function testWrongToken() {
-        $this->givenATokenWithTheToken_For_WasCreated('foobar', 'foo@bar.baz');
-        $this->whenITryToLoginWithTheToken('wrong');
+        $this->givenAChallenge_WithTheToken_WasCreatedFor('foobar', 'password', 'foo@bar.baz');
+        $this->whenITryToAuthenticateWithTheResponseOf_AndTheToken('foobar', 'wrong');
 
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
-        $this->thenTheShouldBeATokenWithTheToken_For('foobar', 'foo@bar.baz');
+        $this->thenThereShouldBeAResponseFor_WithTheToken_For('foobar', 'password', 'foo@bar.baz');
 
         $this->then_ShouldBeLogged('Invalid login');
     }
 
     function testTimeOut() {
-        $this->givenATokenWithTheToken_For_WasCreated('foobar', 'foo@bar.baz', '5 minutes 1 second ago');
-        $this->whenITryToLoginWithTheToken('foobar');
+        $this->givenAChallenge_WithTheToken_WasCreatedFor('challenge', 'password', 'foo@bar.baz', '5 minutes 1 second ago');
+        $this->whenITryToAuthenticateWithTheResponseOf_AndTheToken('challenge', 'password');
 
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
@@ -133,8 +136,8 @@ class AuthenticationTest extends Specification {
             $this->factory->getInstance($className, [Url::parse('http://xkdl')]));
     }
 
-    private function givenTheNextRandomlyGeneratedTokenIs($string) {
-        $this->generator->__mock()->method('generate')->willReturn($string);
+    private function givenTheNextRandomlyGeneratedStringIs($string) {
+        $this->generator->__mock()->method('generate')->willReturn($string)->once();
     }
 
     private function givenIHaveEnteredTheEmail($string) {
@@ -151,8 +154,10 @@ class AuthenticationTest extends Specification {
         $this->assertContains($string, $history->getCalledArgumentAt(0, 'body'));
     }
 
-    private function thenTheShouldBeATokenWithTheToken_For($token, $email) {
-        $this->file->thenThereShouldBeAFile_ThatContains('token/' . $token, $email);
+    private function thenThereShouldBeAResponseFor_WithTheToken_For($challenge, $token, $email) {
+        $file = 'token/' . md5($token . $challenge);
+        $this->file->thenThereShouldBeAFile_ThatContains($file, $email);
+        $this->file->thenThereShouldBeAFile_ThatContains($file, $token);
     }
 
     private function then_ShouldBeLogged($string) {
@@ -160,22 +165,23 @@ class AuthenticationTest extends Specification {
         $this->assertTrue($history->wasCalledWith(['message' => $string]), $history->toString());
     }
 
-    private function givenATokenWithTheToken_For_WasCreated($token, $email, $when = 'now') {
+    private function givenAChallenge_WithTheToken_WasCreatedFor($challenge, $token, $email, $when = 'now') {
         $this->config->givenNowIs($when);
-        $this->givenTheNextRandomlyGeneratedTokenIs($token);
+        $this->givenTheNextRandomlyGeneratedStringIs($challenge);
+        $this->givenTheNextRandomlyGeneratedStringIs($token);
         $this->givenIHaveEnteredTheEmail($email);
         $this->whenIRequestALoginToken();
         $this->config->givenNowIs('now');
     }
 
-    private function whenILoginWithTheToken($token) {
-        $this->web->givenTheParameter_Is('token', $token);
-        $this->web->whenICallTheResource_WithTheMethod('auth', 'login');
+    private function whenIAuthenticateWithTheResponseOf_AndTheToken($challenge, $token) {
+        $this->web->givenTheCookie_WithTheValue('response', md5($token . $challenge));
+        $this->web->whenIGetTheResource('schedule');
     }
 
-    private function whenITryToLoginWithTheToken($token) {
-        $this->web->givenTheParameter_Is('token', $token);
-        $this->web->whenITryToCallTheResource_WithTheMethod('auth', 'login');
+    private function whenITryToAuthenticateWithTheResponseOf_AndTheToken($challenge, $token) {
+        $this->web->givenTheCookie_WithTheValue('response', md5($token . $challenge));
+        $this->web->whenITryToCallTheResource_WithTheMethod('schedule', 'get');
     }
 
     private function thenThereShouldBeNoTokens() {
