@@ -22,7 +22,6 @@
         var token = window.location.hash.substring(1);
         if (token) {
             localStorage.setItem("token", token);
-            console.log('Saved ' + token);
         }
     </script>
 </head>
@@ -51,12 +50,10 @@
         </form>
 
         <script language="JavaScript">
-            console.log('response:' + localStorage.getItem('response'));
             if (localStorage.getItem('response')) {
                 $('[property=email]').hide();
                 $('#pleaseWait').show();
 
-                console.log('Auto login');
                 $('#autoResponse').val(localStorage.getItem('response'));
                 localStorage.removeItem('response');
                 document.forms['autoLogin'].submit();
@@ -92,11 +89,9 @@
 
                 token = CryptoJS.MD5(token + challenge);
                 localStorage.setItem('token', token);
-                console.log('next token ' + token);
 
                 var response = CryptoJS.MD5(token + challenge) + '';
                 localStorage.setItem('response', response);
-                console.log('Next response is ' + response);
 
                 window.location = $('#target').html();
             }
