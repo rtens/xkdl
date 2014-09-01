@@ -66,6 +66,7 @@ class AuthenticationTest extends Specification {
 
         $this->then_ShouldBeLogged('login Foo@Bar.baz');
         $this->web->thenTheHeader_WithTheValue_ShouldBeSet('X-Challenge', 'nextChallenge');
+        $this->web->thenACookie_WithTheValue_ShouldBeSet('response', null);
     }
 
     function testWrongToken() {
@@ -75,6 +76,7 @@ class AuthenticationTest extends Specification {
         $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
         $this->thenThereShouldBeAResponseFor_WithTheToken_For('foobar', 'password', 'foo@bar.baz');
+        $this->web->thenACookie_WithTheValue_ShouldBeSet('response', null);
 
         $this->then_ShouldBeLogged('Invalid login');
     }

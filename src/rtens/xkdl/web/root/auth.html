@@ -7,12 +7,30 @@
 
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="res/style.css"/>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+
+    <script language="JavaScript">
+
+        function setResponse() {
+            var token = $('#token').val();
+            localStorage.setItem('token', token);
+            $('#response').val(CryptoJS.MD5(token + $('#challenge').val()) + '');
+        }
+
+        var token = window.location.hash.substring(1);
+        if (token) {
+            localStorage.setItem("token", token);
+            console.log('Saved ' + token);
+        }
+    </script>
 </head>
 <body>
 
 <div class="container">
 
-    <div class="item bg-primary">
+    <div property="email" class="item bg-primary">
         <form method="post" class="form-inline">
             <label for="email">Please login</label>
             <input class="form-control" required="true" type="text" id="email" name="email"
@@ -21,12 +39,60 @@
         </form>
     </div>
 
-    <div property="sent" class="alert alert-success">
-        The login link was sent to <code property="to">some@email.com</code>
-    </div>
-
     <div property="email" class="alert alert-warning">
         An email containing a login link will be sent to the provided email address.
+    </div>
+
+    <div property="email" class="alert alert-success" id="pleaseWait" style="display: none">
+        Please wait while you are being logged-in.
+
+        <form action="?method=login" method="post" id="autoLogin">
+            <input type="hidden" name="response" id="autoResponse" value=""/>
+        </form>
+
+        <script language="JavaScript">
+            console.log('response:' + localStorage.getItem('response'));
+            if (localStorage.getItem('response')) {
+                $('[property=email]').hide();
+                $('#pleaseWait').show();
+
+                console.log('Auto login');
+                $('#autoResponse').val(localStorage.getItem('response'));
+                localStorage.removeItem('response');
+                document.forms['autoLogin'].submit();
+            }
+
+        </script>
+    </div>
+
+    <input type="hidden" property="challenge" id="challenge" value=""/>
+
+    <div property="sent" class="alert alert-success">
+        <p>The login link was sent to <code property="to">some@email.com</code>.
+            Either click on the link or enter the token here.</p>
+
+        <hr/>
+
+        <form method="post" class="form-inline" onsubmit="setResponse();">
+            <input type="hidden" name="response" id="response"/>
+            <label for="token">Token</label>
+            <input class="form-control" required="true" type="text" id="token" size="32"/>
+            <input class="btn btn-success" type="submit" name="method" value="login"/>
+        </form>
+    </div>
+
+    <div class="alert alert-success" property="login">
+        You are now logged-in! Please wait while you're forwarded to
+        <span id="target" property="target">http://xkdl</span>
+
+        <script language="JavaScript">
+            if (localStorage.getItem('token')) {
+                var response = CryptoJS.MD5(localStorage.getItem("token") + $('#challenge').val()) + '';
+                localStorage.setItem('response', response);
+                console.log('Next response is ' + response);
+                window.location = $('#target').html();
+            }
+        </script>
     </div>
 
 </div>

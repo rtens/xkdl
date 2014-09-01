@@ -48,8 +48,9 @@ class AuthenticationService {
      * @return string The token
      */
     public function createToken($userId) {
+        $token = $this->generator->generate();
         $this->logger->log($this, 'created ' . $userId);
-        return $this->generator->generate();
+        return $token;
     }
 
     public function createChallenge($userId, $token, \DateTime $expire = null) {

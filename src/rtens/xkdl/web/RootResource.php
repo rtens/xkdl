@@ -6,9 +6,7 @@ use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\lib\AuthenticationService;
 use rtens\xkdl\lib\Configuration;
 use watoki\cfg\Loader;
-use watoki\curir\http\error\HttpError;
 use watoki\curir\http\Request;
-use watoki\curir\http\Response;
 use watoki\curir\http\Url;
 use watoki\curir\resource\Container;
 use watoki\curir\responder\Redirecter;
@@ -37,16 +35,6 @@ class RootResource extends Container {
             $this->client->setAccessToken($this->session->get('token'));
         }
 
-        if (!$this->session->isLoggedIn() && $request->getCookies()->has('response')) {
-            try {
-                list($userId, $token) = $this->authentication->validateResponse($request->getCookies()->get('response'));
-                $challenge = $this->authentication->createChallenge($userId, $token);
-                $this->session->setLoggedIn($userId);
-            } catch (\Exception $e) {
-                throw new HttpError(Response::STATUS_UNAUTHORIZED, $e->getMessage());
-            }
-        }
-
         if ($this->session->isLoggedIn()) {
             $homeConfigFile = $this->config->userFolder() . '/home/' . $this->session->getUserId() . '/HomeConfiguration.php';
             if (!file_exists($homeConfigFile)) {
@@ -59,11 +47,7 @@ class RootResource extends Container {
         }
 
         try {
-            $response = parent::respond($request);
-            if (isset($challenge)) {
-                $response->getHeaders()->set('X-Challenge', $challenge);
-            }
-            return $response;
+            return parent::respond($request);
         } catch (AuthenticationException $ae) {
             return (new Redirecter(Url::parse($ae->getAuthenticationUrl())))
                 ->createResponse($request);
