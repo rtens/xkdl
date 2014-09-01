@@ -38,13 +38,13 @@ class AuthResource extends DynamicResource {
         ]);
     }
 
-    public function doPost($email, $tokenOnly = false) {
+    public function doPost($email, $tokenOnly = false, $remember = false) {
         $token = $this->authentication->createToken($email);
 
         $expire = $this->config->then('5 minutes');
         list($challenge, $token) = $this->authentication->createChallenge($email, $token, $expire);
 
-        $this->sendEmail($email, $token, $challenge, $tokenOnly);
+        $this->sendEmail($email, $token, $challenge, $tokenOnly, $remember);
 
         return new Presenter($this, [
             'challenge' => ['value' => $challenge],
@@ -54,14 +54,22 @@ class AuthResource extends DynamicResource {
         ]);
     }
 
-    public function doLogin($response) {
+    /**
+     * @param string $response
+     * @param bool $remember
+     * @return Presenter
+     * @throws \watoki\curir\http\error\HttpError
+     */
+    public function doLogin($response, $remember = false) {
         try {
             list($userId, $token) = $this->authentication->validateResponse($response);
             $this->session->setLoggedIn($userId);
 
-            list($challenge,) = $this->authentication->createChallenge($userId, $token);
+            if ($remember) {
+                list($challenge,) = $this->authentication->createChallenge($userId, $token);
+            }
             return new Presenter($this, [
-                'challenge' => ['value' => $challenge],
+                'challenge' => isset($challenge) ? ['value' => $challenge] : null,
                 'sent' => false,
                 'email' => false,
                 'login' => ['target' => $this->getAncestor(RootResource::$CLASS)->getUrl()->toString()],
@@ -71,13 +79,15 @@ class AuthResource extends DynamicResource {
         }
     }
 
-    private function sendEmail($email, $token, $challenge, $tokenOnly) {
+    private function sendEmail($email, $token, $challenge, $tokenOnly, $remember) {
         $content = '';
 
         if (!$tokenOnly) {
             $url = $this->getUrl();
             $url->getParameters()->set('method', 'login');
             $url->getParameters()->set('response', md5($token . $challenge));
+            $url->getParameters()->set('remember', print_r($remember, true));
+
             $url->setFragment($token);
             $content .= $url->toString() . "\n\n";
         }

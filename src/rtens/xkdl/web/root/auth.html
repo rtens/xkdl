@@ -29,11 +29,19 @@
 
 <div class="container">
 
-    <div property="email" class="item bg-primary">
+    <div property="email" class="item bg-primary clearfix">
         <form method="post" class="form-inline">
             <label for="email">Please login</label>
             <input class="form-control" required="true" type="text" id="email" name="email"
                    placeholder="Email address" size="40"/>
+
+            <span class="checkbox">
+                <label>
+                    <input class="input" type="checkbox" checked="checked" name="remember" value="true"/>
+                    Remember me
+                </label>
+            </span>
+
             <input class="btn btn-success" type="submit" name="request" value="send login link"/>
             <input class="btn btn-warning" type="submit" name="tokenOnly" value="send token only"/>
         </form>
@@ -75,6 +83,14 @@
             <input type="hidden" name="response" id="response"/>
             <label for="token">Token</label>
             <input class="form-control" required="true" type="text" id="token" size="32"/>
+
+            <span class="checkbox">
+                <label>
+                    <input class="input" type="checkbox" checked="checked" name="remember" value="true"/>
+                    Remember me
+                </label>
+            </span>
+
             <input class="btn btn-success" type="submit" name="method" value="login"/>
         </form>
     </div>
@@ -84,18 +100,19 @@
         <span id="target" property="target">http://xkdl</span>
 
         <script language="JavaScript">
-            if (localStorage.getItem('token')) {
+            var $challenge = $('#challenge');
+            if (localStorage.getItem('token') && $challenge.val()) {
                 var token = localStorage.getItem("token");
-                var challenge = $('#challenge').val();
+                var challenge = $challenge.val();
 
                 token = CryptoJS.MD5(token + challenge);
                 localStorage.setItem('token', token);
 
                 var response = CryptoJS.MD5(token + challenge) + '';
                 localStorage.setItem('response', response);
-
-                window.location = $('#target').html();
             }
+
+            window.location = $('#target').html();
         </script>
     </div>
 
