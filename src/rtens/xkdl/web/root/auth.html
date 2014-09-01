@@ -87,9 +87,17 @@
 
         <script language="JavaScript">
             if (localStorage.getItem('token')) {
-                var response = CryptoJS.MD5(localStorage.getItem("token") + $('#challenge').val()) + '';
+                var token = localStorage.getItem("token");
+                var challenge = $('#challenge').val();
+
+                token = CryptoJS.MD5(token + challenge);
+                localStorage.setItem('token', token);
+                console.log('next token ' + token);
+
+                var response = CryptoJS.MD5(token + challenge) + '';
                 localStorage.setItem('response', response);
                 console.log('Next response is ' + response);
+
                 window.location = $('#target').html();
             }
         </script>

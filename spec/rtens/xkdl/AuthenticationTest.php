@@ -63,7 +63,7 @@ class AuthenticationTest extends Specification {
         $this->whenILoginWithTheResponseOf_AndTheToken('theChallenge', 'theToken');
 
         $this->session->thenIShouldBeLoggedInAs('foo@bar.baz');
-        $this->thenThereShouldBeAResponseFor_WithTheToken_For('nextChallenge', 'theToken', 'Foo@Bar.baz');
+        $this->thenThereShouldBeAResponseFor_WithTheToken_After_For('nextChallenge', 'theToken', 'theChallenge', 'Foo@Bar.baz');
 
         $this->then_ShouldBeLogged('login Foo@Bar.baz');
         $this->web->thenTheResponseBodyShouldContain('nextChallenge');
@@ -156,6 +156,14 @@ class AuthenticationTest extends Specification {
     }
 
     private function thenThereShouldBeAResponseFor_WithTheToken_For($challenge, $token, $email) {
+        $token = md5($token . $challenge);
+        $file = 'token/' . md5($token . $challenge);
+        $this->file->thenThereShouldBeAFile_ThatContains($file, $email);
+        $this->file->thenThereShouldBeAFile_ThatContains($file, $token);
+    }
+
+    private function thenThereShouldBeAResponseFor_WithTheToken_After_For($challenge, $token, $previousChallenge, $email) {
+        $token = md5(md5($token . $previousChallenge) . $challenge);
         $file = 'token/' . md5($token . $challenge);
         $this->file->thenThereShouldBeAFile_ThatContains($file, $email);
         $this->file->thenThereShouldBeAFile_ThatContains($file, $token);
@@ -176,12 +184,12 @@ class AuthenticationTest extends Specification {
     }
 
     private function whenILoginWithTheResponseOf_AndTheToken($challenge, $token) {
-        $this->web->givenTheParameter_Is('response', md5($token . $challenge));
+        $this->web->givenTheParameter_Is('response', md5(md5($token . $challenge) . $challenge));
         $this->web->whenICallTheResource_WithTheMethod('auth', 'login');
     }
 
     private function whenITryToLoginWithTheResponseOf_AndTheToken($challenge, $token) {
-        $this->web->givenTheParameter_Is('response', md5($token . $challenge));
+        $this->web->givenTheParameter_Is('response', md5(md5($token . $challenge) . $challenge));
         $this->web->whenITryToCallTheResource_WithTheMethod('auth', 'login');
     }
 

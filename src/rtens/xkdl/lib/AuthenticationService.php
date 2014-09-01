@@ -55,6 +55,7 @@ class AuthenticationService {
 
     public function createChallenge($userId, $token, \DateTime $expire = null) {
         $challenge = $this->generator->generate();
+        $token = md5($token . $challenge);
 
         $file = $this->config->userFolder() . '/token/' . md5($token . $challenge);
         if (!file_exists(dirname($file))) {
