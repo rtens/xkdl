@@ -77,7 +77,14 @@ class AuthenticationService {
         throw new \Exception($string);
     }
 
-    public function logout($userId) {
-        $this->logger->log($this, 'logout ' . $userId);
+    public function logout($response) {
+        $file = $this->config->userFolder() . '/token/' . $response;
+        if(!file_exists($file)) {
+            return;
+        }
+
+        $data = json_decode(file_get_contents($file), true);
+        unlink($file);
+        $this->logger->log($this, 'logout ' . $data['userId']);
     }
 }

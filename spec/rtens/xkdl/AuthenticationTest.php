@@ -92,11 +92,14 @@ class AuthenticationTest extends Specification {
     }
 
     function testLogout() {
-        $this->session->givenIAmLoggedInAs('foo@bar.baz');
+        $this->givenAChallenge_WithTheToken_WasCreatedFor('theChallenge', 'theToken', 'Foo@Bar.baz');
+        $this->whenILoginWithTheResponseOf_AndTheToken('theChallenge', 'theToken');
+
         $this->whenILogOut();
         $this->session->thenIShouldNotBeLoggedIn();
+        $this->thenThereShouldBeNoTokens();
 
-        $this->then_ShouldBeLogged('logout foo@bar.baz');
+        $this->then_ShouldBeLogged('logout Foo@Bar.baz');
     }
 
     ########################## SET-UP ###########################
@@ -185,6 +188,7 @@ class AuthenticationTest extends Specification {
 
     private function whenILoginWithTheResponseOf_AndTheToken($challenge, $token) {
         $this->web->givenTheParameter_Is('response', md5(md5($token . $challenge) . $challenge));
+        $this->web->givenTheParameter_Is('remember', 'true');
         $this->web->whenICallTheResource_WithTheMethod('auth', 'login');
     }
 

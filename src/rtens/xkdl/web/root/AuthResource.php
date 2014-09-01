@@ -43,6 +43,7 @@ class AuthResource extends DynamicResource {
 
         $expire = $this->config->then('5 minutes');
         list($challenge, $token) = $this->authentication->createChallenge($email, $token, $expire);
+        $this->session->set('response', md5($token . $challenge));
 
         $this->sendEmail($email, $token, $challenge, $tokenOnly, $remember);
 
@@ -66,7 +67,8 @@ class AuthResource extends DynamicResource {
             $this->session->setLoggedIn($userId);
 
             if ($remember) {
-                list($challenge,) = $this->authentication->createChallenge($userId, $token);
+                list($challenge, $newToken) = $this->authentication->createChallenge($userId, $token);
+                $this->session->set('response', md5($newToken . $challenge));
             }
             return new Presenter($this, [
                 'challenge' => isset($challenge) ? ['value' => $challenge] : null,
@@ -99,7 +101,8 @@ class AuthResource extends DynamicResource {
 
     public function doLogout() {
         $this->session->requireLoggedIn($this);
-        $this->authentication->logout($this->session->getUserId());
+        $response = $this->session->get('response');
+        $this->authentication->logout($response);
         $this->session->setLoggedIn(false);
 
         return new Redirecter($this->getParent()->getUrl());
