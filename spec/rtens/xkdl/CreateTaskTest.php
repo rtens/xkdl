@@ -2,6 +2,7 @@
 namespace spec\rtens\xkdl;
 
 use rtens\xkdl\lib\TimeSpan;
+use rtens\xkdl\storage\Writer;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ResourceFixture;
 use spec\rtens\xkdl\fixtures\TaskFixture;
@@ -52,7 +53,13 @@ class CreateTaskTest extends Specification {
     }
 
     function testExistingTask() {
-        $this->markTestIncomplete();
+        $this->givenTheTask_Exists('existing/task');
+        $this->givenIHaveEnteredThe('task', 'existing/task');
+
+        $this->whenICreateANewTaskWithJustTheName();
+
+        $this->task->thenThereShouldBeATask('existing/task');
+        $this->thenTheErrorMessage_ShouldBeDisplayed('Could not create task since it already exists.');
     }
 
     function testDurationInDecimalHours() {
@@ -111,6 +118,12 @@ class CreateTaskTest extends Specification {
 
     private function thenTheErrorMessage_ShouldBeDisplayed($string) {
         $this->resource->then_ShouldBe('error/message', $string);
+    }
+
+    private function givenTheTask_Exists($path) {
+        /** @var Writer $writer */
+        $writer = $this->factory->getInstance(Writer::$CLASS);
+        $writer->create($path);
     }
 
 } 

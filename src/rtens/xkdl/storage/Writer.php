@@ -10,6 +10,8 @@ use rtens\xkdl\Task;
 
 class Writer {
 
+    public static $CLASS = __CLASS__;
+
     /** @var Configuration <- */
     public $config;
 

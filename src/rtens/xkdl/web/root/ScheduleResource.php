@@ -49,16 +49,17 @@ class ScheduleResource extends DynamicResource {
     public function doCreateTask($task, TimeSpan $duration = null, \DateTime $deadline = null, $description = null) {
         $task = trim($task);
         if (!$task) {
-            return new Presenter($this, $this->assembleModel($task, [
-                'error' => [
-                    'message' => 'Could not create task. No name given.'
-                ]
-            ]));
+            return $this->assembleError($task, 'Could not create task. No name given.');
+        }
+
+        try {
+            $this->store->getTask($task);
+            return $this->assembleError($task, 'Could not create task since it already exists.');
+        } catch (\Exception $e) {
         }
 
         $this->writer->create($task);
-
-        $newTask = $this->store->getTask($task);
+        $newTask = $this->store->refresh()->getTask($task);
 
         if ($duration) {
             $newTask->setDuration($duration);
@@ -248,6 +249,19 @@ class ScheduleResource extends DynamicResource {
             'error' => null
         );
         return array_merge($model, $merge);
+    }
+
+    /**
+     * @param $task
+     * @param $message
+     * @return Presenter
+     */
+    public function assembleError($task, $message) {
+        return new Presenter($this, $this->assembleModel($task, [
+            'error' => [
+                'message' => $message
+            ]
+        ]));
     }
 
 } 

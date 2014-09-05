@@ -19,6 +19,11 @@ class TaskStore {
     /** @var Task|null */
     private $root;
 
+    public function refresh() {
+        $this->root = null;
+        return $this;
+    }
+
     public function getRoot() {
         if (!$this->root) {
             $this->root = $this->readTask($this->config->rootTaskFolder());
