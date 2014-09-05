@@ -30,7 +30,8 @@ class StorageTest extends Specification {
         $this->whenIReadTheTasks();
         $this->task->thenThereShouldBeATask('Task one');
         $this->task->then_ShouldTake_Minutes('Task one', 15);
-        $this->task->thenThereShouldBeATask('Task two', 0);
+        $this->task->thenThereShouldBeATask('Task two');
+        $this->task->then_ShouldTake_Minutes('Task two', 0);
     }
 
     function testDoneTask() {

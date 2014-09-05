@@ -30,7 +30,16 @@ class CreateTaskTest extends Specification {
     }
 
     function testOnlyNameGiven() {
-        $this->markTestIncomplete();
+        $this->givenIHaveEnteredThe('task', '/some/new/task');
+
+        $this->whenICreateANewTaskWithJustTheName();
+
+        $this->task->thenThereShouldBeATask('some/new/task');
+        $this->task->then_ShouldHaveNoDeadline('some/new/task');
+        $this->task->then_ShouldHaveTheDefaultDuration('some/new/task');
+        $this->task->then_ShouldHaveNoDescription('some/new/task');
+
+        $this->thenTheTaskCreatedMessageFor_ShouldBeDisplayed('/some/new/task');
     }
 
     function testMissingName() {
@@ -77,6 +86,15 @@ class CreateTaskTest extends Specification {
                 TimeSpan::parse($this->params['duration']),
                 new \DateTime($this->params['deadline']),
                 $this->params['description']
+            );
+        });
+    }
+
+    private function whenICreateANewTaskWithJustTheName() {
+        $this->resource->givenTheResourceIs(ScheduleResource::$CLASS);
+        $this->resource->whenIDo(function (ScheduleResource $r) {
+            return $r->doCreateTask(
+                $this->params['task']
             );
         });
     }

@@ -13,9 +13,13 @@ class TimeSpan extends \DateInterval {
      * Accepts <hh>:<mm> (hours and minutes) and <h>.<H/100> (hours as float)
      *
      * @param $string
+     * @throws \InvalidArgumentException
      * @return TimeSpan
      */
     public static function parse($string) {
+        if (!$string) {
+            throw new \InvalidArgumentException('String must not be empty');
+        }
         if (strpos($string, ':') !== false) {
             list($hours, $minutes) = explode(':', $string);
         } else {
@@ -27,12 +31,16 @@ class TimeSpan extends \DateInterval {
     }
 
     public function toString() {
-        return 'P' .
-        ($this->days ? $this->days . 'D' : '') .
-        'T' .
-        ($this->h ? $this->h . 'H' : '') .
-        ($this->i ? $this->i . 'M' : '') .
-        ($this->s ? $this->s . 'S' : '');
+        $days = $this->days ? $this->days . 'D' : '';
+        $time = ($this->h ? $this->h . 'H' : '') .
+            ($this->i ? $this->i . 'M' : '') .
+            ($this->s ? $this->s . 'S' : '');
+
+        if (!$days && !$time) {
+            $time = '0S';
+        }
+
+        return 'P' . $days . 'T' . $time;
     }
 
     function __toString() {

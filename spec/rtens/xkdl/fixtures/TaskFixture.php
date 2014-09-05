@@ -79,8 +79,17 @@ class TaskFixture extends Fixture {
             $this->getTask($path)->getDeadline()->format('c'));
     }
 
+    public function then_ShouldHaveNoDeadline($path) {
+        $this->spec->assertNull($this->getTask($path)->getDeadline());
+    }
+
     public function then_ShouldHaveTheDuration_HoursAnd_Minutes($path, $h, $m) {
         $this->spec->assertEquals("PT{$h}H{$m}M", $this->getTask($path)->getDuration()->toString());
+    }
+
+    public function then_ShouldHaveTheDefaultDuration($path) {
+        $this->spec->assertEquals($this->config->getConfig()->defaultDurationString(),
+            $this->getTask($path)->getDuration()->toString());
     }
 
     public function then_ShouldBeARepeatingTask($path) {
@@ -103,6 +112,10 @@ class TaskFixture extends Fixture {
 
     public function then_ShouldHaveTheDescription($path, $string) {
         $this->spec->assertEquals($string, $this->getTask($path)->getDescription());
+    }
+
+    public function then_ShouldHaveNoDescription($path) {
+        $this->then_ShouldHaveTheDescription($path, null);
     }
 
     public function then_ShouldHaveNoChildren($path) {

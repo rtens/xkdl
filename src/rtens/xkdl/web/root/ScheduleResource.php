@@ -46,14 +46,22 @@ class ScheduleResource extends DynamicResource {
         return new Presenter($this, $this->assembleModel($task));
     }
 
-    public function doCreateTask($task, TimeSpan $duration, \DateTime $deadline, $description) {
+    public function doCreateTask($task, TimeSpan $duration = null, \DateTime $deadline = null, $description = null) {
         $this->writer->create($task);
 
         $newTask = $this->store->getTask($task);
 
-        $newTask->setDuration($duration);
-        $newTask->setDeadline($deadline);
-        $newTask->setDescription($description);
+        if ($duration) {
+            $newTask->setDuration($duration);
+        } else {
+            $newTask->setDuration($this->config->defaultDuration());
+        }
+        if ($deadline) {
+            $newTask->setDeadline($deadline);
+        }
+        if ($description){
+            $newTask->setDescription($description);
+        }
 
         $this->writer->update($newTask);
 
