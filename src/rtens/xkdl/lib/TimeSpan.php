@@ -27,14 +27,15 @@ class TimeSpan extends \DateInterval {
         } else {
             $decimal = floatval($string);
             $hours = floor($decimal);
-            $minutes = (int) (($decimal - $hours) * 60);
+            $minutes = (int)(($decimal - $hours) * 60);
         }
         return new TimeSpan("PT{$hours}H{$minutes}M");
     }
 
     public function toString() {
-        $days = $this->days ? $this->days . 'D' : '';
-        $time = ($this->h ? $this->h . 'H' : '') .
+        $days = $this->totalDays() ? $this->totalDays() . 'D' : '';
+        $time =
+            ($this->h ? $this->h . 'H' : '') .
             ($this->i ? $this->i . 'M' : '') .
             ($this->s ? $this->s . 'S' : '');
 
@@ -50,7 +51,11 @@ class TimeSpan extends \DateInterval {
     }
 
     public function seconds() {
-        return $this->days * 86400 + $this->h * 3600 + $this->i * 60 + $this->s;
+        return $this->totalDays() * 86400 + $this->h * 3600 + $this->i * 60 + $this->s;
+    }
+
+    private function totalDays() {
+        return $this->y * 365 + $this->m * 31 + $this->d;
     }
 
 } 
