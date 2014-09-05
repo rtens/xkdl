@@ -57,6 +57,10 @@ class ScheduleResource extends DynamicResource {
         ));
     }
 
+    public function createTask($task, \DateTime $deadline, $duration, $description) {
+        return new Presenter($this);
+    }
+
     public function doPost(\DateTime $from, \DateTime $until, $scheduler) {
         $root = $this->store->getRoot();
 

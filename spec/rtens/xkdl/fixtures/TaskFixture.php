@@ -10,6 +10,9 @@ use rtens\xkdl\task\RepeatingTask;
 use rtens\xkdl\Task;
 use watoki\scrut\Fixture;
 
+/**
+ * @property ConfigFixture c <-
+ */
 class TaskFixture extends Fixture {
 
     /** @var Task */
@@ -18,12 +21,26 @@ class TaskFixture extends Fixture {
     /** @var Task[]|RepeatingTask[] */
     private $tasks = array();
 
+    /** @var TaskStore */
+    private $store;
+
     private function getTask($path, $task = null) {
-        $task = $task ?: $this->root;
+        $task = $task ?: $this->getRoot();
         foreach (explode('/', $path) as $name) {
             $task = $task->getChild($name);
         }
         return $task;
+    }
+
+    private function getRoot() {
+        if ($this->store) {
+            return $this->store->getRoot();
+        }
+        return $this->root;
+    }
+
+    public function useTaskStore() {
+        $this->store = $this->spec->factory->getInstance(TaskStore::$CLASS);
     }
 
     public function givenTheRootTask($name) {
@@ -57,6 +74,11 @@ class TaskFixture extends Fixture {
 
     public function then_ShouldHaveTheDeadline($path, $deadline) {
         $this->spec->assertEquals(new \DateTime($deadline), $this->getTask($path)->getDeadline());
+    }
+
+    public function then_ShouldHaveTheDuration_HoursAnd_Minutes($path, $h, $m) {
+        $this->spec->assertEquals(TimeSpan::fromInterval(new \DateInterval("PT{$h}H[$m}M")),
+            $this->getTask($path)->getDuration());
     }
 
     public function then_ShouldBeARepeatingTask($path) {

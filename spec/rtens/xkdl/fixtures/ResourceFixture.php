@@ -22,12 +22,16 @@ class ResourceFixture extends Fixture {
         $this->resource = $this->spec->factory->getInstance($className, [Url::parse('http://xkdl')]);
     }
 
+    public function whenIDo($callback) {
+        $this->returned = $callback($this->resource);
+    }
+
     public function whenIInvoke($methodName) {
         $this->whenIInvoke_With($methodName, []);
     }
 
     public function whenIInvoke_With($methodName, $params) {
-        $this->returned = call_user_func_array(array($this->resource, $methodName), $params);
+        $this->whenIDo(call_user_func_array(array($this->resource, $methodName), $params));
     }
 
     public function then_ShouldBe($field, $value) {
