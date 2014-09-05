@@ -73,12 +73,20 @@ class CreateTaskTest extends Specification {
     }
 
     function testInvalidDurationFormat() {
-        $this->markTestIncomplete();
+        $this->givenIHaveEnteredThe('task', '/some/new/task');
+        $this->givenIHaveEnteredThe('duration', 'NaN');
+
+        $this->whenITryToCreateANewTask();
+
+        $this->thenAnExceptionShouldBeThrown();
     }
 
     ######################### SET-UP ###############################
 
     private $params;
+
+    /** @var null|\Exception */
+    private $caught;
 
     protected function setUp() {
         parent::setUp();
@@ -109,6 +117,14 @@ class CreateTaskTest extends Specification {
         });
     }
 
+    private function whenITryToCreateANewTask() {
+        try {
+            $this->whenICreateANewTask();
+        } catch (\Exception $e) {
+            $this->caught = $e;
+        }
+    }
+
     private function whenICreateANewTaskWithJustTheName() {
         $this->resource->givenTheResourceIs(ScheduleResource::$CLASS);
         $this->resource->whenIDo(function (ScheduleResource $r) {
@@ -130,6 +146,10 @@ class CreateTaskTest extends Specification {
         /** @var Writer $writer */
         $writer = $this->factory->getInstance(Writer::$CLASS);
         $writer->create($path);
+    }
+
+    private function thenAnExceptionShouldBeThrown() {
+        $this->assertNotNull($this->caught, 'No Exception caught');
     }
 
 } 

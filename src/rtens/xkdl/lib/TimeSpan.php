@@ -18,10 +18,12 @@ class TimeSpan extends \DateInterval {
      */
     public static function parse($string) {
         if (!$string) {
-            throw new \InvalidArgumentException('String must not be empty');
+            throw new \InvalidArgumentException('TimeSpan string must not be empty');
         }
         if (strpos($string, ':') !== false) {
             list($hours, $minutes) = explode(':', $string);
+        } else if (!is_numeric($string)) {
+            throw new \InvalidArgumentException('TimeSpan string must be numeric or hh:mm');
         } else {
             $decimal = floatval($string);
             $hours = floor($decimal);
