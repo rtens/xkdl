@@ -25,7 +25,7 @@ class TimeSpan extends \DateInterval {
         } else {
             $decimal = floatval($string);
             $hours = floor($decimal);
-            $minutes = ($decimal - $hours) * 60;
+            $minutes = (int) (($decimal - $hours) * 60);
         }
         return new TimeSpan("PT{$hours}H{$minutes}M");
     }

@@ -63,7 +63,13 @@ class CreateTaskTest extends Specification {
     }
 
     function testDurationInDecimalHours() {
-        $this->markTestIncomplete();
+        $this->givenIHaveEnteredThe('task', '/some/new/task');
+        $this->givenIHaveEnteredThe('duration', '2.62');
+
+        $this->whenICreateANewTask();
+
+        $this->task->then_ShouldHaveTheDuration_HoursAnd_Minutes('some/new/task', 2, 37);
+        $this->thenTheTaskCreatedMessageFor_ShouldBeDisplayed('/some/new/task');
     }
 
     function testInvalidDurationFormat() {
