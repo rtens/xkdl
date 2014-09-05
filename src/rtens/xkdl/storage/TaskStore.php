@@ -40,7 +40,7 @@ class TaskStore {
             $properties['type'] = Task::$CLASS;
         }
 
-        $task = $this->createTask($folder, $properties);
+        $task = $this->inflateTask($folder, $properties);
         if ($parent) {
             $parent->addChild($task);
         }
@@ -58,7 +58,12 @@ class TaskStore {
         }
     }
 
-    private function createTask($folder, $properties) {
+    /**
+     * @param $folder
+     * @param $properties
+     * @return Task
+     */
+    private function inflateTask($folder, $properties) {
         $properties = $this->getMetaInformation($folder, $properties);
         return $this->serializerFactory->getSerializerFor($properties['type'])
             ->inflate($folder, $properties);

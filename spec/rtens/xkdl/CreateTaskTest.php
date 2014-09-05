@@ -1,6 +1,7 @@
 <?php
 namespace spec\rtens\xkdl;
 
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ResourceFixture;
 use spec\rtens\xkdl\fixtures\TaskFixture;
@@ -24,6 +25,12 @@ class CreateTaskTest extends Specification {
         $this->task->then_ShouldHaveTheDeadline('some/new/task', '2001-01-01 12:00');
         $this->task->then_ShouldHaveTheDuration_HoursAnd_Minutes('some/new/task', 2, 42);
         $this->task->then_ShouldHaveTheDescription('some/new/task', 'Some description');
+
+        $this->thenTheTaskCreatedMessageFor_ShouldBeDisplayed('/some/new/task');
+    }
+
+    function testOnlyNameGiven() {
+        $this->markTestIncomplete();
     }
 
     function testMissingName() {
@@ -65,13 +72,17 @@ class CreateTaskTest extends Specification {
     private function whenICreateANewTask() {
         $this->resource->givenTheResourceIs(ScheduleResource::$CLASS);
         $this->resource->whenIDo(function (ScheduleResource $r) {
-            return $r->createTask(
+            return $r->doCreateTask(
                 $this->params['task'],
+                TimeSpan::parse($this->params['duration']),
                 new \DateTime($this->params['deadline']),
-                $this->params['duration'],
                 $this->params['description']
             );
         });
+    }
+
+    private function thenTheTaskCreatedMessageFor_ShouldBeDisplayed($task) {
+        $this->resource->then_ShouldBe('created', ['task' => $task]);
     }
 
 } 

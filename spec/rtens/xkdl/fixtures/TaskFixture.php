@@ -11,7 +11,7 @@ use rtens\xkdl\Task;
 use watoki\scrut\Fixture;
 
 /**
- * @property ConfigFixture c <-
+ * @property ConfigFixture config <-
  */
 class TaskFixture extends Fixture {
 
@@ -41,6 +41,7 @@ class TaskFixture extends Fixture {
 
     public function useTaskStore() {
         $this->store = $this->spec->factory->getInstance(TaskStore::$CLASS);
+        mkdir($this->config->getConfig()->rootTaskFolder(), 0777, true);
     }
 
     public function givenTheRootTask($name) {
@@ -73,12 +74,13 @@ class TaskFixture extends Fixture {
     }
 
     public function then_ShouldHaveTheDeadline($path, $deadline) {
-        $this->spec->assertEquals(new \DateTime($deadline), $this->getTask($path)->getDeadline());
+        $this->spec->assertEquals(
+            (new \DateTime($deadline))->format('c'),
+            $this->getTask($path)->getDeadline()->format('c'));
     }
 
     public function then_ShouldHaveTheDuration_HoursAnd_Minutes($path, $h, $m) {
-        $this->spec->assertEquals(TimeSpan::fromInterval(new \DateInterval("PT{$h}H[$m}M")),
-            $this->getTask($path)->getDuration());
+        $this->spec->assertEquals("PT{$h}H{$m}M", $this->getTask($path)->getDuration()->toString());
     }
 
     public function then_ShouldBeARepeatingTask($path) {

@@ -31,7 +31,7 @@ class ResourceFixture extends Fixture {
     }
 
     public function whenIInvoke_With($methodName, $params) {
-        $this->whenIDo(call_user_func_array(array($this->resource, $methodName), $params));
+        $this->returned = call_user_func_array(array($this->resource, $methodName), $params);
     }
 
     public function then_ShouldBe($field, $value) {

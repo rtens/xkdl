@@ -2,11 +2,13 @@
 namespace rtens\xkdl\web\root;
 
 use rtens\xkdl\lib\Configuration;
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\scheduler\SchedulerFactory;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
+use rtens\xkdl\web\filters\TimeSpanFilter;
 use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\Session;
 use watoki\curir\http\Request;
@@ -36,29 +38,30 @@ class ScheduleResource extends DynamicResource {
 
     public function respond(Request $request) {
         $this->session->requireLoggedIn($this);
+        $this->filters->registerFilter(TimeSpan::$CLASS, new TimeSpanFilter());
         return parent::respond($request);
     }
 
     public function doGet($task = '') {
-        $root = $this->store->getRoot();
-
-        $logging = $this->writer->getOngoingLogInfo();
-        return new Presenter($this, array(
-            'task' => array('value' => $task),
-            'idle' => !$logging ? array(
-                    'taskList' => 'var taskList = ' . json_encode($this->getOpenTasksOf($root))
-                ) : null,
-            'logging' => $logging ? array(
-                    'task' => array('value' => $logging['task']),
-                    'start' => array('value' => $logging['start']->format('Y-m-d H:i'))
-                ) : null,
-            'schedule' => $this->assembleSchedule($root),
-            'algorithm' => $this->assembleSchedulers()
-        ));
+        return new Presenter($this, $this->assembleModel($task));
     }
 
-    public function createTask($task, \DateTime $deadline, $duration, $description) {
-        return new Presenter($this);
+    public function doCreateTask($task, TimeSpan $duration, \DateTime $deadline, $description) {
+        $this->writer->create($task);
+
+        $newTask = $this->store->getTask($task);
+
+        $newTask->setDuration($duration);
+        $newTask->setDeadline($deadline);
+        $newTask->setDescription($description);
+
+        $this->writer->update($newTask);
+
+        return new Presenter($this, $this->assembleModel($task, [
+            'created' => [
+                'task' => $task
+            ]
+        ]));
     }
 
     public function doPost(\DateTime $from, \DateTime $until, $scheduler) {
@@ -203,6 +206,31 @@ class ScheduleResource extends DynamicResource {
             ];
         }
         return $schedulers;
+    }
+
+    /**
+     * @param $task
+     * @param array $merge
+     * @return array
+     */
+    private function assembleModel($task, $merge = []) {
+        $root = $this->store->getRoot();
+        $logging = $this->writer->getOngoingLogInfo();
+        $model = array(
+            'task' => array('value' => $task),
+            'idle' => !$logging ? array(
+                    'taskList' => 'var taskList = ' . json_encode($this->getOpenTasksOf($root))
+                ) : null,
+            'logging' => $logging ? array(
+                    'task' => array('value' => $logging['task']),
+                    'start' => array('value' => $logging['start']->format('Y-m-d H:i'))
+                ) : null,
+            'schedule' => $this->assembleSchedule($root),
+            'algorithm' => $this->assembleSchedulers(),
+            'created' => null,
+            'error' => null
+        );
+        return array_merge($model, $merge);
     }
 
 } 

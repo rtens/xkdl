@@ -4,6 +4,7 @@ namespace rtens\xkdl\storage;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\Schedule;
 use rtens\xkdl\lib\Slot;
+use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
 use rtens\xkdl\Task;
 
@@ -11,6 +12,47 @@ class Writer {
 
     /** @var Configuration <- */
     public $config;
+
+    /**
+     * @param string $fullTaskName
+     */
+    public function create($fullTaskName) {
+        $this->getTaskFolder($fullTaskName);
+    }
+
+    public function update(Task $task) {
+        $folder = $this->getTaskFolder($task->getFullName());
+
+        $class = new \ReflectionClass($task);
+        $description = $class->getProperty('description');
+        $description->setAccessible(true);
+        if ($description->getValue($task)) {
+            file_put_contents($folder . '/description.txt', $description->getValue($task));
+        }
+
+        $properties = [
+            'duration' => function (TimeSpan $span) {
+                    return $span->toString();
+                },
+            'deadline' => function (\DateTime $date) {
+                    return $date->format('c');
+                }
+        ];
+
+        $propertyFileContent = [];
+        foreach ($properties as $propertyName => $serializer) {
+            $property = $class->getProperty($propertyName);
+            $property->setAccessible(true);
+
+            if ($property->getValue($task)) {
+                $propertyFileContent[] = $propertyName . ': ' . $serializer($property->getValue($task));
+            }
+        }
+
+        if ($propertyFileContent) {
+            file_put_contents($folder . '/__.txt', implode("\n", $propertyFileContent));
+        }
+    }
 
     public function addLog($fullTaskName, TimeWindow $window) {
         $data = $window->start->format('c') . ' >> ' . $window->end->format('c') . "\n";
