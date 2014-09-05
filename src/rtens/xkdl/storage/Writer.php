@@ -83,8 +83,13 @@ class Writer {
 
     private function getTaskFolder($fullTaskName) {
         $dir = $this->config->rootTaskFolder();
+        $trimmedFullTaskName = trim($fullTaskName, '/');
 
-        foreach (explode('/', trim($fullTaskName, '/')) as $taskName) {
+        if (!$trimmedFullTaskName) {
+            return $dir;
+        }
+
+        foreach (explode('/', $trimmedFullTaskName) as $taskName) {
             foreach (glob($dir . '/*') as $file) {
                 if (basename($file) == $taskName || preg_match('/[xX_]_(\d+_)?' . $taskName . '/', basename($file))) {
                     $dir = $file;

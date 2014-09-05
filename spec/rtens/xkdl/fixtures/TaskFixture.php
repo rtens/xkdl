@@ -64,6 +64,10 @@ class TaskFixture extends Fixture {
         $this->spec->assertNotNull($this->getTask($path));
     }
 
+    public function thenThereShouldNoTasks() {
+        $this->spec->assertEmpty($this->getRoot()->getChildren());
+    }
+
     public function then_ShouldBeDone($path) {
         $this->spec->assertTrue($this->getTask($path)->isDone());
     }

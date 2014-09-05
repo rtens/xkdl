@@ -46,8 +46,8 @@ class ResourceFixture extends Fixture {
         if ($this->returned instanceof Presenter) {
             $model = $this->returned->getModel();
             foreach (explode('/', $path) as $fieldName) {
-                if (!array_key_exists($fieldName, $model)) {
-                    $this->spec->fail('Could not find [' . $fieldName . '] in ' . print_r($model, true));
+                if (!is_array($model) || !array_key_exists($fieldName, $model)) {
+                    $this->spec->fail('Could not find [' . $fieldName . '] in ' . json_encode($model));
                 }
                 $model = $model[$fieldName];
             }

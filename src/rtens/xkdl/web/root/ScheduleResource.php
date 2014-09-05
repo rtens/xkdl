@@ -47,6 +47,15 @@ class ScheduleResource extends DynamicResource {
     }
 
     public function doCreateTask($task, TimeSpan $duration = null, \DateTime $deadline = null, $description = null) {
+        $task = trim($task);
+        if (!$task) {
+            return new Presenter($this, $this->assembleModel($task, [
+                'error' => [
+                    'message' => 'Could not create task. No name given.'
+                ]
+            ]));
+        }
+
         $this->writer->create($task);
 
         $newTask = $this->store->getTask($task);

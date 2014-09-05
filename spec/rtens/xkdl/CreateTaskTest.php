@@ -43,7 +43,12 @@ class CreateTaskTest extends Specification {
     }
 
     function testMissingName() {
-        $this->markTestIncomplete();
+        $this->givenIHaveEnteredThe('task', ' ');
+
+        $this->whenICreateANewTaskWithJustTheName();
+
+        $this->task->thenThereShouldNoTasks();
+        $this->thenTheErrorMessage_ShouldBeDisplayed('Could not create task. No name given.');
     }
 
     function testExistingTask() {
@@ -67,6 +72,7 @@ class CreateTaskTest extends Specification {
         $this->task->useTaskStore();
 
         $this->params = [
+            'task' => null,
             'deadline' => null,
             'duration' => null,
             'description' => null
@@ -100,7 +106,11 @@ class CreateTaskTest extends Specification {
     }
 
     private function thenTheTaskCreatedMessageFor_ShouldBeDisplayed($task) {
-        $this->resource->then_ShouldBe('created', ['task' => $task]);
+        $this->resource->then_ShouldBe('created/task', $task);
+    }
+
+    private function thenTheErrorMessage_ShouldBeDisplayed($string) {
+        $this->resource->then_ShouldBe('error/message', $string);
     }
 
 } 
