@@ -50,12 +50,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client.git",
-                "reference": "99727b0129b23eaaf916d4a665e751d5732d563c"
+                "reference": "c2d8dc70fceeb727c1752ffb0f895ca461b151e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/99727b0129b23eaaf916d4a665e751d5732d563c",
-                "reference": "99727b0129b23eaaf916d4a665e751d5732d563c",
+                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/c2d8dc70fceeb727c1752ffb0f895ca461b151e7",
+                "reference": "c2d8dc70fceeb727c1752ffb0f895ca461b151e7",
                 "shasum": ""
             },
             "require": {
@@ -75,7 +75,7 @@
                     "src/"
                 ]
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "include-path": [
                 "src/"
             ],
@@ -87,7 +87,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2014-08-28 23:03:50"
+            "time": "2014-09-05 08:40:31"
         },
         {
             "name": "nikic/php-parser",
@@ -95,12 +95,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "31bc022d0ddacb5c2fcf0fa499098c76569f7b42"
+                "reference": "7a3789f1a9a9b5588279ee29ec285770e2d14882"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/31bc022d0ddacb5c2fcf0fa499098c76569f7b42",
-                "reference": "31bc022d0ddacb5c2fcf0fa499098c76569f7b42",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/7a3789f1a9a9b5588279ee29ec285770e2d14882",
+                "reference": "7a3789f1a9a9b5588279ee29ec285770e2d14882",
                 "shasum": ""
             },
             "require": {
@@ -132,7 +132,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2014-08-30 10:12:32"
+            "time": "2014-08-31 15:05:11"
         },
         {
             "name": "watoki/cfg",
@@ -232,12 +232,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "c8c8135d0809752427eef95f4a01ac99787a11ac"
+                "reference": "f019a40fb10a9f37b15410a768acf779fa79c1a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/c8c8135d0809752427eef95f4a01ac99787a11ac",
-                "reference": "c8c8135d0809752427eef95f4a01ac99787a11ac",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/f019a40fb10a9f37b15410a768acf779fa79c1a9",
+                "reference": "f019a40fb10a9f37b15410a768acf779fa79c1a9",
                 "shasum": ""
             },
             "require": {
@@ -255,7 +255,7 @@
                     "spec\\watoki\\curir": ""
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -274,7 +274,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2014-08-29 12:01:55"
+            "time": "2014-09-05 19:48:05"
         },
         {
             "name": "watoki/dom",
@@ -301,7 +301,7 @@
                     "spec\\watoki\\dom": ""
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -326,12 +326,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/factory.git",
-                "reference": "a6f60634f6edf0b22549cb6a95f1ec6363fa0a3b"
+                "reference": "9399e3bd039f82d5fa361aac86155aaf4a958f3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/factory/zipball/a6f60634f6edf0b22549cb6a95f1ec6363fa0a3b",
-                "reference": "a6f60634f6edf0b22549cb6a95f1ec6363fa0a3b",
+                "url": "https://api.github.com/repos/watoki/factory/zipball/9399e3bd039f82d5fa361aac86155aaf4a958f3b",
+                "reference": "9399e3bd039f82d5fa361aac86155aaf4a958f3b",
                 "shasum": ""
             },
             "require": {
@@ -348,7 +348,7 @@
                     "spec\\watoki\\factory": ""
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -365,7 +365,7 @@
                 "dependency injection",
                 "watoki"
             ],
-            "time": "2014-08-29 12:35:23"
+            "time": "2014-09-05 19:49:00"
         },
         {
             "name": "watoki/smokey",
@@ -437,7 +437,7 @@
                     "spec\\watoki\\tempan": ""
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -466,19 +466,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "61fed79803b6c75d461b909dfac05bbef5cd4f46"
+                "reference": "fe2466802556d3fe4e4d1d58ffd3ccfd0a19be0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/61fed79803b6c75d461b909dfac05bbef5cd4f46",
-                "reference": "61fed79803b6c75d461b909dfac05bbef5cd4f46",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/fe2466802556d3fe4e4d1d58ffd3ccfd0a19be0b",
+                "reference": "fe2466802556d3fe4e4d1d58ffd3ccfd0a19be0b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
                 "phpunit/php-file-iterator": ">=1.3.0@stable",
                 "phpunit/php-text-template": ">=1.2.0@stable",
-                "phpunit/php-token-stream": ">=1.1.3@stable"
+                "phpunit/php-token-stream": ">=1.1.3,<1.3.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.*@dev"
@@ -519,7 +519,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-05-19 01:58:57"
+            "time": "2014-09-02 10:13:14"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -656,44 +656,45 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "dev-master",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "f8d5d08c56de5cfd592b3340424a81733259a876"
+                "reference": "ad4e1e23ae01b483c16f600ff1bebec184588e32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/f8d5d08c56de5cfd592b3340424a81733259a876",
-                "reference": "f8d5d08c56de5cfd592b3340424a81733259a876",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/ad4e1e23ae01b483c16f600ff1bebec184588e32",
+                "reference": "ad4e1e23ae01b483c16f600ff1bebec184588e32",
                 "shasum": ""
             },
             "require": {
                 "ext-tokenizer": "*",
                 "php": ">=5.3.3"
             },
-            "require-dev": {
-                "phpunit/phpunit": "~4.2"
-            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev"
+                    "dev-master": "1.2-dev"
                 }
             },
             "autoload": {
                 "classmap": [
-                    "src/"
+                    "PHP/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                ""
+            ],
             "license": [
                 "BSD-3-Clause"
             ],
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "sb@sebastian-bergmann.de",
+                    "role": "lead"
                 }
             ],
             "description": "Wrapper around PHP's tokenizer extension.",
@@ -701,7 +702,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2014-08-31 06:12:13"
+            "time": "2014-03-03 05:10:30"
         },
         {
             "name": "phpunit/phpunit",
