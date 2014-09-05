@@ -18,6 +18,11 @@
 
 <div class="container">
 
+<div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        Task <strong property="task">/path/of/created/task</strong> created.
+    </div>
+
     <div property="idle" class="unscheduled item clearfix bg-success">
         <script property="taskList">
             var taskList = [
@@ -38,19 +43,60 @@
         </script>
 
         <form method="post">
-            <div class="main">
-                <label for="task">Log unscheduled task</label>
-                <input class="form-control" required="true" type="text" id="task" name="task"
-                       property="task" value="" placeholder="/full/task/name"/>
-            </div>
-            <div class="logging">
-                <div class="form-group">
-                    <input style="width: 47%;" class="form-control" required="true" type="text" name="start" value="now"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+            <div class="clearfix">
+                <div class="main">
+                    <label for="task">Log or create task</label>
+                    <input class="form-control" required="required" type="text" id="task" name="task"
+                           property="task" value="" placeholder="/full/task/name"/>
                 </div>
+                <div class="logging">
+                    <div class="form-group">
+                        <input style="width: 47%;" class="form-control" required="true" type="text" name="start" value="now"/><div style="width: 5%; text-align: center;">-</div><input style="width: 47%;" class="form-control" type="text" name="end" placeholder="ongoing"/>
+                    </div>
 
-                <div class="actions btn-group">
-                    <input style="width: 60%;" class="btn btn-primary" type="submit" name="method" value="start"/>
-                    <input style="width: 40%;" class="btn btn-success" type="submit" name="method" value="done"/>
+                    <div class="actions btn-group">
+                        <input style="width: 60%;" class="btn btn-primary" type="submit" name="method" value="start"/>
+                        <input style="width: 40%;" class="btn btn-success" type="submit" name="method" value="done"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="extend-toggle">
+                <a data-toggle="collapse-next">
+                    <span class="glyphicon glyphicon-plus"></span>
+                    New task
+                </a>
+            </div>
+            <div class="extended collapse row">
+                <div style="padding-top: 10px">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>
+                                Deadline
+                                <input class="form-control" type="datetime-local" name="deadline"/>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Duration
+                                <input class="form-control" type="text" name="duration" placeholder="h or hh:mm"/>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="cold-md-8">
+                        <div class="form-group">
+                            <label>
+                                Description (with markdown)
+                                <textarea class="form-control" cols="50" rows="5" name="description"></textarea>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <button class="btn btn-success" type="submit" name="method" value="newTask">Create New Task</button>
+                    </div>
                 </div>
             </div>
         </form>
