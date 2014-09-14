@@ -6,16 +6,16 @@ use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\scheduler\EdfScheduler;
 use rtens\xkdl\scheduler\SchedulerFactory;
 use rtens\xkdl\Task;
-use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TimeFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
-use watoki\curir\http\Path;
-use watoki\curir\http\Request;
-use watoki\curir\http\Url;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\protocol\Url;
+use watoki\curir\responder\Presenter;
+use watoki\deli\Path;
 use watoki\scrut\Specification;
 
 /**
@@ -196,7 +196,7 @@ class ShowScheduleTest extends Specification {
         $scheduleFactory->__mock()->method('all')->willReturn([]);
         $this->factory->setSingleton(SchedulerFactory::$CLASS, $scheduleFactory);
 
-        $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS, [Url::parse('schedule')]);
+        $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS);
 
         $this->file->givenTheFolder('root');
         $this->config->givenTheDefaultDurationIs_Minutes(1);
@@ -281,7 +281,7 @@ class ShowScheduleTest extends Specification {
 
     private function whenITryToAccessTheSchedule() {
         try {
-            $this->resource->respond(new Request(new Path()));
+            $this->resource->before(new WebRequest(Url::fromString(''), new Path()));
         } catch (\Exception $e) {
             $this->caught = $e;
         }

@@ -1,8 +1,6 @@
 <?php
 namespace spec\rtens\xkdl\fixtures;
 
-use watoki\curir\http\Url;
-use watoki\curir\Resource;
 use watoki\curir\Responder;
 use watoki\curir\responder\Presenter;
 use watoki\scrut\Fixture;
@@ -19,7 +17,7 @@ class ResourceFixture extends Fixture {
     private $returned;
 
     public function givenTheResourceIs($className) {
-        $this->resource = $this->spec->factory->getInstance($className, [Url::parse('http://xkdl')]);
+        $this->resource = $this->spec->factory->getInstance($className);
     }
 
     public function whenIDo($callback) {

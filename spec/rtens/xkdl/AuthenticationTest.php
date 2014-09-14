@@ -12,8 +12,7 @@ use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
-use watoki\curir\http\Response;
-use watoki\curir\http\Url;
+use watoki\curir\delivery\WebResponse;
 use watoki\scrut\Specification;
 
 /**
@@ -73,7 +72,7 @@ class AuthenticationTest extends Specification {
         $this->givenAChallenge_WithTheToken_WasCreatedFor('foobar', 'password', 'foo@bar.baz');
         $this->whenITryToLoginWithTheResponseOf_AndTheToken('foobar', 'wrong');
 
-        $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
+        $this->web->thenAnErrorWithTheStatus_ShouldOccur(WebResponse::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
         $this->thenThereShouldBeAResponseFor_WithTheToken_For('foobar', 'password', 'foo@bar.baz');
 
@@ -84,7 +83,7 @@ class AuthenticationTest extends Specification {
         $this->givenAChallenge_WithTheToken_WasCreatedFor('challenge', 'password', 'foo@bar.baz', '5 minutes 1 second ago');
         $this->whenITryToLoginWithTheResponseOf_AndTheToken('challenge', 'password');
 
-        $this->web->thenAnErrorWithTheStatus_ShouldOccur(Response::STATUS_UNAUTHORIZED);
+        $this->web->thenAnErrorWithTheStatus_ShouldOccur(WebResponse::STATUS_UNAUTHORIZED);
         $this->session->thenIShouldNotBeLoggedIn();
         $this->thenThereShouldBeNoTokens();
 
@@ -100,6 +99,7 @@ class AuthenticationTest extends Specification {
         $this->thenThereShouldBeNoTokens();
 
         $this->then_ShouldBeLogged('logout Foo@Bar.baz');
+        $this->web->thenIShouldBeRedirectedTo('http://xkdl');
     }
 
     ########################## SET-UP ###########################
@@ -130,14 +130,14 @@ class AuthenticationTest extends Specification {
         if (!class_exists($className)) {
             $code = "class $className extends \\rtens\\xkdl\\web\\RootResource {
                 public function doGet() {
-                    throw new $exceptionClass(\\watoki\\curir\\http\\Url::parse('http://xkdl/bar'));
+                    throw new $exceptionClass(\\watoki\\curir\\protocol\\Url::fromString('http://xkdl/bar'));
                 }
             }";
             eval($code);
         }
 
         $this->factory->setSingleton(RootResource::$CLASS,
-            $this->factory->getInstance($className, [Url::parse('http://xkdl')]));
+            $this->factory->getInstance($className));
     }
 
     private function givenTheNextRandomlyGeneratedStringIs($string) {

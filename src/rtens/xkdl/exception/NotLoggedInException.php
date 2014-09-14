@@ -2,7 +2,7 @@
 namespace rtens\xkdl\exception;
 
 use Exception;
-use watoki\curir\http\Url;
+use watoki\curir\protocol\Url;
 
 class NotLoggedInException extends \Exception {
 

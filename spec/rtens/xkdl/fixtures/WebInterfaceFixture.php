@@ -3,13 +3,14 @@ namespace spec\rtens\xkdl\fixtures;
 
 use rtens\xkdl\web\RootResource;
 use Symfony\Component\Yaml\Tests\A;
+use watoki\collections\Liste;
 use watoki\collections\Map;
-use watoki\curir\http\error\HttpError;
-use watoki\curir\http\Path;
-use watoki\curir\http\Request;
-use watoki\curir\http\Response;
-use watoki\curir\http\Url;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\delivery\WebResponse;
+use watoki\curir\error\HttpError;
+use watoki\curir\protocol\Url;
 use watoki\curir\Responder;
+use watoki\deli\Path;
 use watoki\scrut\Fixture;
 
 /**
@@ -19,7 +20,7 @@ use watoki\scrut\Fixture;
  */
 class WebInterfaceFixture extends Fixture {
 
-    /** @var Response */
+    /** @var WebResponse */
     private $response;
 
     /** @var array */
@@ -30,9 +31,6 @@ class WebInterfaceFixture extends Fixture {
 
     /** @var null|\Exception */
     private $caught;
-
-    /** @var array */
-    private $cookies = array();
 
     public function thenIShouldNotBeRedirected() {
         $has = $this->response->getHeaders()->has('Location');
@@ -54,7 +52,7 @@ class WebInterfaceFixture extends Fixture {
     }
 
     public function whenIGetTheResource($path) {
-        $this->whenICallTheResource_WithTheMethod($path, Request::METHOD_GET);
+        $this->whenICallTheResource_WithTheMethod($path, WebRequest::METHOD_GET);
     }
 
     public function whenITryToCallTheResource_WithTheMethod($path, $method) {
@@ -67,10 +65,10 @@ class WebInterfaceFixture extends Fixture {
 
     public function whenICallTheResource_WithTheMethod($path, $method) {
         /** @var RootResource $root */
-        $root = $this->spec->factory->getInstance(RootResource::$CLASS, [Url::parse('http://xkdl')]);
+        $root = $this->spec->factory->getInstance(RootResource::$CLASS);
 
-        $request = new Request(Path::parse($path), $this->accept, $method, new Map($this->parameters),
-            null, '', new Map($this->cookies));
+        $request = new WebRequest(Url::fromString('http://xkdl'), Path::fromString($path), $method, new Map($this->parameters),
+                new Liste($this->accept), null);
         $this->response = $root->respond($request);
     }
 
@@ -81,16 +79,6 @@ class WebInterfaceFixture extends Fixture {
         } else {
             $this->spec->fail('Not an HttpError: ' . $this->caught->getMessage());
         }
-    }
-
-    public function thenACookie_WithTheValue_ShouldBeSet($name, $value) {
-        $cookies = $this->response->getCookies();
-        $this->spec->assertArrayHasKey($name, $cookies);
-        $this->spec->assertEquals($value, $cookies[$name]['value']);
-    }
-
-    public function givenTheCookie_WithTheValue($key, $value) {
-        $this->cookies[$key] = $value;
     }
 
     public function thenTheHeader_WithTheValue_ShouldBeSet($key, $value) {

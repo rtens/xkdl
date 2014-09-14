@@ -2,7 +2,7 @@
 namespace rtens\xkdl\lib;
 
 use rtens\xkdl\scheduler\SchedulerFactory;
-use watoki\curir\http\Url;
+use watoki\curir\protocol\Url;
 
 abstract class Configuration {
 
@@ -68,7 +68,7 @@ abstract class Configuration {
     }
 
     public function getHost() {
-        return Url::parse($this->getRootUrl())->getHost();
+        return Url::fromString($this->getRootUrl())->getHost();
     }
 
 } 

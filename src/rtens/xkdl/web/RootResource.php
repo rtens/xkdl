@@ -6,10 +6,11 @@ use rtens\xkdl\exception\NotLoggedInException;
 use rtens\xkdl\lib\AuthenticationService;
 use rtens\xkdl\lib\Configuration;
 use watoki\cfg\Loader;
-use watoki\curir\http\Request;
-use watoki\curir\http\Url;
-use watoki\curir\resource\Container;
+use watoki\curir\Container;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\delivery\WebResponse;
 use watoki\curir\responder\Redirecter;
+use watoki\deli\Request;
 
 class RootResource extends Container {
 
@@ -30,6 +31,10 @@ class RootResource extends Container {
     /** @var Loader <- */
     public $loader;
 
+    /**
+     * @param Request|WebRequest $request
+     * @return WebResponse
+     */
     public function respond(Request $request) {
         if ($this->session->has('token')) {
             $this->client->setAccessToken($this->session->get('token'));
@@ -49,21 +54,20 @@ class RootResource extends Container {
         try {
             return parent::respond($request);
         } catch (AuthenticationException $ae) {
-            return (new Redirecter(Url::parse($ae->getAuthenticationUrl())))
-                ->createResponse($request);
+            return $this->createResponse(Redirecter::fromString($ae->getAuthenticationUrl()), $request);
         } catch (NotLoggedInException $nlie) {
-            return (new Redirecter($this->getUrl('auth')))->createResponse($request);
+            return $this->createResponse(Redirecter::fromString('auth'), $request);
         }
     }
 
     public function doGet() {
-        return new Redirecter($this->getUrl('schedule'));
+        return Redirecter::fromString('schedule');
     }
 
     public function doAuthenticate($code) {
         $this->client->authenticate($code);
         $this->session->set('token', $this->client->getAccessToken());
-        return new Redirecter($this->getUrl());
+        return Redirecter::fromString('');
     }
 
 } 

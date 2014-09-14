@@ -4,16 +4,16 @@ namespace rtens\xkdl\web\root;
 use rtens\xkdl\lib\AuthenticationService;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\EmailService;
-use rtens\xkdl\web\Presenter;
-use rtens\xkdl\web\RootResource;
 use rtens\xkdl\web\Session;
-use watoki\curir\http\error\HttpError;
-use watoki\curir\http\Response;
-use watoki\curir\resource\DynamicResource;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\delivery\WebResponse;
+use watoki\curir\error\HttpError;
+use watoki\curir\Resource;
+use watoki\curir\responder\Presenter;
 use watoki\curir\Responder;
 use watoki\curir\responder\Redirecter;
 
-class AuthResource extends DynamicResource {
+class AuthResource extends Resource {
 
     /** @var Session <- */
     public $session;
@@ -29,25 +29,25 @@ class AuthResource extends DynamicResource {
 
     public function doGet() {
         if ($this->session->isLoggedIn()) {
-            return new Redirecter($this->getAncestor(RootResource::$CLASS)->getUrl());
+            return Redirecter::fromString('..');
         }
 
-        return new Presenter($this, [
+        return new Presenter([
             'sent' => false,
             'login' => false,
         ]);
     }
 
-    public function doPost($email, $tokenOnly = false, $remember = false) {
+    public function doPost(WebRequest $r, $email, $tokenOnly = false, $remember = false) {
         $token = $this->authentication->createToken($email);
 
         $expire = $this->config->then('5 minutes');
         list($challenge, $token) = $this->authentication->createChallenge($email, $token, $expire);
         $this->session->set('response', md5($token . $challenge));
 
-        $this->sendEmail($email, $token, $challenge, $tokenOnly, $remember);
+        $this->sendEmail($r, $email, $token, $challenge, $tokenOnly, $remember);
 
-        return new Presenter($this, [
+        return new Presenter([
             'challenge' => ['value' => $challenge],
             'sent' => ['to' => $email],
             'email' => false,
@@ -56,12 +56,13 @@ class AuthResource extends DynamicResource {
     }
 
     /**
+     * @param WebRequest $request
      * @param string $response
      * @param bool $remember
+     * @throws HttpError
      * @return Presenter
-     * @throws \watoki\curir\http\error\HttpError
      */
-    public function doLogin($response, $remember = false) {
+    public function doLogin(WebRequest $request, $response, $remember = false) {
         try {
             list($userId, $token) = $this->authentication->validateResponse($response);
             $this->session->setLoggedIn($userId);
@@ -70,22 +71,22 @@ class AuthResource extends DynamicResource {
                 list($challenge, $newToken) = $this->authentication->createChallenge($userId, $token);
                 $this->session->set('response', md5($newToken . $challenge));
             }
-            return new Presenter($this, [
+            return new Presenter([
                 'challenge' => isset($challenge) ? ['value' => $challenge] : null,
                 'sent' => false,
                 'email' => false,
-                'login' => ['target' => $this->getAncestor(RootResource::$CLASS)->getUrl()->toString()],
+                'login' => ['target' => $request->getContext() . '/..'],
             ]);
         } catch (\Exception $e) {
-            throw new HttpError(Response::STATUS_UNAUTHORIZED, $e->getMessage());
+            throw new HttpError(WebResponse::STATUS_UNAUTHORIZED, $e->getMessage());
         }
     }
 
-    private function sendEmail($email, $token, $challenge, $tokenOnly, $remember) {
+    private function sendEmail(WebRequest $request, $email, $token, $challenge, $tokenOnly, $remember) {
         $content = '';
 
         if (!$tokenOnly) {
-            $url = $this->getUrl();
+            $url = $request->getContext();
             $url->getParameters()->set('method', 'login');
             $url->getParameters()->set('response', md5($token . $challenge));
             $url->getParameters()->set('remember', print_r($remember, true));
@@ -99,13 +100,13 @@ class AuthResource extends DynamicResource {
         $this->email->send($email, 'xkdl@rtens.org', 'xkdl login', $content);
     }
 
-    public function doLogout() {
-        $this->session->requireLoggedIn($this);
+    public function doLogout(WebRequest $request) {
+        $this->session->requireLoggedIn($request);
         $response = $this->session->get('response');
         $this->authentication->logout($response);
         $this->session->setLoggedIn(false);
 
-        return new Redirecter($this->getParent()->getUrl());
+        return Redirecter::fromString('..');
     }
 
 } 

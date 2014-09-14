@@ -6,7 +6,7 @@ use spec\rtens\xkdl\fixtures\GoogleApiFixture;
 use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TaskStorageFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
-use watoki\curir\http\Response;
+use watoki\curir\delivery\WebResponse;
 use watoki\scrut\Specification;
 
 /**
@@ -26,7 +26,7 @@ class ImportGoogleCalendarTest extends Specification {
         $this->web->givenTheParameter_Is('from', 'now');
         $this->web->givenTheParameter_Is('until', 'tomorrow');
         $this->web->whenICallTheResource_WithTheMethod('schedule', 'post');
-        $this->web->thenTheResponseStatusShouldBe(Response::STATUS_UNAUTHORIZED);
+        $this->web->thenTheResponseStatusShouldBe(WebResponse::STATUS_UNAUTHORIZED);
         $this->web->thenIShouldBeRedirectedTo('http://auth.example.com');
 
         $this->api->givenTheAccessTokenIs('some-token');

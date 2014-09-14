@@ -9,15 +9,16 @@ use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
 use rtens\xkdl\web\filters\TimeSpanFilter;
-use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\Session;
-use watoki\curir\http\Request;
-use watoki\curir\resource\DynamicResource;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\Resource;
+use watoki\curir\responder\Presenter;
 use watoki\curir\responder\Redirecter;
 use watoki\curir\Responder;
 use watoki\dom\Element;
+use watoki\factory\FilterFactory;
 
-class ScheduleResource extends DynamicResource {
+class ScheduleResource extends Resource {
 
     public static $CLASS = __CLASS__;
 
@@ -36,14 +37,17 @@ class ScheduleResource extends DynamicResource {
     /** @var SchedulerFactory <- */
     public $schedulerFactory;
 
-    public function respond(Request $request) {
-        $this->session->requireLoggedIn($this);
+    /** @var FilterFactory <- */
+    public $filters;
+
+    public function before(WebRequest $request) {
+        $this->session->requireLoggedIn($request);
         $this->filters->registerFilter(TimeSpan::$CLASS, new TimeSpanFilter());
-        return parent::respond($request);
+        return parent::before($request);
     }
 
     public function doGet($task = '') {
-        return new Presenter($this, $this->assembleModel($task));
+        return new Presenter($this->assembleModel($task));
     }
 
     public function doCreateTask($task, TimeSpan $duration = null, \DateTime $deadline = null, $description = null) {
@@ -75,7 +79,7 @@ class ScheduleResource extends DynamicResource {
 
         $this->writer->update($newTask);
 
-        return new Presenter($this, $this->assembleModel($task, [
+        return new Presenter($this->assembleModel($task, [
             'created' => [
                 'task' => $task
             ]
@@ -88,7 +92,7 @@ class ScheduleResource extends DynamicResource {
         $schedule = $this->schedulerFactory->create($scheduler, $root)->createSchedule($from, $until);
 
         $this->writer->saveSchedule($schedule);
-        return new Redirecter($this->getUrl());
+        return Redirecter::fromString('');
     }
 
     public function doStart($task, \DateTime $start, $end = null) {
@@ -100,29 +104,29 @@ class ScheduleResource extends DynamicResource {
             }
             $this->writer->startLogging($task, $start);
         }
-        return new Redirecter($this->getUrl());
+        return Redirecter::fromString('');
     }
 
-    public function doStop(\DateTime $end) {
+    public function doStop(WebRequest $request, \DateTime $end) {
         $task = $this->writer->stopLogging($end);
-        $url = $this->getUrl();
+        $url = $request->getContext();
         $url->getParameters()->set('task', $task);
         return new Redirecter($url);
     }
 
     public function doCancel() {
         $this->writer->cancelLogging();
-        return new Redirecter($this->getUrl());
+        return Redirecter::fromString('');
     }
 
     public function doDone($task) {
         $this->writer->markDone($task);
-        return new Redirecter($this->getUrl());
+        return Redirecter::fromString('');
     }
 
     public function doOpen($task) {
         $this->writer->markOpen($task);
-        return new Redirecter($this->getUrl());
+        return Redirecter::fromString('');
     }
 
     private function getOpenTasksOf(Task $task) {
@@ -257,7 +261,7 @@ class ScheduleResource extends DynamicResource {
      * @return Presenter
      */
     public function assembleError($task, $message) {
-        return new Presenter($this, $this->assembleModel($task, [
+        return new Presenter($this->assembleModel($task, [
             'error' => [
                 'message' => $message
             ]

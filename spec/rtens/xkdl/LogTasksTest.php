@@ -3,9 +3,11 @@ namespace spec\rtens\xkdl;
 
 use spec\rtens\xkdl\fixtures\TimeFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
-use watoki\curir\http\Url;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\protocol\Url;
+use watoki\curir\responder\Presenter;
+use watoki\deli\Path;
 use watoki\scrut\Specification;
-use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\root\ScheduleResource;
 use spec\rtens\xkdl\fixtures\ConfigFixture;
 use spec\rtens\xkdl\fixtures\FileFixture;
@@ -142,7 +144,7 @@ class LogTasksTest extends Specification {
 
     protected function setUp() {
         parent::setUp();
-        $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS, [Url::parse('schedule')]);
+        $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS);
 
         $this->fieldEnd = null;
     }
@@ -180,7 +182,8 @@ class LogTasksTest extends Specification {
     }
 
     private function whenIFinishLogging() {
-        $this->redirecter = $this->resource->doStop(new \DateTime($this->fieldEnd));
+        $request = new WebRequest(Url::fromString('schedule'), new Path());
+        $this->redirecter = $this->resource->doStop($request, new \DateTime($this->fieldEnd));
     }
 
     private function thenNoLoggingShouldBeGoingOn() {

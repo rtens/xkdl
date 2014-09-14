@@ -3,12 +3,13 @@ namespace rtens\xkdl\web\root;
 
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\Task;
-use rtens\xkdl\web\Presenter;
 use rtens\xkdl\web\Session;
-use watoki\curir\resource\DynamicResource;
+use watoki\curir\delivery\WebRequest;
+use watoki\curir\Resource;
 use watoki\curir\Responder;
+use watoki\curir\responder\Presenter;
 
-class LogsResource extends DynamicResource {
+class LogsResource extends Resource {
 
     public static $CLASS = __CLASS__;
 
@@ -19,14 +20,15 @@ class LogsResource extends DynamicResource {
     public $session;
 
     /**
+     * @param WebRequest $request
      * @param string $task
      * @param null|string $from
      * @param null|string $until
      * @param bool $sortByTime
      * @return Presenter
      */
-    public function doGet($task = '', $from = null, $until = null, $sortByTime = false) {
-        $this->session->requireLoggedIn($this);
+    public function doGet(WebRequest $request, $task = '', $from = null, $until = null, $sortByTime = false) {
+        $this->session->requireLoggedIn($request);
 
         $from = $from ? new \DateTime($from) : null;
         $until = $until ? new \DateTime($until) : null;
@@ -46,7 +48,7 @@ class LogsResource extends DynamicResource {
             return $l['s'];
         }, $logs));
 
-        return new Presenter($this, [
+        return new Presenter([
             'from' => ['value' => $from ? $from->format('Y-m-d H:i') : ''],
             'until' => ['value' => $until ? $until->format('Y-m-d H:i') : ''],
             'task' => ['value' => $task],
