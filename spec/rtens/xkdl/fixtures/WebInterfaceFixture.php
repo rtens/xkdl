@@ -10,6 +10,8 @@ use watoki\curir\delivery\WebResponse;
 use watoki\curir\error\HttpError;
 use watoki\curir\protocol\Url;
 use watoki\curir\Responder;
+use watoki\deli\filter\DefaultFilterRegistry;
+use watoki\deli\filter\FilterRegistry;
 use watoki\deli\Path;
 use watoki\scrut\Fixture;
 
@@ -66,6 +68,7 @@ class WebInterfaceFixture extends Fixture {
     public function whenICallTheResource_WithTheMethod($path, $method) {
         /** @var RootResource $root */
         $root = $this->spec->factory->getInstance(RootResource::$CLASS);
+        $this->spec->factory->setSingleton(FilterRegistry::$CLASS, new DefaultFilterRegistry());
 
         $request = new WebRequest(Url::fromString('http://xkdl'), Path::fromString($path), $method, new Map($this->parameters),
                 new Liste($this->accept), null);

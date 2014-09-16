@@ -15,8 +15,8 @@ use watoki\curir\Resource;
 use watoki\curir\responder\Presenter;
 use watoki\curir\responder\Redirecter;
 use watoki\curir\Responder;
+use watoki\deli\filter\FilterRegistry;
 use watoki\dom\Element;
-use watoki\factory\FilterFactory;
 
 class ScheduleResource extends Resource {
 
@@ -37,7 +37,7 @@ class ScheduleResource extends Resource {
     /** @var SchedulerFactory <- */
     public $schedulerFactory;
 
-    /** @var FilterFactory <- */
+    /** @var FilterRegistry <- */
     public $filters;
 
     public function before(WebRequest $request) {
