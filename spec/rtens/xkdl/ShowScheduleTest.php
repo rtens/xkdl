@@ -2,7 +2,7 @@
 namespace spec\rtens\xkdl;
 
 use rtens\mockster\MockFactory;
-use rtens\xkdl\exception\NotLoggedInException;
+use rtens\xkdl\exception\AuthenticationException;
 use rtens\xkdl\scheduler\EdfScheduler;
 use rtens\xkdl\scheduler\SchedulerFactory;
 use rtens\xkdl\Task;
@@ -12,10 +12,7 @@ use spec\rtens\xkdl\fixtures\FileFixture;
 use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TimeFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
-use watoki\curir\delivery\WebRequest;
-use watoki\curir\protocol\Url;
 use watoki\curir\responder\Presenter;
-use watoki\deli\Path;
 use watoki\scrut\Specification;
 
 /**
@@ -37,7 +34,7 @@ class ShowScheduleTest extends Specification {
     public function testRequiresLogIn() {
         $this->session->givenIAmNotLoggedIn();
         $this->whenITryToAccessTheSchedule();
-        $this->then_ShouldBeThrown(NotLoggedInException::$CLASS);
+        $this->then_ShouldBeThrown(AuthenticationException::$CLASS);
     }
 
     function testShowScheduleWthBunchOfTasks() {
@@ -281,7 +278,7 @@ class ShowScheduleTest extends Specification {
 
     private function whenITryToAccessTheSchedule() {
         try {
-            $this->resource->before(new WebRequest(Url::fromString(''), new Path()));
+            $this->resource = $this->factory->getInstance(ScheduleResource::$CLASS);
         } catch (\Exception $e) {
             $this->caught = $e;
         }

@@ -1,7 +1,7 @@
 <?php
 namespace rtens\xkdl\lib;
 
-class EmailService {
+class EmailSender {
 
     public static $CLASS = __CLASS__;
 

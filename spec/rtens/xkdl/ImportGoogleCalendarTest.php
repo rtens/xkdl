@@ -37,6 +37,8 @@ class ImportGoogleCalendarTest extends Specification {
     }
 
     function testSaveTokenInSession() {
+        $this->markTestIncomplete();
+
         $this->session->givenTheSessionContains_WithTheValue('token', 'my-token');
         $this->web->whenICallTheResource_WithTheMethod('', 'get');
         $this->api->thenTheAccesToken_ShouldBeSet('my-token');

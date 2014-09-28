@@ -1,6 +1,7 @@
 <?php
 namespace rtens\xkdl\web\root;
 
+use rtens\xkdl\lib\auth\AuthenticatedSession;
 use rtens\xkdl\lib\Configuration;
 use rtens\xkdl\lib\TimeSpan;
 use rtens\xkdl\lib\TimeWindow;
@@ -9,7 +10,6 @@ use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\storage\Writer;
 use rtens\xkdl\Task;
 use rtens\xkdl\web\filters\TimeSpanFilter;
-use rtens\xkdl\web\Session;
 use watoki\curir\delivery\WebRequest;
 use watoki\curir\Resource;
 use watoki\curir\responder\Presenter;
@@ -31,7 +31,7 @@ class ScheduleResource extends Resource {
     /** @var Configuration <- */
     public $config;
 
-    /** @var Session <- */
+    /** @var AuthenticatedSession <- */
     public $session;
 
     /** @var SchedulerFactory <- */
@@ -41,7 +41,6 @@ class ScheduleResource extends Resource {
     public $filters;
 
     public function before(WebRequest $request) {
-        $this->session->requireLoggedIn($request);
         $this->filters->registerFilter(TimeSpan::$CLASS, new TimeSpanFilter());
         return parent::before($request);
     }

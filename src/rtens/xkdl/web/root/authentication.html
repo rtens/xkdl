@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tickets, please!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="utf-8"/>
+
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="res/style.css"/>
+
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+
+    <script src="authentication.js"></script>
+</head>
+<body>
+
+<input type="hidden" property="challenge" id="challenge" value=""/>
+<input type="hidden" property="target" id="target" value=""/>
+
+<div class="container">
+
+    <div property="email" class="item bg-primary clearfix">
+        <form method="post" class="form-inline">
+            <label for="email">Please login</label>
+            <input class="form-control" required="true" type="text" id="email" name="email"
+                   placeholder="Email address" size="40"/>
+            <input class="btn btn-success" type="submit" name="action" value="send token"/>
+        </form>
+    </div>
+
+    <div property="email" class="alert alert-success" id="pleaseWait" style="display: none">
+        Please wait while you are being logged-in.
+
+        <script language="JavaScript">
+            var challenge = $('#challenge').val();
+            if (localStorage.getItem('token') && challenge) {
+                $('[property=email]').hide();
+                $('#pleaseWait').show();
+
+                authentication.respond(challenge);
+                window.location = $('#target').val();
+            }
+        </script>
+    </div>
+
+    <div property="sent" class="alert alert-success">
+        <p>Please enter the token that was sent to <code property="to">some@email.com</code>.</p>
+
+        <hr/>
+
+        <form method="post" class="form-inline" onsubmit="useSeed(); return false;">
+            <label for="seed">Token</label>
+            <input class="form-control" required="true" type="text" id="seed" size="32"/>
+
+            <input class="btn btn-success" type="submit" name="method" value="login"/>
+        </form>
+
+        <script language="JavaScript">
+            function useSeed() {
+                var challenge = $('#challenge').val();
+                var token = authentication.hash($('#seed').val(), challenge);
+                localStorage.setItem('token', token);
+                authentication.respond(challenge);
+                window.location = $('#target').val();
+            }
+        </script>
+    </div>
+
+    <div property="logout" class="alert alert-success">
+        <p>You are now logged-out. <a href="?method=get">Login again</a></p>
+
+        <script language="JavaScript">
+            localStorage.removeItem('token');
+        </script>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,16 +1,13 @@
 <?php
 namespace spec\rtens\xkdl;
 
-use rtens\xkdl\exception\NotLoggedInException;
+use rtens\xkdl\exception\AuthenticationException;
 use rtens\xkdl\web\root\LogsResource;
 use spec\rtens\xkdl\fixtures\SessionFixture;
 use spec\rtens\xkdl\fixtures\TaskFixture;
 use spec\rtens\xkdl\fixtures\WebInterfaceFixture;
-use watoki\curir\delivery\WebRequest;
-use watoki\curir\protocol\Url;
 use watoki\curir\Responder;
 use watoki\curir\responder\Presenter;
-use watoki\deli\Path;
 use watoki\scrut\Specification;
 
 /**
@@ -27,7 +24,7 @@ class LogsReportTest extends Specification {
     public function testRequiresLogIn() {
         $this->session->givenIAmNotLoggedIn();
         $this->whenITryToRequestAReportOfLogs();
-        $this->then_ShouldBeThrown(NotLoggedInException::$CLASS);
+        $this->then_ShouldBeThrown(AuthenticationException::$CLASS);
     }
 
     public function testNoLogs() {
@@ -141,8 +138,7 @@ class LogsReportTest extends Specification {
     private function whenIRequestAReportOfLogsUnder_Between_And($task, $start, $end, $sortByTime = false) {
         /** @var LogsResource $resource */
         $resource = $this->factory->getInstance(LogsResource::$CLASS);
-        $request = new WebRequest(Url::fromString(''), new Path());
-        $this->responder = $resource->doGet($request, $task, $start, $end, $sortByTime);
+        $this->responder = $resource->doGet($task, $start, $end, $sortByTime);
     }
 
     private function thenThereShouldBe_Logs($count) {

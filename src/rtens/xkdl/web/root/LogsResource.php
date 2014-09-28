@@ -1,13 +1,12 @@
 <?php
 namespace rtens\xkdl\web\root;
 
+use rtens\xkdl\lib\auth\AuthenticatedSession;
 use rtens\xkdl\storage\TaskStore;
 use rtens\xkdl\Task;
-use rtens\xkdl\web\Session;
-use watoki\curir\delivery\WebRequest;
 use watoki\curir\Resource;
-use watoki\curir\Responder;
 use watoki\curir\responder\Presenter;
+use watoki\curir\Responder;
 
 class LogsResource extends Resource {
 
@@ -16,20 +15,17 @@ class LogsResource extends Resource {
     /** @var TaskStore <- */
     public $store;
 
-    /** @var Session <- */
+    /** @var AuthenticatedSession <- */
     public $session;
 
     /**
-     * @param WebRequest $request
      * @param string $task
      * @param null|string $from
      * @param null|string $until
      * @param bool $sortByTime
      * @return Presenter
      */
-    public function doGet(WebRequest $request, $task = '', $from = null, $until = null, $sortByTime = false) {
-        $this->session->requireLoggedIn($request);
-
+    public function doGet($task = '', $from = null, $until = null, $sortByTime = false) {
         $from = $from ? new \DateTime($from) : null;
         $until = $until ? new \DateTime($until) : null;
 

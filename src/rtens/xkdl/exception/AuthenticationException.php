@@ -5,6 +5,8 @@ use Exception;
 
 class AuthenticationException extends \Exception {
 
+    public static $CLASS = __CLASS__;
+
     private $authenticationUrl;
 
     public function __construct($authenticationUrl) {

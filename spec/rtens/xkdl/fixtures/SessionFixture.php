@@ -1,10 +1,9 @@
 <?php
 namespace spec\rtens\xkdl\fixtures;
 
-use rtens\mockster\Mock;
-use rtens\mockster\MockFactory;
-use rtens\mockster\Mockster;
-use rtens\xkdl\web\Session;
+use rtens\xkdl\exception\AuthenticationException;
+use rtens\xkdl\lib\auth\AuthenticatedSession;
+use watoki\factory\providers\CallbackProvider;
 use watoki\scrut\Fixture;
 
 /**
@@ -12,46 +11,21 @@ use watoki\scrut\Fixture;
  */
 class SessionFixture extends Fixture {
 
-    /** @var Session|Mock */
-    private $session;
-
     public function setUp() {
         parent::setUp();
-
-        $mf = new MockFactory();
-        $this->session = $mf->getInstance(Session::$CLASS);
-        $this->spec->factory->setSingleton(Session::$CLASS, $this->session);
-        $this->session->__mock()->mockMethods(Mockster::F_NONE);
-
-        /** @var Session $session */
-        $session = $this->session;
-        $session->config = $this->config->getConfig();
-        $session->setLoggedIn('some@foo.com');
+        $this->givenIAmLoggedInAs('foo@bar.baz');
     }
 
     public function givenIAmNotLoggedIn() {
-        $this->session->setLoggedIn(false);
+        $this->spec->factory->setProvider(AuthenticatedSession::$CLASS, new CallbackProvider(function () {
+            throw new AuthenticationException('Not logged in');
+        }));
     }
 
     public function givenIAmLoggedInAs($email) {
-        $this->session->setLoggedIn($email);
-    }
-
-    public function givenTheSessionContains_WithTheValue($key, $value) {
-        $this->session->set($key, $value);
-    }
-
-    public function thenTheSessionShouldContain_WithTheValue($key, $value) {
-        $this->spec->assertEquals($value, $this->session->get($key));
-    }
-
-    public function thenIShouldBeLoggedInAs($email) {
-        $this->spec->assertTrue($this->session->isLoggedIn(), 'Not logged in');
-        $this->spec->assertEquals($email, $this->session->getUserId());
-    }
-
-    public function thenIShouldNotBeLoggedIn() {
-        $this->spec->assertFalse($this->session->isLoggedIn(), 'Logged in');
+        $this->spec->factory->setProvider(AuthenticatedSession::$CLASS, new CallbackProvider(function () use ($email) {
+            return new AuthenticatedSession($email, '5 minutes');
+        }));
     }
 
 } 

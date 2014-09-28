@@ -12,6 +12,9 @@ class SerializerFactory {
     /** @var Serializer[] */
     private $serializers = array();
 
+    /**
+     * @param Factory $factory <-
+     */
     function __construct(Factory $factory) {
         $factory->setSingleton(get_class($this), $this);
 

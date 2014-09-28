@@ -2,7 +2,7 @@
 namespace rtens\xkdl\web\filters;
 
 use rtens\xkdl\lib\TimeSpan;
-use watoki\factory\Filter;
+use watoki\deli\filter\Filter;
 
 class TimeSpanFilter implements Filter {
 
