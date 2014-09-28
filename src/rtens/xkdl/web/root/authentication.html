@@ -57,6 +57,7 @@
         </form>
 
         <script language="JavaScript">
+            localStorage.removeItem('token');
             function useSeed() {
                 var challenge = $('#challenge').val();
                 var token = authentication.hash($('#seed').val(), challenge);
