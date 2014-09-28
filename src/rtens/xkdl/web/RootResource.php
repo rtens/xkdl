@@ -73,14 +73,16 @@ class RootResource extends Container {
         try {
             $response = parent::respond($request);
             if (isset($session) && isset($sessionId) && $response->getHeaders()->get(WebResponse::HEADER_CONTENT_TYPE) == MimeTypes::getType('html')) {
-                $challenge = $this->authenticator->renew($sessionId);
+                try {
+                    $challenge = $this->authenticator->renew($sessionId);
 
-                $response->setBody($response->getBody() . '
-                <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
-                <script src="' . $request->getContext() .'/authentication.js"></script>
-                <script language="JavaScript">
-                    authentication.respond("' . $challenge .  '");
-                </script>');
+                    $response->setBody($response->getBody() . '
+                    <script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+                    <script src="' . $request->getContext() . '/authentication.js"></script>
+                    <script language="JavaScript">
+                        authentication.respond("' . $challenge . '");
+                    </script>');
+                } catch (\Exception $e) {}
             }
             return $response;
         } catch (AuthenticationException $ae) {
