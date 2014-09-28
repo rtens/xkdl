@@ -36,7 +36,7 @@ class Authenticator {
     }
 
     public function create($userId, $validFor = '5 minutes') {
-        $session = new AuthenticatedSession($userId, $validFor);
+        $session = new AuthenticatedSession(strtolower($userId), $validFor);
         $id = $this->random->generate();
         $this->store->create($session, $id);
         return $session;

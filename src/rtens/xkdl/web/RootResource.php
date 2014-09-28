@@ -2,10 +2,9 @@
 namespace rtens\xkdl\web;
 
 use rtens\xkdl\exception\AuthenticationException;
+use rtens\xkdl\lib\auth\AuthenticatedSession;
 use rtens\xkdl\lib\auth\Authenticator;
 use rtens\xkdl\lib\auth\InvalidSessionException;
-use rtens\xkdl\lib\auth\AuthenticatedSession;
-use rtens\xkdl\lib\AuthenticationService;
 use rtens\xkdl\lib\Configuration;
 use watoki\cfg\Loader;
 use watoki\curir\Container;
@@ -23,9 +22,6 @@ class RootResource extends Container {
 
     /** @var \Google_Client <- */
     public $client;
-
-    /** @var AuthenticationService <- */
-    public $authentication;
 
     /** @var Configuration <- */
     public $config;
