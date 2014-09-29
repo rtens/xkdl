@@ -106,6 +106,11 @@ class ScheduleResource extends Resource {
         return Redirecter::fromString('');
     }
 
+    /**
+     * @param WebRequest $request <-
+     * @param \DateTime $end
+     * @return Redirecter
+     */
     public function doStop(WebRequest $request, \DateTime $end) {
         $task = $this->writer->stopLogging($end);
         $url = $request->getContext();
